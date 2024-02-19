@@ -32,10 +32,30 @@ const renderUsers = async (req, res) => {
         console.error(error);
     }
 }
+const blockUser = async (req, res) => {
+    try {
+        const userId = req.query.id;
+        await User.findByIdAndUpdate(userId, { isBlocked: true });
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error(error);
+    }
+}
+const unblockUser = async (req, res) => {
+    try {
+        const userId = req.query.id;
+        await User.findByIdAndUpdate(userId, { isBlocked: false });
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 module.exports = {
     renderLogin,
     handleLogin,
     renderDashboard,
     renderUsers,
+    blockUser,
+    unblockUser
 }
