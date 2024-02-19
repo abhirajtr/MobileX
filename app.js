@@ -5,6 +5,7 @@ require('dotenv').config();
 require('./configs/databaseConnection');
 
 const userRoute = require('./routes/userRoute');
+const adminRoute = require('./routes/adminRoute');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(session({
 }))
 
 app.use('/', userRoute);
+app.use('/admin', adminRoute);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`http://localhost:${PORT}/`));
