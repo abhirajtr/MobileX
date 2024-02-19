@@ -19,8 +19,12 @@ app.use(session({
     saveUninitialized: true
 }))
 
-app.use('/', userRoute);
+app.use((req, res, next) => {
+    console.log(Date.now());
+    next();
+})
 app.use('/admin', adminRoute);
+app.use('/', userRoute);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`http://localhost:${PORT}/`));

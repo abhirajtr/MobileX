@@ -17,6 +17,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/admin-assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -32,8 +33,8 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item active">
-                    <a class="menu-link" href="index.html"> <i class="icon material-icons md-home"></i>
+                <li class="menu-item <%= locals.dashboard ? 'active': 'inactive '%>">
+                    <a class="menu-link" href="/admin/dashboard"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
@@ -48,7 +49,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                    <a class="menu-link inactive" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
                         <span class="text">Sellers</span>
                     </a>
                 </li>
@@ -72,7 +73,7 @@
                         <a href="page-transactions-2.html">Transaction 2</a>
                     </div>
                 </li> -->
-                <li class="menu-item">
+                <li class="menu-item <%= locals.users ? 'active': 'inactive'%>">
                     <a class="menu-link" href="/admin/users"> <i class="icon material-icons md-person"></i>
                         <span class="text">Users</span>
                         <!-- <span class="text">Account</span> -->

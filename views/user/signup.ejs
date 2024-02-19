@@ -125,7 +125,8 @@
                         url: '/signup',
                         type: 'POST',
                         data: formData,
-                        success: handleSuccess
+                        success: handleSuccess,
+                        error: handleError
                     })
                 }
             }
@@ -134,6 +135,10 @@
                 if (response.status === 'success') {
                     window.location.href = response.redirect;
                 }
+            }
+            function handleError(xhr) {
+                const errorElement = $(`#${email.attr('id')}-error`)
+                displayMessage(email, errorElement, xhr.responseJSON.error);
             }
 
             function isValidForm() {

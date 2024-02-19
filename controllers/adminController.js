@@ -20,13 +20,13 @@ const handleLogin = async (req, res) => {
     }
 }
 const renderDashboard = (req, res) => {
-    res.render('admin/dashboard');
+    res.render('admin/dashboard', { dashboard: true });
 }
 
 const renderUsers = async (req, res) => {
     try {
         const users = await User.find({ isAdmin: false });
-        console.log(users);
+        // console.log(users);
         res.render('admin/users', { users });
     } catch (error) {
         console.error(error);
@@ -50,6 +50,27 @@ const unblockUser = async (req, res) => {
         console.error(error);
     }
 }
+const renderEditUser = async (req, res) => {
+    try {
+        const userId = req.query.id;
+        // console.log(userId);
+        const user = await User.findById(userId, { password: 0, isAdmin: 0, isBlocked: 0 });
+        // console.log(user);
+        res.render('admin/edit-user', { users: true , user})
+    } catch (error) {
+        console.error(error);
+    }
+}
+const handleEdituser = async (req, res) => {
+    try {
+        // console.log(req.body);
+        const { userId, username, email } = req.body;
+        await User.findByIdAndUpdate(userId, { username, email });
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 module.exports = {
     renderLogin,
@@ -57,5 +78,7 @@ module.exports = {
     renderDashboard,
     renderUsers,
     blockUser,
-    unblockUser
+    unblockUser,
+    renderEditUser,
+    handleEdituser,
 }

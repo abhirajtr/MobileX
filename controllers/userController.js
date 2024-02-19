@@ -18,10 +18,10 @@ const handleLogin = async (req, res) => {
         if (!foundUser) {
             return res.status(404).json({ error: 'Account not found. Please verify your username or sign up for a new account.' });
         }
-        if(!await foundUser.comparePassword(password)) {
+        if (!await foundUser.comparePassword(password)) {
             return res.status(401).json({ error: 'Invalid credentials. Please check your password and try again.' });
         }
-        if( foundUser.isBlocked) {
+        if (foundUser.isBlocked) {
             return res.status(403).json({ error: 'Your account has been blocked by the administrator' });
         }
         req.session.user = foundUser.email;
@@ -35,11 +35,20 @@ const renderSignup = (req, res) => {
     res.render('user/signup');
 }
 const handleSignup = async (req, res) => {
-    req.session.tempUser = req.body;
-    req.session.tempUser.otp = generateOTP();
-    console.log('tempUser', req.session.tempUser);
-    await nodemailer(req.session.tempUser.email, req.session.tempUser.otp);
-    res.status(200).json({ status: 'success', redirect: '/verify-email' });
+    try {
+        req.session.tempUser = req.body;
+        const { email } = req.body;
+        const foundEmail = User.findOne({ email }, { email: 1 });
+        if (foundEmail) {
+            return res.status(409).json({ error: 'Email address already in use.' });
+        }
+        req.session.tempUser.otp = generateOTP();
+        // console.log('tempUser', req.session.tempUser);
+        await nodemailer(req.session.tempUser.email, req.session.tempUser.otp);
+        res.status(200).json({ status: 'success', redirect: '/verify-email' });
+    } catch (error) {
+        console.error(error);
+    }
 }
 const renderVerifyEmail = (req, res) => {
     req.session.tempUser.createdAt = new Date();
