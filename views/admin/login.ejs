@@ -106,7 +106,7 @@
                 if (isValidForm()) {
                     const formData = $('#loginForm').serialize();
                     $.ajax({
-                        url: '/login',
+                        url: '/admin/login',
                         method: 'POST',
                         data: formData,
                         success: handleSuccess,
