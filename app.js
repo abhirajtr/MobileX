@@ -19,10 +19,6 @@ app.use(session({
     saveUninitialized: true
 }))
 
-app.use((req, res, next) => {
-    console.log(Date.now());
-    next();
-})
 app.use('/admin', adminRoute);
 app.use('/', userRoute);
 

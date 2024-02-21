@@ -9949,3 +9949,22 @@ span.fi-rs-apps {
 .nav-item img.rounded-circle:hover {
   border-color: #088178
 }
+.img-lg {
+  -o-object-fit: cover;
+  object-fit: cover;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  -webkit-box-flex: 0;
+  -ms-flex-positive: 0;
+  flex-grow: 0
+}
+.img-avatar {
+  border-radius: 100%;
+  border: 3px solid #fff
+}
+.card-user .img-avatar {
+  position: absolute;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  top: 100%
+}

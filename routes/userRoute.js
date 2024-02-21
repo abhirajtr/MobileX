@@ -12,6 +12,7 @@ router.get('/verify-email', userFound, userController.renderVerifyEmail);
 router.post('/verify-email', userFound, userController.handleVerifyEmail);
 router.get('/resend-otp', userFound, userController.handleResendOtp);
 router.get('/logout', userController.handleLogout);
+router.get('/edit-profile', userController.renderEditProfile);
 router.use(isBlocked);
 router.get('/', userController.renderHome);
 

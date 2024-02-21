@@ -96,6 +96,15 @@ const handleLogout = (req, res) => {
     delete req.session.user;
     res.redirect('/');
 }
+const renderEditProfile = async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.session.user });
+        console.log(user);
+        res.render('user/edit-profile', { user: true , user });
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 module.exports = {
     renderHome,
@@ -106,5 +115,6 @@ module.exports = {
     renderVerifyEmail,
     handleVerifyEmail,
     handleResendOtp,
-    handleLogout
+    handleLogout,
+    renderEditProfile
 }

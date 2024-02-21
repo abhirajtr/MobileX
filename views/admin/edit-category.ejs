@@ -1,0 +1,86 @@
+<%- include('../partials/admin-header') %>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Edit Category</h2>
+                <p>Category ID: <%= category._id %></p>
+            </div>
+        </div>
+        <div class="card w-50">
+            <div class="card-body w-100">
+                <div class="row ">
+                    <p style="height:1rem" id="error-message" class="text-danger"></p>
+                    <div class="col-md-12">
+                        <form>
+                            <input type="text" class="d-none" name="id" value="<%= category._id %>">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="name" name="name" value="<%= category.name %>" />
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" name="description"
+                                    id="description"><%= category.description %></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary">Update category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section>
+
+    <%- include('../partials/admin-footer') %>
+
+        <script>
+            $('document').ready(() => {
+                const name = $('#name');
+                const description = $('#description');
+                $('form').submit(function (event) {
+                    event.preventDefault();
+                    if (isValidForm()) {
+                        const formData = $('form').serialize();
+                        $.ajax({
+                            url: '/admin/edit-category',
+                            type: 'POST',
+                            data: formData,
+                            success: function (response) {
+                                console.log(response.redirect);
+                                window.location.href = response.redirect;
+                            },
+                            error: function (xhr) {
+                                console.log(xhr.responseJSON);
+                                displayMessage(name, xhr.responseJSON.error)
+                            }
+                        })
+                    }
+                });
+
+                function isValidForm() {
+                    if (name.val().trim() === "") {
+                        displayMessage(name, 'Inavlid category name');
+                        name.focus();
+                        return false;
+                    }
+                    if (description.val().trim() === "") {
+                        displayMessage(description, 'Inavlid description');
+                        description.focus();
+                        return false;
+                    }
+                    return true;
+                }
+
+                function displayMessage(inputElement, message) {
+                    $('#error-message').text(message);
+                    inputElement.focus();
+                    inputElement.addClass('is-invalid');
+                    setTimeout(() => {
+                        $('#error-message').text('');
+                        inputElement.removeClass('is-invalid');
+                    }, 2000);
+                }
+            })
+        </script>

@@ -1,0 +1,122 @@
+<%- include('../partials/admin-header') %>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Categories </h2>
+                <p>Add, edit or delete a category</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <p style="height:1rem" id="error-message" class="text-danger"></p>
+                    <div class="col-md-3">
+                        <form method="post" action="/admin/create-category">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="name" name="name" />
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" name="description"
+                                    id="description"></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary">Create category</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-9 mt-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>List/Unlist</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <% category.forEach(c => { %>
+                                        <tr>
+                                            <td class="align-middle"><%= c._id %></td>
+                                            <td class="align-middle"><b><%= c.name %></b></td>
+                                            <td style="max-width: 12rem;"><%= c.description %></td>
+                                            <td class="align-middle">
+                                                <% if (c.isListed) { %>
+                                                    <a href="/admin/category-unlist?id=<%= c._id %>"class="btn btn-danger rounded btn-sm font-sm w-100">Unlist</a>
+                                                    <%  } else { %>
+                                                        <a href="/admin/category-list?id=<%= c._id %>"class="btn btn-success rounded btn-sm font-sm w-100">List</a>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-end align-middle">
+                                                <a href="/admin/edit-category?id=<%= c._id %>"class="btn btn-info rounded btn-sm font-sm"><i class="material-icons md-edit align-baseline"></i></span>Edit</a>
+                                            </td>
+                                        </tr>
+                                    <% }) %>    
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section>
+
+    <%- include('../partials/admin-footer') %>
+
+        <script>
+            $('document').ready(() => {
+                const name = $('#name');
+                const description = $('#description');
+                $('form').submit(function (event) {
+                    event.preventDefault();
+                    if (isValidForm()) {
+                        const formData = $('form').serialize();
+                        $.ajax({
+                            url: '/admin/create-category',
+                            type: 'POST',
+                            data: formData,
+                            success : function(response) {
+                                window.location.reload();
+                            },
+                            error : function(xhr) {
+                                console.log(xhr.responseJSON);
+                                displayMessage(name, xhr.responseJSON.error)
+                            }
+                        })
+                    }
+                });
+
+                function isValidForm() {
+                    if (name.val().trim() === "") {
+                        displayMessage(name, 'Inavlid category name');
+                        name.focus();
+                        return false;
+                    }
+                    if (description.val().trim() === "") {
+                        displayMessage(description, 'Inavlid description');
+                        description.focus();
+                        return false;
+                    }
+                    return true;
+                }
+
+                function displayMessage(inputElement, message) {
+                    $('#error-message').text(message);
+                    inputElement.addClass('is-invalid');
+                    setTimeout(() => {
+                        $('#error-message').text('');
+                        inputElement.removeClass('is-invalid');
+                    }, 2000);
+                }
+            })
+        </script>
