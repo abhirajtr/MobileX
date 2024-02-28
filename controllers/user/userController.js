@@ -118,26 +118,6 @@ const handleResendOtp = async (req, res) => {
     res.status(200).json({ message: 'OTP resend success' });
 }
 
-const renderEditProfile = async (req, res) => {
-    try {
-        const user = await User.findOne({ _id: req.session.user });
-        // console.log(user);
-        Address.findOne({})
-        res.render('user/edit-profile', { user: true, user });
-    } catch (error) {
-        console.error(error);
-    }
-}
-const handleEditDetails = async (req, res) => {
-    try {
-        console.log(req.body);
-        const {  name: username, email } = req.body;
-        await User.findOneAndUpdate({ email: req.session.user }, { $set: { username: username, email: email } });
-        res.status(200).json({ message: 'Details updated successfully'});
-    } catch (error) {
-        console.error(error);
-    }
-} 
 const handleLogout = (req, res) => {
     delete req.session.user;
     delete req.session.passport;
@@ -154,7 +134,5 @@ module.exports = {
     handleVerifyEmail,
     handleResendOtp,
     handleLogout,
-    renderEditProfile,
     renderProductDetails,
-    handleEditDetails
 }

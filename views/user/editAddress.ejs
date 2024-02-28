@@ -1,56 +1,69 @@
 <%- include('../partials/user-header') %>
-<div class="container mt-4">
-    <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Create User Address</h3>
-    <form id="addressForm" method="POST" action="/addNewAddress" class="border-0 p-3">
-        <div class="row mb-50">
-            <div class="form-group col-md-4">
-                <label for="addressType">Address Type:</label>
-                <input type="text" class="form-control border-3" id="addressType" name="addressType">
-                <small class="text-danger error-msg" id="addressType-error"></small>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="name">Name:</label>
-                <input type="text" class="form-control border-3" id="name" name="name">
-                <small class="text-danger error-msg" id="name-error"></small>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="city">City:</label>
-                <input type="text" class="form-control border-3" id="city" name="city">
-                <small class="text-danger error-msg" id="city-error"></small>
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/edit-profile" rel="nofollow">Profile</a>
+                <span></span> Edit Address
+                <!-- <span></span> Account -->
             </div>
         </div>
-        <div class="row mb-3">
-            <div class="form-group col-md-4">
-                <label for="landMark">Landmark:</label>
-                <input type="text" class="form-control border-3" id="landMark" name="landmark">
-                <small class="text-danger error-msg" id="landMark-error"></small>
+    </div>
+    <div class="container mt-4">
+        <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Edit User Address</h3>
+        <form id="addressForm" method="POST" action="/edit-Address" class="border-0 p-3">
+            <input type="text" name="addressId" id="" class="d-none" value="<%= matchedAddress._id %>">
+            <div class="row mb-50">
+                <div class="form-group col-md-4">
+                    <label for="addressType">Address Type:</label>
+                    <input type="text" class="form-control border-3" id="addressType" name="addressType" value="<%= matchedAddress.addressType %>">
+                    <small class="text-danger error-msg" id="addressType-error"></small>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control border-3" id="name" name="name"  value="<%= matchedAddress.name %>">
+                    <small class="text-danger error-msg" id="name-error"></small>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="city">City:</label>
+                    <input type="text" class="form-control border-3" id="city" name="city" value="<%= matchedAddress.city %>">
+                    <small class="text-danger error-msg" id="city-error"></small>
+                </div>
             </div>
-            <div class="form-group col-md-4">
-                <label for="state">State:</label>
-                <input type="text" class="form-control border-3" id="state" name="state">
-                <small class="text-danger error-msg" id="state-error"></small>
+            <div class="row mb-3">
+                <div class="form-group col-md-4">
+                    <label for="landMark">Landmark:</label>
+                    <input type="text" class="form-control border-3" id="landMark" name="landmark" value="<%= matchedAddress.landmark %>">
+                    <small class="text-danger error-msg" id="landMark-error"></small>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="state">State:</label>
+                    <input type="text" class="form-control border-3" id="state" name="state" value="<%= matchedAddress.state %>">
+                    <small class="text-danger error-msg" id="state-error"></small>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="pincode">Pincode:</label>
+                    <input type="number" class="form-control border-3" id="pincode" name="pincode" value="<%= matchedAddress.pincode %>">
+                    <small class="text-danger error-msg" id="pincode-error"></small>
+                </div>
             </div>
-            <div class="form-group col-md-4">
-                <label for="pincode">Pincode:</label>
-                <input type="number" class="form-control border-3" id="pincode" name="pincode">
-                <small class="text-danger error-msg" id="pincode-error"></small>
+            <div class="row mb-3">
+                <div class="form-group col-md-4">
+                    <label for="phone">Phone:</label>
+                    <input type="number" class="form-control border-3" id="phone" name="phone" value="<%= matchedAddress.phone %>">
+                    <small class="text-danger error-msg" id="phone-error"></small>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="altPhone">Alternate Phone:</label>
+                    <input type="number" class="form-control border-3" id="altPhone" name="altPhone" value="<%= matchedAddress.altPhone %>">
+                    <small class="text-danger error-msg" id="altPhone-error"></small>
+                </div>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="form-group col-md-4">
-                <label for="phone">Phone:</label>
-                <input type="number" class="form-control border-3" id="phone" name="phone">
-                <small class="text-danger error-msg" id="phone-error"></small>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="altPhone">Alternate Phone:</label>
-                <input type="number" class="form-control border-3" id="altPhone" name="altPhone">
-                <small class="text-danger error-msg" id="altPhone-error"></small>
-            </div>
-        </div>
-        <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
-    </form>
-</div>
+            <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</main>
+
 
 <!-- <script>
     document.addEventListener("DOMContentLoaded", function() {

@@ -19,6 +19,7 @@ router.get('/', isBlocked, userController.renderHome);
 router.get('/product-details', userController.renderProductDetails);
 
 
+// Route for initiating Google OAuth 2.0 authentication
 router.get('/auth/google',
 passport.authenticate('google', { scope: ['email', 'profile'] })
 );
@@ -33,11 +34,11 @@ router.get('/auth/failure', (req, res) => {
 router.use(isBlocked);
 router.use(isAuthenticated);
 
-router.get('/edit-profile', userController.renderEditProfile);
-router.post('/edit-details', userController.handleEditDetails);
-// Route for initiating Google OAuth 2.0 authentication
+router.get('/edit-profile', profileController.renderEditProfile);
+router.post('/edit-details', profileController.handleEditDetails);
 router.get('/addNewAddress', profileController.rednerAddNewAddress);
 router.post('/addNewAddress', profileController.handleAddNewAddress);
-router.get('/editAddress', profileController.handleAddNewAddress);
+router.get('/edit-Address', profileController.renderEditAddress);
+router.post('/edit-Address', profileController.handleEditAddress);
 
 module.exports = router;
