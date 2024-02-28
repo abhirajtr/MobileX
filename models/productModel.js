@@ -4,8 +4,18 @@ const productSchema = new mongoose.Schema({
     name: {
         type: String
     },
-    highlights: {
-        type: Array
+    brand: {
+        required: true,
+        type: String
+    },
+    ram: {
+        type: Number
+    },
+    storage: {
+        type: Number
+    },
+    color: {
+        type: String
     },
     description: {
         type: String
@@ -25,6 +35,9 @@ const productSchema = new mongoose.Schema({
     isBlocked: {
         type: Boolean,
         default: false
+    },
+    categoryId: {
+        type: String
     }
 }, {
     versionKey: false

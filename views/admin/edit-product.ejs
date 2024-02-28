@@ -1,0 +1,285 @@
+<%- include('../partials/admin-header') %>
+
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    </head>
+
+    <section class="content-main">
+        <div class="row">
+            <div class="col-6">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product</h2>
+                    <!-- <div>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                        <button class="btn btn-md rounded font-sm hover-up">Publich</button>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <form action="/admin/edit-product" method="post">
+                <div class="col-lg-12">
+                    <input type="text" name="id" value="<%= product._id %>" id="" class="d-none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>1. General info</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Product title</label>
+                                        <input type="text" placeholder="Type here" class="form-control" name="name"
+                                            id="name" value="<%= product.name %>">
+                                        <div id="name-error" class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-4 row">
+                                        <div class="col-lg-4">
+                                            <label class="form-label">Brand</label>
+                                            <select class="form-select" name="brand" id="brand">
+                                                <!-- <option value="Iphone">Iphone</option> -->
+                                                <option value=""></option>
+                                                <% brand.forEach(brand=> { %>
+                                                    <% if (product.brand==brand.name) { %>
+
+                                                        <option value="<%= brand.name %>" selected>
+                                                            <%= brand.name %>
+                                                                <% } else {%>
+                                                        <option value="<%= brand.name %>">
+                                                            <%= brand.name %>
+                                                        </option>
+                                                        <% } }) %>
+                                            </select>
+                                            <div id="brand-error" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4 row">
+                                        <div class="col-lg-4">
+                                            <label class="form-label">RAM</label>
+                                            <select class="form-select" name="ram" id="ram">
+                                                <option value=""></option>
+                                                <option value="1">1 GB</option>
+                                                <option value="2">2 GB</option>
+                                                <option value="3">3 GB</option>
+                                                <option value="4">4 GB</option>
+                                                <option value="6">6 GB</option>
+                                                <option value="8">8 GB</option>
+                                                <option value="12">12 GB</option>
+                                            </select>
+                                            <div id="ram-error" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4 row">
+                                        <div class="col-lg-4">
+                                            <label class="form-label">Storage</label>
+                                            <select class="form-select" name="storage" id="storage">
+                                                <option value=""></option>
+                                                <option value="16">16 GB</option>
+                                                <option value="32">32 GB</option>
+                                                <option value="64">64 GB</option>
+                                                <option value="128">128 GB</option>
+                                                <option value="256">256 GB</option>
+                                                <option value="512">512 GB</option>
+                                            </select>
+                                            <div id="storage-error" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4 row">
+                                        <div class="col-lg-4">
+                                            <label class="form-label">Color</label>
+                                            <input placeholder="" type="text" class="form-control" name="color"
+                                                value="<%= product.color %>" id="color">
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Description</label>
+                                        <textarea placeholder="Type here" class="form-control" rows="4"
+                                            name="description"
+                                            id="description"><%= product.description %></textarea>
+                                        <div id="description-error" class="invalid-feedback"></div>
+                                    </div>
+                                    <!-- <div class="mb-4">
+                                    <label class="form-label">Brand name</label>
+                                    <select class="form-select">
+                                        <option> Adidas </option>
+                                        <option> Nike </option>
+                                        <option> Puma </option>
+                                    </select>
+                                </div> -->
+                                </div>
+                            </div>
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>2. Pricing</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Regular price</label>
+                                        <input type="text" placeholder="&#8377;00.0" class="form-control"
+                                            value="<%= product.regularPrice %>" name="regularPrice" id="regularPrice">
+                                        <div id="regularPrice-error" class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Promotional price</label>
+                                        <input type="text" placeholder="&#8377;00.0" class="form-control"
+                                            value="<%= product.promotionalPrice %>" name="promotionalPrice"
+                                            id="promotionalPrice">
+                                        <div id="promotionalPrice-error" class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>3. Category</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <div id="category-error" class="invalid-feedback"></div>
+                                        <% categories.forEach(category=> { %>
+                                            <label class="mb-2 form-check form-check-inline" style="width: 45%;">
+                                                <%  if (product.category == category._id) { %>
+                                                    <input class="form-check-input" name="categoryId" type="radio"
+                                                            id="category" value="<%= category._id %>" checked>
+                                                        <span class="form-check-label">
+                                                            <%= category.name %>
+                                                        </span>
+                                                    <% } else { %>
+                                                        <input class="form-check-input" name="categoryId" type="radio"
+                                                            id="category" value="<%= category._id %>" checked>
+                                                        <span class="form-check-label">
+                                                            <%= category.name %>
+                                                        </span>
+                                                        <% } %>
+                                            </label>
+                                            <% }) %>
+                                                <div id="category-error" class="invalid-feedback"></div>
+                                    </div>
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>4. Quantity</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Qunatity</label>
+                                        <input type="text" placeholder="" class="form-control" name="quantity"
+                                            id="quantity" value="<%= product.quantity %>">
+                                        <div id="qunatity-error" class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>4. Media</h6>
+                                </div>
+                                <div class="col-md-9">
+
+                                    <div class="row">
+                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                            <img src="/product-images/<%= product.image[0] %>" alt="" id="imgView1">
+                                            <input class="form-control" type="file" name="images" id="input1"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                onchange="viewImage1(event), viewImage(event, 1)">
+                                        </div>
+                                        <div class="image-cropper d-flex align-items-center"
+                                            style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                            <img src="" id="croppedImg1" alt="" style="width: 10rem; height: auto;">
+                                            <button type="button" id="saveButton1"
+                                                class="btn-sm btn-primary">Save</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                            <img src="/product-images/<%= product.image[1] %>" alt="" id="imgView2">
+                                            <input class="form-control" type="file" name="images" id="input2"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                onchange="viewImage2(event),viewImage(event, 2)">
+                                        </div>
+                                        <div class="image-cropper d-flex align-items-center"
+                                            style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                            <img src="" id="croppedImg2" alt="" style="width: auto; height: 10rem;">
+                                            <button type="button" id="saveButton2"
+                                                class="btn-sm btn-primary">Save</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                            <img src="/product-images/<%= product.image[2] %>" alt="" id="imgView3"">
+                                            <input class=" form-control" type="file" name="images" id="input3"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                onchange="viewImage3(event),viewImage(event, 3)">
+                                        </div>
+                                        <div class="image-cropper d-flex align-items-center"
+                                            style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                            <img src="" id="croppedImg3" alt="" style="width: auto; height: 10rem">
+                                            <button type="button" id="saveButton3"
+                                                class="btn-sm btn-primary">Save</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                            <img src="/product-images/<%= product.image[3] %>" alt="" id="imgView4">
+                                            <input class="form-control" type="file" name="images" id="input4"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                onchange="viewImage4(event),viewImage(event, 4)">
+                                        </div>
+                                        <div class="image-cropper d-flex align-items-center"
+                                            style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                            <img src="" id="croppedImg4" alt="" style="width: auto; height: 10rem">
+                                            <button type="button" id="saveButton4"
+                                                class="btn-sm btn-primary">Save</button>
+                                        </div>
+                                    </div>
+                                    <div id="image-error" class="invalid-feedback"></div>
+                                </div>
+
+
+
+
+
+
+
+
+
+                            </div>
+                            <hr class="mb-4 mt-0">
+
+                            <div class="row">
+                                <div class="col text-center">
+                                    <button type="submit" class="btn btn-sm btn-primary">Publish</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        </div>
+    </section>
+
+    <%- include('../partials/admin-footer') %>
+    <script>
+        function handleImageChange() {
+            const imageInput = document.getElementById('image');
+            const form = document.getElementById('myForm');
+    
+            if (imageInput.files.length > 0) {
+                form.setAttribute('enctype', 'multipart/form-data');
+            } else {
+                form.removeAttribute('enctype');
+            }
+        }
+    </script>
+    
+        <script src="/js/editProduct.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>

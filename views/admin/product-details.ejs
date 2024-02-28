@@ -1,0 +1,440 @@
+<%- include("../partials/admin-header") %>
+    <style>
+        .slider {
+            position: relative;
+            max-width: 40rem;
+            height: 26.625rem;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 26.625rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 1s;
+        }
+
+        .slide>img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        button {
+            background: none;
+            border: none;
+        }
+
+        button .fas {
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .btn-slide {
+            position: absolute;
+            top: 50%;
+            z-index: 10;
+
+            height: 5.5rem;
+            width: 5.5rem;
+            cursor: pointer;
+        }
+
+        .prev {
+            left: 3rem;
+            transform: translate(-50%, -50%);
+        }
+
+        .next {
+            right: 3rem;
+            transform: translate(50%, -50%);
+        }
+
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .dot {
+            width: 25px;
+            height: 5px;
+            margin: 15px 5px;
+            border-radius: .5rem;
+            background: rgba(39, 39, 39, .5);
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: #272727;
+        }
+    </style>
+    <main class="main">
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product-detail accordion-detail">
+                            <div class="row mb-50">
+                                <div class="col-md-4 col-sm-12 col-xs-12">
+
+                                    <div class="slider">
+                                        <% for( let i=0; i < product.image.length; i++ ) { %>
+                                            <div class="slide">
+                                                <img src="/product-images/<%= product.image[i] %>" alt="Photo1"
+                                                    style="object-fit: contain;" />
+                                            </div>
+                                            <% } %>
+
+                                                <button class="btn-slide prev"><i
+                                                        class="fas fa-3x fa-chevron-circle-left"></i></button>
+                                                <button class="btn-slide next"><i
+                                                        class="fas fa-3x fa-chevron-circle-right"></i></button>
+
+                                    </div>
+
+
+                                    <div class="dots-container">
+                                        <!-- Replace the span with an image -->
+                                        <% for( let i=0; i < product.image.length; i++ ) { %>
+                                            <img class="dot active" style="height: 50px; border-radius: 0;"
+                                                data-slide="<%= i %>" src="/product-images/<%= product.image[i] %>">
+                                            <% } %>
+
+                                    </div>
+                                    <!-- End Gallery -->
+                                </div>
+                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                    <div class="detail-info">
+                                        <h2 class="title-detail">
+                                            <%= product.name %>(<%= product.color %>, <%= product.storage %> GB) (<%=
+                                                            product.ram %> GB RAM)
+                                        </h2>
+                                        <div class="product-detail-rating">
+                                            <div class="pro-details-brand">
+                                                <span> Brands: <a href="shop-grid-right.html">
+                                                        <%= product.brand %>
+                                                    </a></span>
+                                            </div>
+                                            <!-- <div class="product-rate-cover text-end">
+                                                <div class="product-rate d-inline-block">
+                                                    <div class="product-rating" style="width:90%">
+                                                    </div>
+                                                </div>
+                                                <span class="font-small ml-5 text-muted"> (25 reviews)</span>
+                                            </div> -->
+                                        </div>
+                                        <div class="clearfix product-price-cover">
+                                            <div class="product-price primary-color float-left">
+                                                <ins><span class="text-brand">$<%= product.promotionalPrice %>
+                                                    </span></ins>
+                                                <ins><span class="old-price font-md ml-15">$<%= product.regularPrice %>
+                                                    </span></ins>
+                                                <!-- <span class="save-price  font-md color3 ml-15">25% Off</span> -->
+                                                <% const discountPercentage=((product.regularPrice -
+                                                    product.promotionalPrice) / product.regularPrice) * 100; if
+                                                    (discountPercentage.toFixed(0)> 0) { %>
+                                                    <span class="save-price font-md color3 ml-15">
+                                                        <%= discountPercentage.toFixed(0) %>% Off
+                                                    </span>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="bt-1 border-color-1 mt-15 mb-15"></div>
+                                        <div class="short-desc mb-30">
+                                            <p>
+                                                <%= product.description %>
+                                            </p>
+                                        </div>
+                                        <div class="product_sort_info font-xs mb-30">
+                                            <ul>
+                                                <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera
+                                                    Brand Warranty</li>
+                                                <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return
+                                                    Policy</li>
+                                                <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!-- <div class="attr-detail attr-color mb-15">
+                                            <strong class="mr-10">Color</strong>
+                                            <ul class="list-filter color-filter">
+                                                <li><a href="#" data-color="Red"><span class="product-color-red"></span></a></li>
+                                                <li><a href="#" data-color="Yellow"><span class="product-color-yellow"></span></a></li>
+                                                <li class="active"><a href="#" data-color="White"><span class="product-color-white"></span></a></li>
+                                                <li><a href="#" data-color="Orange"><span class="product-color-orange"></span></a></li>
+                                                <li><a href="#" data-color="Cyan"><span class="product-color-cyan"></span></a></li>
+                                                <li><a href="#" data-color="Green"><span class="product-color-green"></span></a></li>
+                                                <li><a href="#" data-color="Purple"><span class="product-color-purple"></span></a></li>
+                                            </ul>
+                                        </div> -->
+                                        <!-- <div class="attr-detail attr-size">
+                                            <strong class="mr-10">Size</strong>
+                                            <ul class="list-filter size-filter font-small">
+                                                <li><a href="#">S</a></li>
+                                                <li class="active"><a href="#">M</a></li>
+                                                <li><a href="#">L</a></li>
+                                                <li><a href="#">XL</a></li>
+                                                <li><a href="#">XXL</a></li>
+                                            </ul>
+                                        </div> -->
+                                        <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                                        <ul class="product-meta font-xs color-grey mt-50">
+                                            <li>Availability:
+                                                <% if (product.quantity> 0) { %>
+                                                    <span class="in-stock text-success ml-5">
+                                                        <%= product.quantity %> Items In
+                                                            Stock
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="in-stock text-danger ml-5">No Items In
+                                                            Stock</span>
+                                                        <% } %>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- Detail Info -->
+                                </div>
+                            </div>
+
+                            <!-- <div class="row mt-60">
+                                <div class="col-12">
+                                    <h3 class="section-title style-1 mb-30">Related products</h3>
+                                </div>
+                                <div class="col-12">
+                                    <div class="row related-products">
+                                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                            <div class="product-cart-wrap small hover-up">
+                                                <div class="product-img-action-wrap">
+                                                    <div class="product-img product-img-zoom">
+                                                        <a href="shop-product-right.html" tabindex="0">
+                                                            <img class="default-img"
+                                                                src="/user-assets/imgs/shop/product-2-1.jpg" alt="">
+                                                            <img class="hover-img"
+                                                                src="/user-assets/imgs/shop/product-2-2.jpg" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="product-action-1">
+                                                        <a aria-label="Quick view" class="action-btn small hover-up"
+                                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
+"><i class="fi-rs-search"></i></a>
+                                                        <a aria-label="Add To Wishlist"
+                                                            class="action-btn small hover-up" href="shop-wishlist.html"
+                                                            tabindex="0"><i class="fi-rs-heart"></i></a>
+                                                        <a aria-label="Compare" class="action-btn small hover-up"
+                                                            href="shop-compare.html" tabindex="0"><i
+                                                                class="fi-rs-shuffle"></i></a>
+                                                    </div>
+                                                    <div
+                                                        class="product-badges product-badges-position product-badges-mrg">
+                                                        <span class="hot">Hot</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-content-wrap">
+                                                    <h2><a href="shop-product-right.html" tabindex="0">Ulstra Bass
+                                                            Headphone</a></h2>
+                                                    <div class="rating-result" title="90%">
+                                                        <span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$238.85 </span>
+                                                        <span class="old-price">$245.8</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                            <div class="product-cart-wrap small hover-up">
+                                                <div class="product-img-action-wrap">
+                                                    <div class="product-img product-img-zoom">
+                                                        <a href="shop-product-right.html" tabindex="0">
+                                                            <img class="default-img"
+                                                                src="/user-assets/imgs/shop/product-3-1.jpg" alt="">
+                                                            <img class="hover-img"
+                                                                src="/user-assets/imgs/shop/product-4-2.jpg" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="product-action-1">
+                                                        <a aria-label="Quick view" class="action-btn small hover-up"
+                                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
+"><i class="fi-rs-search"></i></a>
+                                                        <a aria-label="Add To Wishlist"
+                                                            class="action-btn small hover-up" href="shop-wishlist.html"
+                                                            tabindex="0"><i class="fi-rs-heart"></i></a>
+                                                        <a aria-label="Compare" class="action-btn small hover-up"
+                                                            href="shop-compare.html" tabindex="0"><i
+                                                                class="fi-rs-shuffle"></i></a>
+                                                    </div>
+                                                    <div
+                                                        class="product-badges product-badges-position product-badges-mrg">
+                                                        <span class="sale">-12%</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-content-wrap">
+                                                    <h2><a href="shop-product-right.html" tabindex="0">Smart Bluetooth
+                                                            Speaker</a></h2>
+                                                    <div class="rating-result" title="90%">
+                                                        <span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$138.85 </span>
+                                                        <span class="old-price">$145.8</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                            <div class="product-cart-wrap small hover-up">
+                                                <div class="product-img-action-wrap">
+                                                    <div class="product-img product-img-zoom">
+                                                        <a href="shop-product-right.html" tabindex="0">
+                                                            <img class="default-img"
+                                                                src="/user-assets/imgs/shop/product-4-1.jpg" alt="">
+                                                            <img class="hover-img"
+                                                                src="/user-assets/imgs/shop/product-4-2.jpg" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="product-action-1">
+                                                        <a aria-label="Quick view" class="action-btn small hover-up"
+                                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
+"><i class="fi-rs-search"></i></a>
+                                                        <a aria-label="Add To Wishlist"
+                                                            class="action-btn small hover-up" href="shop-wishlist.html"
+                                                            tabindex="0"><i class="fi-rs-heart"></i></a>
+                                                        <a aria-label="Compare" class="action-btn small hover-up"
+                                                            href="shop-compare.html" tabindex="0"><i
+                                                                class="fi-rs-shuffle"></i></a>
+                                                    </div>
+                                                    <div
+                                                        class="product-badges product-badges-position product-badges-mrg">
+                                                        <span class="new">New</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-content-wrap">
+                                                    <h2><a href="shop-product-right.html" tabindex="0">HomeSpeak 12UEA
+                                                            Goole</a></h2>
+                                                    <div class="rating-result" title="90%">
+                                                        <span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$738.85 </span>
+                                                        <span class="old-price">$1245.8</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                            <div class="product-cart-wrap small hover-up mb-0">
+                                                <div class="product-img-action-wrap">
+                                                    <div class="product-img product-img-zoom">
+                                                        <a href="shop-product-right.html" tabindex="0">
+                                                            <img class="default-img"
+                                                                src="/user-assets/imgs/shop/product-5-1.jpg" alt="">
+                                                            <img class="hover-img"
+                                                                src="/user-assets/imgs/shop/product-3-2.jpg" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="product-action-1">
+                                                        <a aria-label="Quick view" class="action-btn small hover-up"
+                                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
+"><i class="fi-rs-search"></i></a>
+                                                        <a aria-label="Add To Wishlist"
+                                                            class="action-btn small hover-up" href="shop-wishlist.html"
+                                                            tabindex="0"><i class="fi-rs-heart"></i></a>
+                                                        <a aria-label="Compare" class="action-btn small hover-up"
+                                                            href="shop-compare.html" tabindex="0"><i
+                                                                class="fi-rs-shuffle"></i></a>
+                                                    </div>
+                                                    <div
+                                                        class="product-badges product-badges-position product-badges-mrg">
+                                                        <span class="hot">Hot</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-content-wrap">
+                                                    <h2><a href="shop-product-right.html" tabindex="0">Dadua Camera 4K
+                                                            2022EF</a></h2>
+                                                    <div class="rating-result" title="90%">
+                                                        <span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$89.8 </span>
+                                                        <span class="old-price">$98.8</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+
+
+                            <!-- <div class="banner-img banner-big wow fadeIn f-none animated mt-50">
+                                <img class="border-radius-10" src="/user-assets/imgs/banner/banner-4.png" alt="">
+                                <div class="banner-text">
+                                    <h4 class="mb-15 mt-40">Repair Services</h4>
+                                    <h2 class="fw-600 mb-20">We're an Apple <br>Authorised Service Provider</h2>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include("../partials/admin-footer") %>
+        <script>
+            function Slider() {
+                const carouselSlides = document.querySelectorAll('.slide');
+                const btnPrev = document.querySelector('.prev');
+                const btnNext = document.querySelector('.next');
+                const dotsSlide = document.querySelector('.dots-container');
+                let currentSlide = 0;
+
+                const activeDot = function (slide) {
+                    document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+                    document.querySelector(`.dot[data-slide="${slide}"]`).classList.add('active');
+                };
+                activeDot(currentSlide);
+
+                const changeSlide = function (slides) {
+                    carouselSlides.forEach((slide, index) => (slide.style.transform = `translateX(${100 * (index - slides)}%)`));
+                };
+                changeSlide(currentSlide);
+
+                btnNext.addEventListener('click', function () {
+                    currentSlide++;
+                    if (carouselSlides.length - 1 < currentSlide) {
+                        currentSlide = 0;
+                    };
+                    changeSlide(currentSlide);
+                    activeDot(currentSlide);
+                });
+                btnPrev.addEventListener('click', function () {
+                    currentSlide--;
+                    if (0 >= currentSlide) {
+                        currentSlide = 0;
+                    };
+                    changeSlide(currentSlide);
+                    activeDot(currentSlide);
+                });
+
+                dotsSlide.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('dot')) {
+                        const slide = e.target.dataset.slide;
+                        changeSlide(slide);
+                        activeDot(slide);
+                    }
+                });
+            };
+            Slider();
+        </script>

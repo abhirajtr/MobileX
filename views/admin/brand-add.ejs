@@ -1,0 +1,68 @@
+<%- include('../partials/admin-header') %>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Add Brand </h2>
+                <!-- <p>Add, edit or delete a category</p> -->
+            </div>
+            <!-- <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div> -->
+        </div>
+        <div class="card col-md-6">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form>
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="name" />
+                            </div>
+                            <!-- <div class="mb-4">
+                                <label for="product_slug" class="form-label">Slug</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_slug" />
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Parent</label>
+                                <select class="form-select">
+                                    <option>Clothes</option>
+                                    <option>T-Shirts</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control"></textarea>
+                            </div> -->
+                            <div class="d-grid">
+                                <button class="btn btn-primary">Create Brand</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+    <%- include('../partials/admin-footer') %>
+
+    <script>
+        $('document').ready(() => {
+            const name = $('#name');
+            $('form').submit(function(event) {
+                event.preventDefault();
+                if (name.val().trim() !== '') {
+                    const data = {
+                        name: name.val().trim()
+                    }
+                    console.log(1);
+                    $.ajax({
+                        url: '/admin/brand-add',
+                        type: 'POST',
+                        data : data,
+                        success: function (response) {
+                            window.location.href = response.redirect;
+                        }
+                    })
+                }
+            })
+        })
+    </script>

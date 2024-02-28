@@ -1,20 +1,20 @@
 <%- include('../partials/user-header') %>
-<style>
-    .upload-text {
-        visibility: hidden;
-        height: 30px;
-    }
+    <style>
+        .upload-text {
+            visibility: hidden;
+            height: 30px;
+        }
 
-    .img-avatar:hover + .upload-text {
-        visibility: visible;
-    }
-</style>
+        .img-avatar:hover+.upload-text {
+            visibility: visible;
+        }
+    </style>
 
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow">Edit Profile</a>
+                    <a href="/edit-profile" rel="nofollow">Edit Profile</a>
                     <!-- <span></span> Pages -->
                     <!-- <span></span> Account -->
                 </div>
@@ -34,17 +34,17 @@
                                                 aria-selected="false"><i
                                                     class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
                                         </li>
-                                        <li class="nav-item">
+                                        <!-- <li class="nav-item">
                                             <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders"
                                                 role="tab" aria-controls="orders" aria-selected="false"><i
                                                     class="fi-rs-shopping-bag mr-10"></i>Orders</a>
-                                        </li>
-                                        <li class="nav-item">
+                                        </li> -->
+                                        <!-- <li class="nav-item">
                                             <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab"
                                                 href="#track-orders" role="tab" aria-controls="track-orders"
                                                 aria-selected="false"><i
                                                     class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
-                                        </li>
+                                        </li> -->
                                         <li class="nav-item">
                                             <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address"
                                                 role="tab" aria-controls="address" aria-selected="true"><i
@@ -55,10 +55,10 @@
                                                 href="#account-detail" role="tab" aria-controls="account-detail"
                                                 aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
                                         </li>
-                                        <li class="nav-item">
+                                        <!-- <li class="nav-item">
                                             <a class="nav-link" href="page-login-register.html"><i
                                                     class="fi-rs-sign-out mr-10"></i>Logout</a>
-                                        </li>
+                                        </li> -->
                                     </ul>
                                 </div>
                             </div>
@@ -68,7 +68,9 @@
                                         aria-labelledby="dashboard-tab">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h5 class="mb-0">Hello Rosie! </h5>
+                                                <h5 class="mb-0">
+                                                    <%= locals.user.username %>!
+                                                </h5>
                                             </div>
                                             <div class="card-body">
                                                 <p>From your account dashboard. you can easily check &amp; view your <a
@@ -78,7 +80,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                    <!-- <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                         <div class="card">
                                             <div class="card-header">
                                                 <h5 class="mb-0">Your Orders</h5>
@@ -122,8 +124,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="track-orders" role="tabpanel"
+                                    </div> -->
+                                    <!-- <div class="tab-pane fade" id="track-orders" role="tabpanel"
                                         aria-labelledby="track-orders-tab">
                                         <div class="card">
                                             <div class="card-header">
@@ -156,10 +158,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="tab-pane fade" id="address" role="tabpanel"
                                         aria-labelledby="address-tab">
-                                        <div class="row">
+                                        <a href="/addNewAddress" class="btn btn-sm">Add new address</a>
+                                        <div class="row mt-3">
+
+
                                             <div class="col-lg-6">
                                                 <div class="card mb-3 mb-lg-0">
                                                     <div class="card-header">
@@ -174,7 +179,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+
+
+                                            <!-- <div class="col-lg-6">
                                                 <div class="card">
                                                     <div class="card-header">
                                                         <h5 class="mb-0">Shipping Address</h5>
@@ -187,7 +194,9 @@
                                                         <a href="#" class="btn-small">Edit</a>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
+
+
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="account-detail" role="tabpanel"
@@ -199,14 +208,19 @@
                                             <div class="card-body">
                                                 <div class="col-lg-12">
                                                     <section class="content-body p-xl-4">
-                                                        <form>
+                                                        <form id="edit-details">
                                                             <div class="row">
                                                                 <div class="col-lg-8">
                                                                     <div class="row gx-3">
                                                                         <div class="col-8  mb-2">
+                                                                            <p class="mb-2 text-success"
+                                                                                style="height: 20px;" id="successMessage"></p>
                                                                             <label class="form-label">Username</label>
-                                                                            <input class="form-control" type="text"
-                                                                                placeholder="Type here" value="<%= locals.user.username %>">
+                                                                            <input class="form-control" type="text" id="name"
+                                                                                name="name" placeholder="Type here"
+                                                                                value="<%= locals.user.username %>">
+                                                                            <div class="invalid-feedback"
+                                                                                id="name-error"></div>
                                                                         </div> <!-- col .// -->
                                                                         <!-- <div class="col-6  mb-3">
                                                                             <label class="form-label">Last name</label>
@@ -215,8 +229,12 @@
                                                                         </div> -->
                                                                         <div class="col-lg-8">
                                                                             <label class="form-label">Email</label>
-                                                                            <input class="form-control" type="email"
-                                                                                placeholder="example@mail.com" value="<%= locals.user.email %>">
+                                                                            <input class="form-control" type="email" id="email"
+                                                                                name="email"
+                                                                                placeholder="example@mail.com"
+                                                                                value="<%= locals.user.email %>">
+                                                                            <div class="invalid-feedback"
+                                                                                id="email-error"></div>
                                                                         </div>
                                                                         <!-- <div class="col-lg-6  mb-3">
                                                                             <label class="form-label">Phone</label>
@@ -239,13 +257,18 @@
                                                                         <!-- <img class="img-lg mb-2 img-avatar"
                                                                             src="/admin-assets/imgs/people/avatar1.jpg"
                                                                             alt="User Photo"> -->
-                                                                            <div class="position-relative">
-                                                                                <input type="file" id="userPhotoInput" class="d-none" accept="image/*">
-                                                                                <label for="userPhotoInput" class="mb-2">
-                                                                                    <img class="img-lg img-avatar" src="/admin-assets/imgs/people/avatar1.jpg" alt="User Photo" style="cursor: pointer;">
-                                                                                    <span class="upload-text">Upload new profile image</span>
-                                                                                </label>
-                                                                            </div>
+                                                                        <div class="position-relative">
+                                                                            <input type="file" id="userPhotoInput"
+                                                                                class="d-none" accept="image/*">
+                                                                            <label for="userPhotoInput" class="mb-2">
+                                                                                <img class="img-lg img-avatar"
+                                                                                    src="/admin-assets/imgs/people/avatar2.jpg"
+                                                                                    alt="User Photo"
+                                                                                    style="cursor: pointer;">
+                                                                                <span class="upload-text">Upload new
+                                                                                    profile image</span>
+                                                                            </label>
+                                                                        </div>
 
 
                                                                         <figcaption>
@@ -305,3 +328,52 @@
 
 
     <%- include('../partials/user-footer') %>
+
+        <script>
+            $('document').ready(() => {
+                console.log(1);
+                const name = $('#name');
+                const email = $('#email');
+                $('#edit-details').submit(function (event) {
+                    event.preventDefault();
+                    console.log(2);
+                    const data = {
+                        name: $('#name').val().trim(),
+                        email : $('#email').val().trim()
+                    }
+                    console.log(data);
+                    if (isValidFomrm()) {
+                        $.ajax({
+                            url: '/edit-details',
+                            type: 'POST',
+                            data: data,
+                            success: function(response) {
+                                $('#successMessage').text(response.message);
+                                setTimeout(() => {
+                                    $('#successMessage').text('');
+                                    window.location.reload();
+                                }, 2000)
+                            }
+                    })
+                    }
+
+                })
+                function isValidFomrm() {
+                    if (name.val().trim() === '') {
+                        displayMessage('name', 'Plese enter your name');
+                        return false;
+                    }
+                    if (email.val().trim() === '') {
+                        displayMessage('email', 'Plese enter your email');
+                        return false;
+                    }
+                    return true;
+                }
+                function displayMessage(input, message) {
+                    $(`#${input}-error`).addClass('d-block').text(message);
+                    setTimeout(() => {
+                        $(`#${input}-error`).removeClass('d-block').text('');
+                    }, 3000)
+                }
+            })
+        </script>
