@@ -91,6 +91,40 @@
                                         </div>
                                     </div>
                                 </div>
+
+
+                                <% if (addresses && addresses.address && addresses.address.length > 0) { %>
+                                    <% addresses.address.forEach(a => { %>
+                                        <div class="col-lg-6 mb-2">
+                                            <div class="card mb-2 mb-lg-0">
+                                                <div class="card-header">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-1">
+                                                            <input type="radio" name="address" class="form-check-input" id="address" value="<%= a._id %>" checked="">
+                                                        </div>
+                                                        <div class="col">
+                                                            <h5 class="mb-0"><%= a.addressType %></h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <address>
+                                                        <%= a.name %><br>
+                                                        <%= a.landmark %>, <%= a.city %>, <%= a.state %> <%= a.pincode %><br>
+                                                        Phone: <%= a.phone %><br>
+                                                        Alt. Phone: <%= a.altPhone %>
+                                                    </address>
+                                                    
+                                                    <a href="/edit-address?id=<%= a._id %>" class="btn-small">Edit</a>
+                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p>No addresses found.</p>
+                                <% } %>
+
                                 <button onclick="placeOrder()" class="btn btn-fill-out btn-block mt-30">Place
                                     Order</button>
                             </div>
@@ -112,11 +146,17 @@
         // })
         function placeOrder() {
             const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+            const address = document.querySelector('input[name="address"]:checked').value;
             console.log(paymentMethod);
             $.ajax({
                 url: '/place-order',
                 method: 'POST',
-                data: { paymentMethod },
+                data: { paymentMethod, address },
+                success: function(response) {
+                    if(response.status == "success") {
+                        window.location.href = response.redirect;
+                    }
+                }
             })
         }
     </script>

@@ -1,6 +1,7 @@
 const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController');
 const cartController = require('../controllers/user/cartController');
+const orderController = require('../controllers/user/orderController');
 const { Router } = require('express');
 const router = Router();
 const userFound = require('../middlewares/userFound');
@@ -49,7 +50,8 @@ router.post("/changeQuantity", cartController.changeQuantity)
 router.get("/deleteItem", cartController.deleteProduct)
 router.post("/cartQuantityUpdate", cartController.handleUpdateQuantity);
 router.get("/checkout", cartController.renderCheckout);
-router.post("/place-order", cartController.handlePlaceOrder);
+router.post("/place-order", orderController.handlePlaceOrder);
+router.post("/cancel-order", orderController.handleCancelOrder);
 
 
 module.exports = router;

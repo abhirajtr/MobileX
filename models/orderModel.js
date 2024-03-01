@@ -4,34 +4,38 @@ const orderSchema = mongoose.Schema({
     orderId: {
         type: String
     },
-    customer: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    products: [{
-        product: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product'
-        },
-        name: {
-            type: String
-        },
-        image: {
-            type: String
-        },
-        price: {
-            type: Number
-        },
-        quantity: {
-            type: Number
-        },
-        status: {
-            type: String,
-            enum: ['pending', 'processing', 'shipped', 'delivered'],
-            default: 'pending'
-        }
-    }],
+    address: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
+        required: true
+    },
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
+    productName: {
+        type: String
+    },
+    productImage: {
+        type: String
+    },
+    price: {
+        type: Number
+    },
+    quantity: {
+        type: Number
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'processing', 'shipped', 'delivered'],
+        default: 'pending'
+    },
     totalPrice: {
         type: Number
     },
@@ -42,7 +46,8 @@ const orderSchema = mongoose.Schema({
     paymentMethod: {
         type: String
     }
-})
+});
+
 
 const orderModel = mongoose.model('order', orderSchema);
 

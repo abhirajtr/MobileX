@@ -2,6 +2,7 @@ const { default: mongoose } = require('mongoose');
 const Product = require('../../models/productModel');
 const User = require('../../models/userModel');
 const Order = require('../../models/orderModel');
+const Address = require('../../models/addressModel');
 const mongodb = require("mongodb")
 
 // const renderCart = async (req, res) => {
@@ -234,6 +235,7 @@ const handleUpdateQuantity = async (req, res) => {
 const renderCheckout = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
+        const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
         const cart = await User.aggregate([
             {
                 $match: {
@@ -268,76 +270,13 @@ const renderCheckout = async (req, res) => {
         ]);
         const totalPrice = cart.reduce((total, item) => total + item.subtotal, 0);
         console.log(cart);
-        res.render('user/checkout', { user: true, cart, totalPrice });
+        res.render('user/checkout', { user: true, cart, totalPrice, addresses });
     } catch (error) {
         console.error(error);
     }
 }
 
-const handlePlaceOrder = async (req, res) => {
-    try {
-        const { paymentMethod } = req.body;
-        console.log(req.body);
-        const userId = new mongoose.Types.ObjectId(req.session.user);
-        // console.log(req.body);
-        console.log(paymentMethod);
-        const userCart = await User.aggregate([{ $match: { _id: userId }, },
-        { $unwind: "$cart" },
-        {
-            $lookup: {
-                from: "products",
-                localField: "cart.productId",
-                foreignField: "_id",
-                as: "product"
-            }
-        },
-        { $unwind: "$product" },
-        {
-            $project: {
-                _id: 0,
-                userId: "$_id",
-                productId: "$product._id",
-                productName: "$product.name",
-                productImage: { $arrayElemAt: ["$product.image", 0] },
-                productPrice: "$product.promotionalPrice",
-                quantity: "$cart.quantity"
-            }
-        }
-        ]);
-        console.log(userCart);
-        // Calculate the total price based on user's cart data
-        const totalPrice = userCart.reduce((total, item) => total + item.productPrice * item.quantity, 0);
-        console.log(totalPrice);
-        // Construct the products array for the new order
-        const products = userCart.map(item => ({
-            name: item.productName,
-            product: item.productId,
-            image: item.productImage,
-            price: item.productPrice,
-            quantity: item.quantity,
-            status: 'pending' // Set the initial status of each product
-        }));
 
-        function generateOrderId() {
-            const timestamp = Date.now().toString(); // Get current timestamp
-            const randomString = Math.random().toString(36).substring(2, 8); // Generate random string
-            return timestamp + '-' + randomString; // Concatenate timestamp and random string
-        }
-
-        // Create a new Order object
-        const newOrder = new Order({
-            orderId: generateOrderId(),
-            customer: userId,
-            products: products,
-            totalPrice: totalPrice,
-            paymentMethod: paymentMethod
-        });
-        await newOrder.save();
-        res.status(200).json({ status: 'success', redirect: '/orders' });
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 module.exports = {
     renderCart,
@@ -346,5 +285,4 @@ module.exports = {
     deleteProduct,
     handleUpdateQuantity,
     renderCheckout,
-    handlePlaceOrder,
 }

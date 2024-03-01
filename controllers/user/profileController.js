@@ -1,14 +1,16 @@
+const mongoose = require('mongoose');
 const Address = require('../../models/addressModel');
 const User = require('../../models/userModel');
-const mongoose = require('mongoose');
-
+const Order = require('../../models/orderModel');
 const renderEditProfile = async (req, res) => {
     try {
-        const userId = req.session.user;
+        const userId = new mongoose.Types.ObjectId(req.session.user);
         const user = await User.findOne({ _id: userId });
-        const addresses = await Address.findOne({ userId }, {_id: 0, address: 1 } );
+        const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
         console.log(addresses);
-        res.render('user/edit-profile', { user, addresses });
+        const orders = await Order.find({ userId: userId }).sort({ createdAt: -1 });
+        console.log('orders', orders);
+        res.render('user/edit-profile', { user, addresses, orders });
     } catch (error) {
         console.error(error);
     }
@@ -16,9 +18,9 @@ const renderEditProfile = async (req, res) => {
 const handleEditDetails = async (req, res) => {
     try {
         console.log(req.body);
-        const {  name: username, email } = req.body;
+        const { name: username, email } = req.body;
         await User.findOneAndUpdate({ email: req.session.user }, { $set: { username: username, email: email } });
-        res.status(200).json({ message: 'Details updated successfully'});
+        res.status(200).json({ message: 'Details updated successfully' });
     } catch (error) {
         console.error(error);
     }
@@ -44,7 +46,7 @@ const handleAddNewAddress = async (req, res) => {
         } else {
             const newAddress = new Address({ userId: req.session.user, address: [{ addressType, name, city, landmark, state, pincode, phone, altPhone }] });
             await newAddress.save();
-            
+
         }
         res.redirect('/edit-profile');
     } catch (error) {
@@ -61,7 +63,7 @@ const renderEditAddress = async (req, res) => {
         const currentAddress = await Address.findOne({ userId, 'address._id': addressId });
         const matchedAddress = currentAddress.address.find(addr => addr._id.toString() === addressId);
         console.log(matchedAddress);
-        res.render('user/editAddress', { user: true , matchedAddress});
+        res.render('user/editAddress', { user: true, matchedAddress });
     } catch (error) {
         console.error(error);
     }

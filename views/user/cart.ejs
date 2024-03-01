@@ -1,4 +1,31 @@
 <%- include('../partials/user-header') %>
+<style>
+    .empty-cart {
+        text-align: center;
+        padding: 50px;
+    }
+    .empty-cart h2 {
+        font-size: 24px;
+        color: #333;
+    }
+    .empty-cart p {
+        font-size: 16px;
+        color: #666;
+    }
+    .empty-cart a {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-top: 20px;
+        color: #fff;
+        background-color: #007bff;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    .empty-cart a:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+    }
+</style>
 
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
@@ -188,22 +215,22 @@
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
-                    <div class="col-9">
-                        <div class="table-responsive">
-                            <table class="table shopping-summery text-center clean">
-                                <thead>
-                                    <tr class="main-heading">
-                                        <th scope="col">Image</th>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Price</th>
-                                        <th scope="col">Quantity</th>
-                                        <th scope="col">Subtotal</th>
-                                        <th scope="col">Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <% if (cart.length> 0) { %>
+                    
+                    <% if (cart.length> 0) { %>
+                        <div class="col-9">
+                            <div class="table-responsive">
+                                <table class="table shopping-summery text-center clean">
+                                    <thead>
+                                        <tr class="main-heading">
+                                            <th scope="col">Image</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Subtotal</th>
+                                            <th scope="col">Remove</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
                                         <% for( let i=0; i < cart.length; i++ ) { %>
                                             <tr>
@@ -240,53 +267,69 @@
                                             </tr>
                                             <% } %>
 
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <!-- <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount"><span
+                                                            class="font-lg fw-900 text-brand">&#8377;<%= totalAmount %></span></td>
+                                                </tr> -->
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free
+                                                        Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span
+                                                                class="font-xl fw-900 text-brand">&#8377;<span id="totalAmount"><%= totalAmount %></span></span></strong>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                        CheckOut</a>
+                                </div>
+                            </div>
+                                                <% } else { %>
+                                                    <!-- <div class="container" style="height: 50vh;">
+                                                        <div class="alert alert-info" role="alert">
+                                                            No products found in cart.
+                                                        </div>
+                                                        <a href="/" class="btn btn-primary">Go to Shopping</a>
+                                                    </div> -->
+                                                    <div class="container">
+                                                        <div class="row">
+                                                            <div class="col-md-12 empty-cart">
+                                                                <h2>Your cart is empty</h2>
+                                                                <p>You haven't added any items to your cart yet. Let's start shopping!</p>
+                                                                <a href="/" class="btn btn-primary">Go Shopping</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 <% } %>
-
                                                     <!-- <tr>
                                                         <td colspan="6" class="text-end">
                                                             <a href="#" class="text-muted"> <i
                                                                     class="fi-rs-cross-small"></i> Clear Cart</a>
                                                         </td>
                                                     </tr> -->
-                                </tbody>
-                            </table>
-                        </div>
                         <!-- <div class="cart-action text-end">
                             <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
                             <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                         </div>  -->
-                        </div>
-                        <div class="col-lg-3 col-md-12">
-                            <div class="border p-md-4 p-30 border-radius cart-totals">
-                                <div class="heading_s1 mb-3">
-                                    <h4>Cart Totals</h4>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <tbody>
-                                            <!-- <tr>
-                                                <td class="cart_total_label">Cart Subtotal</td>
-                                                <td class="cart_total_amount"><span
-                                                        class="font-lg fw-900 text-brand">&#8377;<%= totalAmount %></span></td>
-                                            </tr> -->
-                                            <tr>
-                                                <td class="cart_total_label">Shipping</td>
-                                                <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free
-                                                    Shipping</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="cart_total_label">Total</td>
-                                                <td class="cart_total_amount"><strong><span
-                                                            class="font-xl fw-900 text-brand">&#8377;<span id="totalAmount"><%= totalAmount %></span></span></strong>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
-                                    CheckOut</a>
-                            </div>
-                        </div>
                     </div>
 
                     
