@@ -7,12 +7,13 @@ const Address = require('../../models/addressModel');
 const renderHome = async (req, res) => {
     try {
         // console.log('1',req.session);
-        if(req.session.passport) {
-            req.session.user = req.session.passport.user.email;
+        if (req.session.passport) {
+            req.session.user = req.session.passport.user._id;
         }
         const products = await Product.find({ isBlocked: false });
         // console.log(products);
-        req.session.user ? res.render('user/home', { user: true, products }) : res.render('user/home', { products });
+        // req.session.user ? res.render('user/home', { user: req.session.user, products }) : res.render('user/home', { products });
+        res.render('user/home', { products, user: req.session.user ? req.session.user : false });
     } catch (error) {
         console.error(error);
     }
@@ -21,13 +22,13 @@ const renderProductDetails = async (req, res) => {
     try {
         const productDetails = await Product.findById(req.query.id);
         // console.log(productDetails);
-        res.render('user/product-details', {user: req.session.user ? true: false, product: productDetails });
+        res.render('user/product-details', { user: req.session.user ? true : false, product: productDetails });
     } catch (error) {
         console.error(error);
     }
 }
 const renderLogin = (req, res) => {
-    if(req.session.user) {
+    if (req.session.user) {
         console.log(req.session.user);
     }
     res.render('user/login');
@@ -37,7 +38,7 @@ const handleLogin = async (req, res) => {
     try {
         // console.log(req.body);
         const { email, password } = req.body;
-        const foundUser = await User.findOne({ email, isAdmin: false }, { password: 1, isBlocked: 1});
+        const foundUser = await User.findOne({ email, isAdmin: false }, { password: 1, isBlocked: 1 });
         console.log(foundUser);
         if (!foundUser) {
             return res.status(404).json({ error: 'Account not found. Please verify your username or sign up for a new account.' });
@@ -89,7 +90,7 @@ const handleVerifyEmail = async (req, res) => {
         // console.log(req.body);
         const createdAt = new Date(req.session.tempUser.createdAt);
         console.log('createdAt', createdAt);
-        console.log(req.session.tempUser.createdAt);
+        console.log(req.session.tempUser);
         const currentTime = Date.now();
         console.log('currentTime', currentTime);
         const differenceInSeconds = (currentTime - createdAt.getTime()) / 1000;
@@ -124,6 +125,10 @@ const handleLogout = (req, res) => {
     res.redirect('/');
 }
 
+const renderForgotPassword = (req, res) => {
+    res.render('user/forgot-password');
+}
+
 module.exports = {
     renderHome,
     renderLogin,
@@ -135,4 +140,5 @@ module.exports = {
     handleResendOtp,
     handleLogout,
     renderProductDetails,
+    renderForgotPassword
 }

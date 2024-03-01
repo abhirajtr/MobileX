@@ -32,7 +32,7 @@ function viewImage(event, index) {
                 aspectRatio: NaN, // Square aspect ratio
                 viewMode: 1,
                 guides: true,
-                background: false,
+                background: true,
                 autoCropArea: 1,
                 zoomable: true,
             });

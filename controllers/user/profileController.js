@@ -99,11 +99,29 @@ const handleEditAddress = async (req, res) => {
     }
 }
 
+const handleDeleteAddress = async (req, res) => {
+    try {
+        const userId = new mongoose.Types.ObjectId(req.session.user);
+        const addressId = req.query.id;
+        await Address.findOneAndUpdate({
+            userId
+        }, {
+            $pull: {
+                address: { _id: addressId }
+            }
+        });
+        res.redirect('/edit-profile');
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
     renderEditProfile,
     handleEditDetails,
     rednerAddNewAddress,
     handleAddNewAddress,
     renderEditAddress,
-    handleEditAddress
+    handleEditAddress,
+    handleDeleteAddress
 }

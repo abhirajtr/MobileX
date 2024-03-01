@@ -1,4 +1,6 @@
 const Product = require('../../models/productModel');
+const Category =  require('../../models/categoryModel');
+const Brand =  require('../../models/brandModel');
 
 const renderProducts = async (req, res) => {
     try {

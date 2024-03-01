@@ -1,5 +1,6 @@
 const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController');
+const cartController = require('../controllers/user/cartController');
 const { Router } = require('express');
 const router = Router();
 const userFound = require('../middlewares/userFound');
@@ -14,6 +15,7 @@ router.post('/signup', userFound, userController.handleSignup);
 router.get('/verify-email', userFound, userController.renderVerifyEmail);
 router.post('/verify-email', userFound, userController.handleVerifyEmail);
 router.get('/resend-otp', userFound, userController.handleResendOtp);
+router.get('/auth-forgot-password', userFound, userController.renderForgotPassword);
 router.get('/logout', userController.handleLogout);
 router.get('/', isBlocked, userController.renderHome);
 router.get('/product-details', userController.renderProductDetails);
@@ -32,6 +34,7 @@ router.get('/auth/failure', (req, res) => {
 })
 
 router.use(isBlocked);
+router.post('/addToCart', cartController.handleAddToCart);
 router.use(isAuthenticated);
 
 router.get('/edit-profile', profileController.renderEditProfile);
@@ -40,5 +43,13 @@ router.get('/addNewAddress', profileController.rednerAddNewAddress);
 router.post('/addNewAddress', profileController.handleAddNewAddress);
 router.get('/edit-Address', profileController.renderEditAddress);
 router.post('/edit-Address', profileController.handleEditAddress);
+router.get('/delete-Address', profileController.handleDeleteAddress);
+router.get('/cart', cartController.renderCart);
+router.post("/changeQuantity", cartController.changeQuantity)
+router.get("/deleteItem", cartController.deleteProduct)
+router.post("/cartQuantityUpdate", cartController.handleUpdateQuantity);
+router.get("/checkout", cartController.renderCheckout);
+router.post("/place-order", cartController.handlePlaceOrder);
+
 
 module.exports = router;

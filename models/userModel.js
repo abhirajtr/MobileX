@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String
     },
+    cart: [{
+        productId: mongoose.Types.ObjectId,
+        quantity: Number
+    }],
     isBlocked: {
         type: Boolean,
         default: false
@@ -25,16 +29,20 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function () {
-    try {
-        const hashedPassword = await bcrypt.hash(this.password, 10);
-        this.password = hashedPassword;
-    } catch (error) {
-        console.error(error);
+    if (this.isModified('password')) {
+        try {
+            const hashedPassword = await bcrypt.hash(this.password, 10);
+            this.password = hashedPassword;
+        } catch (error) {
+            console.error(error);
+        }
     }
 });
 
 userSchema.methods.comparePassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
+    const comparePassword = await bcrypt.compare(password, this.password);
+    console.log('comparePassword', comparePassword);
+    return comparePassword;
 }
 
 const userModel = mongoose.model('user', userSchema);
