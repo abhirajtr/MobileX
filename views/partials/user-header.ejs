@@ -19,6 +19,12 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="/user-assets/css/maind134.css?v=3.4">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Include SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 </head>
 
@@ -120,24 +126,30 @@
                                     <div class="col-nav">
                                         <ul class="nav">
                                             <li class="dropdown nav-item">
-                                                <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
-                                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                                                    <a class="dropdown-item" href="/edit-profile"><i class="material-icons md-perm_identity"></i>Profile</a>
+                                                <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                                                    id="dropdownAccount" aria-expanded="false"> <img
+                                                        class="img-xs rounded-circle"
+                                                        src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
+                                                <div class="dropdown-menu dropdown-menu-end"
+                                                    aria-labelledby="dropdownAccount">
+                                                    <a class="dropdown-item" href="/edit-profile"><i
+                                                            class="material-icons md-perm_identity"></i>Profile</a>
                                                     <!-- <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a> -->
                                                     <!-- <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a> -->
                                                     <!-- <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a> -->
                                                     <!-- <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a> -->
                                                     <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item text-danger" href="/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                                                    <a class="dropdown-item text-danger" href="/logout"><i
+                                                            class="material-icons md-exit_to_app"></i>Logout</a>
                                                 </div>
                                             </li>
                                         </ul>
                                     </div>
-                                <% } else { %>
-                                    <div class="col-nav">
-                                        <ul class="nav">
-                                            <li class="dropdown nav-item">
-                                                <!-- <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
+                                    <% } else { %>
+                                        <div class="col-nav">
+                                            <ul class="nav">
+                                                <li class="dropdown nav-item">
+                                                    <!-- <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
                                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                                                     <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
                                                     <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
@@ -147,12 +159,13 @@
                                                     <div class="dropdown-divider"></div>
                                                     <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
                                                 </div> -->
-                                                
-                                                <a class="btn-md btn-primary rounded fw-bold" href="/login" id="dropdownAccount" aria-expanded="false">Login</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                <% } %>
+
+                                                    <a class="btn-md btn-primary rounded fw-bold" href="/login"
+                                                        id="dropdownAccount" aria-expanded="false">Login</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <% } %>
 
                             </div>
 

@@ -13,7 +13,10 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     cart: [{
-        productId: mongoose.Types.ObjectId,
+        productId: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Product'
+        },
         quantity: Number
     }],
     isBlocked: {
@@ -45,6 +48,6 @@ userSchema.methods.comparePassword = async function (password) {
     return comparePassword;
 }
 
-const userModel = mongoose.model('user', userSchema);
+const User = mongoose.model('User', userSchema);
 
-module.exports = userModel;
+module.exports = User;

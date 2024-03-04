@@ -72,15 +72,15 @@
                                         <div class="custome-radio">
                                             <div class="custome-radio">
                                                 <input class="form-check-input" required="" type="radio"
-                                                    name="payment_option" id="cod" checked="" value="cod">
+                                                    name="payment_option" id="cod" checked="" value="cash_on_delivery">
                                                 <label class="form-check-label" for="cod" data-bs-toggle="collapse"
                                                     data-target="#cod" aria-controls="cod">Cash On Delivery</label>
                                             </div>
-                                            <input class="form-check-input" required="" type="radio"
+                                            <input class="form-check-input" required="" type="radio" value="debit_card"
                                                 name="payment_option" id="exampleRadios3">
                                             <label class="form-check-label" for="exampleRadios3"
                                                 data-bs-toggle="collapse" data-target="#bankTranfer"
-                                                aria-controls="bankTranfer">Direct Bank Transfer</label>
+                                                aria-controls="bankTranfer">Debit Card</label>
                                         </div>
                                         <div class="custome-radio">
                                             <input class="form-check-input" required="" type="radio"
@@ -100,9 +100,11 @@
                                                 <div class="card-header">
                                                     <div class="row align-items-center">
                                                         <div class="col-1">
+                                                            <!-- <span><%= a._id %></span> -->
                                                             <input type="radio" name="address" class="form-check-input" id="address" value="<%= a._id %>" checked="">
                                                         </div>
                                                         <div class="col">
+                                                            <h6><%= a._id %></h6>
                                                             <h5 class="mb-0"><%= a.addressType %></h5>
                                                         </div>
                                                     </div>

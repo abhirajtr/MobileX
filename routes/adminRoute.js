@@ -1,6 +1,7 @@
 const adminController = require('../controllers/admin/adminController');
 const userController = require('../controllers/admin/userController');
 const productController = require('../controllers/admin/productController');
+const orderController = require('../controllers/admin/orderController');
 const isAuthenticated = require('../middlewares/isAuthenticatedAdmin');
 const { Router } = require('express');
 const router = Router();
@@ -34,6 +35,9 @@ router.get('/brands', adminController.renderBrands);
 router.get('/brand-add', adminController.renderAddBrand);
 router.post('/brand-add', adminController.handleAddBrand);
 router.get('/logout', adminController.handleLogout);
+
+router.get('/orders', orderController.renderOrders);
+router.get('/order-details', orderController.renderOrderDetails);
 
 
 module.exports = router;

@@ -47,11 +47,11 @@ router.post('/edit-Address', profileController.handleEditAddress);
 router.get('/delete-Address', profileController.handleDeleteAddress);
 router.get('/cart', cartController.renderCart);
 router.post("/changeQuantity", cartController.changeQuantity)
-router.get("/deleteItem", cartController.deleteProduct)
 router.post("/cartQuantityUpdate", cartController.handleUpdateQuantity);
 router.get("/checkout", cartController.renderCheckout);
 router.post("/place-order", orderController.handlePlaceOrder);
 router.post("/cancel-order", orderController.handleCancelOrder);
+router.post("/remove-product", cartController.handleRemoveProduct);
 
 
 module.exports = router;

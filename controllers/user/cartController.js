@@ -60,7 +60,7 @@ const mongodb = require("mongodb")
 
 const handleAddToCart = async (req, res) => {
     try {
-        console.log(req.body);
+        // console.log(req.body);
         const productId = new mongoose.Types.ObjectId(req.body.productId);
         // console.log(productId);
         // const product = await Product.findById(productId, {} );
@@ -69,7 +69,7 @@ const handleAddToCart = async (req, res) => {
             { _id: req.session.user, "cart.productId": { $ne: productId } },
             { $addToSet: { cart: { productId, quantity: 1 } } }
         );
-        console.log(updatedCart.modifiedCount);
+        // console.log(updatedCart.modifiedCount);
         if (updatedCart.modifiedCount) {
             res.status(200).json({ status: 'success' });
         }
@@ -101,7 +101,7 @@ const changeQuantity = async (req, res) => {
             let newQuantity
             if (productExistinCart) {
                 // console.log('iam in the carrt----------------------mm');
-                console.log(count);
+                // console.log(count);
                 if (count == 1) {
                     // console.log("count + 1");
                     newQuantity = productExistinCart.quantity + 1
@@ -150,21 +150,21 @@ const changeQuantity = async (req, res) => {
 }
 
 
-const deleteProduct = async (req, res) => {
-    try {
-        const id = req.query.id
-        console.log(id, "id");
-        const userId = req.session.user
-        const user = await User.findById(userId)
-        const cartIndex = user.cart.findIndex(item => item.productId == id)
-        user.cart.splice(cartIndex, 1)
-        await user.save()
-        console.log("item deleted from cart");
-        res.redirect("/cart")
-    } catch (error) {
-        console.log('thsi is aeroor ', error);
-    }
-}
+// const deleteProduct = async (req, res) => {
+//     try {
+//         const id = req.query.id
+//         console.log(id, "id");
+//         const userId = req.session.user
+//         const user = await User.findById(userId)
+//         const cartIndex = user.cart.findIndex(item => item.productId == id)
+//         user.cart.splice(cartIndex, 1)
+//         await user.save()
+//         console.log("item deleted from cart");
+//         res.redirect("/cart")
+//     } catch (error) {
+//         console.log('thsi is aeroor ', error);
+//     }
+// }
 
 const renderCart = async (req, res) => {
     try {
@@ -204,8 +204,8 @@ const renderCart = async (req, res) => {
         ]);
         // Calculate the total amount
         const totalAmount = cart.reduce((total, item) => total + item.subtotal, 0);
-        console.log(totalAmount);
-        console.log(cart);
+        // console.log(totalAmount);
+        // console.log(cart);
         res.render('user/cart', { cart, totalAmount, user: req.session.user });
     } catch (error) {
         console.error(error);
@@ -214,7 +214,7 @@ const renderCart = async (req, res) => {
 
 const handleUpdateQuantity = async (req, res) => {
     try {
-        console.log(req.body);
+        // console.log(req.body);
         const userId = new mongoose.Types.ObjectId(req.session.user);
         const productId = new mongoose.Types.ObjectId(req.body.productId);
         const newQuantity = parseInt(req.body.newQuantity);
@@ -236,6 +236,7 @@ const renderCheckout = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
         const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
+        // console.log('add', addresses);
         const cart = await User.aggregate([
             {
                 $match: {
@@ -269,10 +270,22 @@ const renderCheckout = async (req, res) => {
             }
         ]);
         const totalPrice = cart.reduce((total, item) => total + item.subtotal, 0);
-        console.log(cart);
+        // console.log(cart);
         res.render('user/checkout', { user: true, cart, totalPrice, addresses });
     } catch (error) {
         console.error(error);
+    }
+}
+
+const handleRemoveProduct = async (req, res) => {
+    try {
+        const productId = new mongoose.Types.ObjectId(req.body.productId);
+        const userId = new mongoose.Types.ObjectId(req.session.user);
+        const result = await User.updateOne({ _id: userId }, { $pull: { cart: { productId } } });
+        // console.log(result);
+        res.status(200).json({ status: 'success' })
+    } catch (error) {
+        console.log(error);
     }
 }
 
@@ -282,7 +295,7 @@ module.exports = {
     renderCart,
     handleAddToCart,
     changeQuantity,
-    deleteProduct,
     handleUpdateQuantity,
     renderCheckout,
+    handleRemoveProduct,
 }

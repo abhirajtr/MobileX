@@ -8,9 +8,29 @@ const renderEditProfile = async (req, res) => {
         const user = await User.findOne({ _id: userId });
         const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
         console.log(addresses);
-        const orders = await Order.find({ userId: userId }).sort({ createdAt: -1 });
-        console.log('orders', orders);
-        res.render('user/edit-profile', { user, addresses, orders });
+        // const userOrders = await Order.find({ userId }, { address: 0, userId: 0, });
+        const userOrders = await Order.aggregate([
+            {
+                $match: {
+                    userId: userId
+                }
+            },
+            {
+                $unwind: "$products"
+            },
+            {
+                $project: {
+                    "address": 0
+                }
+            },
+            {
+                $sort: {
+                    createdAt: -1
+                }
+            }
+        ])
+        console.log('Orders', userOrders);
+        res.render('user/edit-profile', { user, addresses, orders: userOrders });
     } catch (error) {
         console.error(error);
     }
