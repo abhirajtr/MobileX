@@ -1,5 +1,4 @@
 <%- include('../partials/admin-header') %>
-
     <section class="content-main">
         <div class="content-header">
             <div>
@@ -48,14 +47,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% orders.forEach(order => { %>
+
+                            <% orders.forEach(order=> { %>
                                 <tr>
                                     <td><%= order._id %></td>
                                     <td><b><%= order.user.username %></b></td>
                                     <td><%= order.user.email %></td>
-                                    <td>$<%= order.totalPrice %></td>
-                                    <td><span class="badge rounded-pill alert-warning"><%= order.status %></span></td>
-                                    <td><%= order.createdAt.toLocaleDateString() %></td>
+                                    <td>$ <%= order.products.subtotal %> .00</td>
+                                    <td> <% if (order.products.status == 'cancelled') { %>
+                                        <span class="badge rounded-pill alert-danger">Canceled</span>
+                                    <%  } else if (order.products.status == 'pending') { %>
+                                        <span class="badge rounded-pill alert-warning">Pending</span>
+                                    <% } else if (order.products.status == 'delivered') { %>
+                                        <span class="badge rounded-pill alert-success">Delivered</span>
+                                    <% } %>
+                                        <!-- <span class="badge rounded-pill alert-warning"><%= order.products.status %></span></td> -->
+                                        <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
                                     <td class="text-end">
                                         <a href="#" class="btn btn-md rounded font-sm">Detail</a>
                                         <div class="dropdown">
@@ -63,14 +70,14 @@
                                                 class="btn btn-light rounded btn-sm font-sm">
                                                 <i class="material-icons md-more_horiz"></i> </a>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="/admin/order-details?id=<%= order._id %>">View detail</a>
+                                                <a class="dropdown-item" href="#">View detail</a>
                                                 <a class="dropdown-item" href="#">Edit info</a>
                                                 <a class="dropdown-item text-danger" href="#">Delete</a>
                                             </div>
                                         </div> <!-- dropdown //end -->
                                     </td>
                                 </tr>
-                            <% }) %>
+                                <% }) %>
                         </tbody>
                     </table>
                 </div> <!-- table-responsive //end -->
@@ -90,6 +97,5 @@
                 </ul>
             </nav>
         </div>
-    </section>
-
+    </section> <!-- content-main end// -->
     <%- include('../partials/admin-footer') %>
