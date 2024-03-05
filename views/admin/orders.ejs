@@ -64,8 +64,8 @@
                                         <!-- <span class="badge rounded-pill alert-warning"><%= order.products.status %></span></td> -->
                                         <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
                                     <td class="text-end">
-                                        <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                        <div class="dropdown">
+                                        <a href="/admin/order-details?orderId=<%= order._id %>&productId=<%= order.products.productId %>" class="btn btn-md rounded font-sm">Detail</a>
+                                        <!-- <div class="dropdown">
                                             <a href="#" data-bs-toggle="dropdown"
                                                 class="btn btn-light rounded btn-sm font-sm">
                                                 <i class="material-icons md-more_horiz"></i> </a>
@@ -74,7 +74,7 @@
                                                 <a class="dropdown-item" href="#">Edit info</a>
                                                 <a class="dropdown-item text-danger" href="#">Delete</a>
                                             </div>
-                                        </div> <!-- dropdown //end -->
+                                        </div> -->
                                     </td>
                                 </tr>
                                 <% }) %>

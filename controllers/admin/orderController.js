@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const Order = require('../../models/orderModel');
 const User = require('../../models/userModel');
+const ObjectId = require('mongoose').Types.ObjectId
 
 const renderOrders = async (req, res) => {
     try {
@@ -21,6 +22,7 @@ const renderOrders = async (req, res) => {
             },
             {
                 $project: {
+                    "products.productId": 1,
                     "products.subtotal": 1,
                     "products.status": 1,
                     "createdAt": 1,
@@ -50,41 +52,36 @@ const renderOrders = async (req, res) => {
 
 const renderOrderDetails = async (req, res) => {
     try {
-        const orderId = new mongoose.Types.ObjectId(req.query.id);
-        const orderDetails = await Order.aggregate([
-            {
-                $match: {
-                    _id: orderId
-                }
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'userId',
-                    foreignField: '_id',
-                    as: 'user'
-                },
-            },
-            {
-                $unwind: "$user"
-            },
-            {
-                $lookup: {
-                    from: 'address',
-                    localField: 'address',
-                    foreignField: '_id',
-                    as: 'orderAddress'
-                }
-            }
-        ]);
-        console.log(orderDetails);
-        res.render('admin/order-details');
+        console.log('details');
+        const orderId = req.query.orderId;
+        const productId = new ObjectId(req.query.productId);
+        console.log(orderId, productId);
+        const order = await Order.findOne(
+            { _id: orderId, "products.productId": productId }, { "products.$": 1, address: 1, paymentMethod: 1, createdAt: 1 });
+
+        console.log('o', order);
+        res.render('admin/order-details', { order });
     } catch (error) {
         console.log(error);
     }
 }
 
+const handleUpdateOrderStatus = async (req, res) => {
+    try {
+        console.log(req.body);
+        const orderId = new ObjectId(req.body.orderId);
+        const productId = new ObjectId(req.body.productId);
+        const { status } = req.body;
+        await Order.findOneAndUpdate({ _id: orderId, "products.productId": productId }, {
+            $set: { "products.$.status": status }
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
     renderOrders,
-    renderOrderDetails
+    renderOrderDetails,
+    handleUpdateOrderStatus
 }

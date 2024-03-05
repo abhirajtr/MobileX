@@ -38,6 +38,7 @@ router.get('/logout', adminController.handleLogout);
 
 router.get('/orders', orderController.renderOrders);
 router.get('/order-details', orderController.renderOrderDetails);
+router.post('/updateOrderStatus', orderController.handleUpdateOrderStatus);
 
 
 module.exports = router;

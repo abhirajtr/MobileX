@@ -1,9 +1,9 @@
-const shortid = require('shortid');
+var uniqueOccurrences = function(arr) {
+    const set = new Set(arr);
+    console.log(set);
+    console.log(arr.length,set.size);
+    
+    return set.size < arr.length? true : false;
+};
 
-
-const timestamp = new Date().getTime(); // Get current timestamp
-
-    // Generate a unique order ID with date
-    const orderId = `${timestamp}-${shortid.generate()}`;
-
-console.log(orderId);
+console.log(uniqueOccurrences([3,5,-2,-3,-6,-6]));
