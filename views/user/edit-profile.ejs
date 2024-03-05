@@ -13,8 +13,8 @@
         .order-item {
             border: 1px solid #dee2e6;
             border-radius: 0.25rem;
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 10px;
+            padding: 10px;
             background-color: #fff;
             display: flex;
             align-items: center;
@@ -22,7 +22,7 @@
         }
 
         .order-details {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .order-id {
@@ -146,24 +146,28 @@
                                     </div>
                                     <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
 
-                                        <div class="container mt-5">
+                                        <div class="container mt-3">
                                             <h2 class="mb-4">My Orders</h2>
 
-                                            <% if (orders.length > 0) { %>
+                                            <% if (orders.length> 0) { %>
                                                 <% orders.forEach(order=> { %>
                                                     <div class="order-item">
                                                         <div class="order-details">
                                                             <div>
                                                                 <span class="order-id">Order ID: <%= order._id %></span>
-                                                                <span class="status">Status: <strong>
-                                                                        <%= order.products.status %>
-                                                                    </strong></span>
+                                                                <% if (order.products.status !='cancelled' ) { %>
+                                                                    <span class="status">Status: <strong
+                                                                            id="status-<%= order.products.productId %>">
+                                                                            <%= order.products.status %>
+                                                                        </strong></span>
+
+                                                                    <% } %>
                                                             </div>
                                                             <img src="/product-images/<%= order.products.image %>"
                                                                 alt="Product Image" class="product-img">
                                                             <p class="product">Product: <%= order.products.name %> (<%=
-                                                                        order.products.color %>, <%= order.products.storage
-                                                                            %> GB
+                                                                        order.products.color %>, <%=
+                                                                            order.products.storage %> GB
                                                                             ) (<%= order.products.ram %> RAM)</p>
                                                             <p class="quantity">Quantity: <%= order.products.quantity %>
                                                             </p>
@@ -177,12 +181,20 @@
                                                             </p>
                                                         </div>
                                                         <!-- Cancel button -->
-                                                        <button class="cancel-btn">Cancel</button>
-                                                    </div>
+                                                        <% if (order.products.status != 'cancelled' ) { %>
+
+                                                            <button class="cancel-btn"
+                                                                onclick="cancelOrder(this,'<%= order._id %>','<%= order.products.productId %>')">Cancel</button>
+                                                                <% } else { %>
+                                                                    <span class="text-danger">Cancelled</span>
+                                                                    
+                                                                    <% } %>
+                                                                </div>
                                                     <% }); %>
-                                                <% }else {%>
-                                                    <p>No orders found. <a href="/shopping">Go to shopping</a>.</p>
-                                                    <% } %>
+                                                        <% }else {%>
+                                                            <p>No orders found. <a href="/shopping">Go to shopping</a>.
+                                                            </p>
+                                                            <% } %>
                                         </div>
 
 
@@ -462,6 +474,7 @@
             })
 
             function cancelOrder(button, orderId, productId) {
+                console.log(button, orderId, productId);
                 Swal.fire({
                     title: "Are you sure?",
                     text: "You won't be able to revert this!",
@@ -478,8 +491,15 @@
                             data: { orderId, productId },
                             success: function (response) {
                                 console.log(response);
-                                $(button).text('Cancelled').prop('disabled', true).removeClass('btn-danger').addClass('btn-secondary');
-                                $('#status-' + orderId).text('Cancelled').removeClass('text-success').addClass('text-danger');
+                                // Create a new element for the "Cancelled" message
+                                var cancelledMessage = $('<span/>')
+                                    .text('Cancelled')
+                                    .addClass('text-danger');
+
+                                // Replace the button with the "Cancelled" message
+                                $(button).replaceWith(cancelledMessage);
+                                $(`#status-${productId}`).parent().remove();
+
                             }
                         })
                         Swal.fire({

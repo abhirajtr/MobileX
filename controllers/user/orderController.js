@@ -20,7 +20,7 @@ const handlePlaceOrder = async (req, res) => {
             },
             {
                 $unwind: "$cart"
-            }, 
+            },
             {
                 $lookup: {
                     from: "products",
@@ -34,7 +34,7 @@ const handlePlaceOrder = async (req, res) => {
             },
             {
                 $project: {
-                    _id:0,
+                    _id: 0,
                     userId: "$_id",
                     productId: "$cartProducts._id",
                     name: "$cartProducts.name",
@@ -89,11 +89,14 @@ const handleCancelOrder = async (req, res) => {
         const orderId = new mongoose.Types.ObjectId(req.body.orderId);
         const productId = new mongoose.Types.ObjectId(req.body.productId);
         // await Order.findByIdAndUpdate(orderId, { $set: { status: "cancelled" } });
-        const updatedOrder = await Order.findOneAndUpdate(
-            { _id: orderId, "products.productId": productId }, // Match the order ID and the product ID
-            { $set: { "products.$.status": "cancelled" } }, // Update the status of the matched product
-            { new: true } // Return the updated document
-        );
+        // const updatedOrder = await Order.findOneAndUpdate(
+        //     { _id: orderId, "products.productId": productId }, // Match the order ID and the product ID
+        //     { $set: { "products.$.status": "cancelled" } }, // Update the status of the matched product
+        //     { new: true } // Return the updated document
+        // );
+        const updatedOrder = await Order.findOneAndUpdate({ _id: orderId, "products.productId": productId }, {
+            $set: { "products.$.status": "cancelled" }
+        });
         res.status(200).json({ status: 'success' });
     } catch (error) {
         console.error(error);
