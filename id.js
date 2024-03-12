@@ -1,9 +1,12 @@
-var uniqueOccurrences = function(arr) {
-    const set = new Set(arr);
-    console.log(set);
-    console.log(arr.length,set.size);
-    
-    return set.size < arr.length? true : false;
+var findWordsContaining = function (words, x) {
+    return words.map((curr, index, aar) => {
+        for (let i = 0; i < curr.length; i++) {
+            
+        }
+    })
 };
 
-console.log(uniqueOccurrences([3,5,-2,-3,-6,-6]));
+const words = ["abc", "bcd", "aaaa", "cbc"];
+const x = "a";
+
+console.log(findWordsContaining(words, x));

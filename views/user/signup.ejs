@@ -31,7 +31,8 @@
                     <form id="signupForm">
                         <div class="mb-3">
                             <label class="form-label">Username</label>
-                            <input class="form-control" placeholder="Username" type="text" name="username" id="username">
+                            <input class="form-control" placeholder="Username" type="text" name="username"
+                                id="username">
                             <div id="username-error" class="text-danger"
                                 style="visibility: hidden; font-size: small; height: 10px;"></div>
                         </div> <!-- form-group// -->
@@ -144,7 +145,18 @@
                 if (!isFieldValid(email, 'Email address is required')) return false;
                 if (!isEmailValid()) return false;
                 if (!isFieldValid(password, 'Password is required')) return false;
+                if (!isPasswordFieldValid(password, 'Password must have at least 6 characters')) return false;
                 if (!arePasswordsMatching()) return false;
+                return true;
+            }
+            function isPasswordFieldValid(field, errorMessage) {
+                const fieldValue = field.val().trim();
+                const errorElement = $(`#${field.attr('id')}-error`);
+
+                if (fieldValue.length < 6) {
+                    displayMessage(field, errorElement, errorMessage);
+                    return false;
+                }
                 return true;
             }
 

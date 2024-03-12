@@ -5,73 +5,18 @@ const Order = require('../../models/orderModel');
 const Address = require('../../models/addressModel');
 const mongodb = require("mongodb")
 
-// const renderCart = async (req, res) => {
-//     try {
-//         const userId = req.session.user;
-//         const user = await User.findById(userId, { cart: 1 });
-//         // console.log(user);
-//         const productIds = user.cart.map(item => item.productId);
-//         // console.log(productIds);
-//         const products = await Product.find({ _id: { $in: productIds } });
-//         console.log('products', products);
-//         const oid = new mongodb.ObjectId(userId);
-//         let data = await User.aggregate([
-//             { $match: { _id: oid } },
-//             { $unwind: '$cart' },
-//             {
-//                 $project: {
-//                     proId: { '$toObjectId': '$cart.productId' },
-//                     quantity: '$cart.quantity',
-//                 }
-//             },
-//             {
-//                 $lookup: {
-//                     from: 'products',
-//                     localField: 'proId',
-//                     foreignField: '_id',
-//                     as: 'productDetails',
-//                 }
-//             },
-//         ]);
-//         console.log('data', data);
-//         // console.log("Data  =>>", data[0].productDetails[0])
-//         let quantity = 0;
-
-//         for (const i of user.cart) {
-//             quantity += i.quantity
-//         }
-//         let grandTotal = 0;
-//         for (let i = 0; i < data.length; i++) {
-
-//             if (products[i]) {
-//                 grandTotal += data[i].productDetails[0].promotionalPrice * data[i].quantity;
-//             }
-//             req.session.grandTotal = grandTotal
-//         }
-//         res.render('user/cart', {
-//             user: req.session.user, quantity,
-//             data,
-//             grandTotal
-//         });
-//     } catch (error) {
-//         console.error(error);
-//     }
-// }
-
 const handleAddToCart = async (req, res) => {
     try {
-        // console.log(req.body);
         const productId = new mongoose.Types.ObjectId(req.body.productId);
-        // console.log(productId);
-        // const product = await Product.findById(productId, {} );
-        // console.log(product);
         const updatedCart = await User.updateOne(
             { _id: req.session.user, "cart.productId": { $ne: productId } },
             { $addToSet: { cart: { productId, quantity: 1 } } }
         );
         // console.log(updatedCart.modifiedCount);
         if (updatedCart.modifiedCount) {
+            req.session.count.cart ++;
             res.status(200).json({ status: 'success' });
+            console.log(req.session);
         }
     } catch (error) {
         console.error(error);
@@ -148,24 +93,6 @@ const changeQuantity = async (req, res) => {
         return res.status(500).json({ status: false, error: "Server error" });
     }
 }
-
-
-// const deleteProduct = async (req, res) => {
-//     try {
-//         const id = req.query.id
-//         console.log(id, "id");
-//         const userId = req.session.user
-//         const user = await User.findById(userId)
-//         const cartIndex = user.cart.findIndex(item => item.productId == id)
-//         user.cart.splice(cartIndex, 1)
-//         await user.save()
-//         console.log("item deleted from cart");
-//         res.redirect("/cart")
-//     } catch (error) {
-//         console.log('thsi is aeroor ', error);
-//     }
-// }
-
 const renderCart = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
@@ -206,7 +133,7 @@ const renderCart = async (req, res) => {
         const totalAmount = cart.reduce((total, item) => total + item.subtotal, 0);
         // console.log(totalAmount);
         // console.log(cart);
-        res.render('user/cart', { cart, totalAmount, user: req.session.user });
+        res.render('user/cart', { cart, totalAmount, user: req.session.user, count: req.session.count });
     } catch (error) {
         console.error(error);
     }
@@ -283,7 +210,9 @@ const handleRemoveProduct = async (req, res) => {
         const userId = new mongoose.Types.ObjectId(req.session.user);
         const result = await User.updateOne({ _id: userId }, { $pull: { cart: { productId } } });
         // console.log(result);
+        req.session.count.cart--;
         res.status(200).json({ status: 'success' })
+
     } catch (error) {
         console.log(error);
     }

@@ -1,0 +1,44 @@
+<%- include('../partials/user-header') %>
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .card-body {
+            
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 20px;
+            }
+        }
+    </style>
+    <div class="container mt-100 mb-100 my-5">
+        <div class="row justify-content-center my-5">
+            <div class="col-md-6 my-5">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h2 class="mb-4">Order Successful!</h2>
+                        <p>Your order has been successfully placed.</p>
+                        <!-- <p>You will receive an email confirmation shortly.</p> -->
+                        <a href="/" class="btn btn-primary mt-3">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../partials/user-footer') %>

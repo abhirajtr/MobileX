@@ -19,6 +19,16 @@ const userSchema = new mongoose.Schema({
         },
         quantity: Number
     }],
+    wishlist: [{
+        productId: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Product'
+        }
+    }],
+    wallet: {
+        type: Number,
+        default: 0
+    },
     isBlocked: {
         type: Boolean,
         default: false

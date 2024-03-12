@@ -72,9 +72,10 @@ const handleUpdateOrderStatus = async (req, res) => {
         const orderId = new ObjectId(req.body.orderId);
         const productId = new ObjectId(req.body.productId);
         const { status } = req.body;
-        await Order.findOneAndUpdate({ _id: orderId, "products.productId": productId }, {
+        const result = await Order.findOneAndUpdate({ _id: orderId, "products.productId": productId }, {
             $set: { "products.$.status": status }
         });
+        if (result) res.status(200).json({ status: 'success', redirect: '/admin/orders' });
     } catch (error) {
         console.error(error);
     }

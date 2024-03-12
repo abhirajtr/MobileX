@@ -14,7 +14,8 @@ $(document).ready(() => {
 
     function handleSuccess(response) {
         if(response.status === "success") {
-            $('#addToCart').text('Go to Cart').css('background-color', 'green');
+            $('#addToCart').attr('id', 'goToCart').text('Go to Cart').css('background-color', 'green');
+            window.location.href = '/cart'
         }
     }
 });

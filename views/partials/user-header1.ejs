@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:04:24 GMT -->
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara - eCommerce HTML Template</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/user-assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/user-assets/css/maind134.css?v=3.4">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Include SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        nav ul.d-flex li {
+            margin-right: 20px;
+            /* Adjust the value as needed */
+        }
+
+        nav ul.d-flex li a.active {
+            /* background-color: red; */
+            color: black;
+            font-weight: bolder;
+        }
+        header {
+            height: 3rem;
+            background-color: #e3f2fd;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <header class="header-area header-style-1 header-height-2">
+        <div class="header-bottom header-bottom-bg-color sticky-bar">
+            <div class="container">
+                <div class="header-wrap header-space-between position-relative">
+                    <div class="logo logo-width-1 d-block d-lg-none">
+                        <a href="index.html"><img src="/user-assets/imgs/theme/logo.svg" alt="logo"></a>
+                    </div>
+                    <div class="header-nav d-none d-lg-flex">
+                        <div class="logo logo-width-1">
+                            <!-- <a href="index.html"><img src="/user-assets/imgs/theme/logo.svg" alt="logo"></a> -->
+                            <a href="/">MobileX</a>
+                        </div>
+                    </div>
+                    <div class="main-menu-padding-1 main-menu-lh-2 d-none d-lg-block">
+                        <nav>
+                            <ul class="d-flex">
+                                <li><a class="fw-600 active" href="/">Home</a>
+                                </li>
+                                <li><a class="fw-600" href="/">Shop</a>
+                                </li>
+                                <!-- <li><a href="shop-grid-right.html">Shop</a>
+                                </li>
+                                <li>
+                                    <a href="page-contact.html">Contact</a>
+                                </li> -->
+                            </ul>
+                        </nav>
+                    </div>
+                    <!-- <div class="hotline d-none d-lg-block">
+                        <p><i class="fi-rs-headset"></i><span>Hotline</span> 1900 - 888 </p>
+                    </div> -->
+
+                    <div class="header-action-right">
+                        <div class="header-action-2">
+                            <div class="header-action-icon-2">
+                                <a href="/wishlist">
+                                    <img class="svgInject" alt="Evara"
+                                        src="/user-assets/imgs/theme/icons/icon-heart.svg">
+                                    <% if (locals.user && locals.count && locals.count.wishlist !==undefined) { %>
+                                        <!-- Check if locals.user exists and locals.count exists with cart property defined -->
+                                        <span class="pro-count blue">
+                                            <%= locals.count.wishlist %>
+                                        </span>
+                                        <% } else { %>
+
+                                            <% } %>
+                                </a>
+                            </div>
+                            <div class="header-action-icon-2">
+                                <a class="mini-cart-icon" href="/cart">
+                                    <img alt="Evara" src="/user-assets/imgs/theme/icons/icon-cart.svg">
+                                    <% if (locals.user && locals.count && locals.count.cart !==undefined) { %>
+                                        <!-- Check if locals.user exists and locals.count exists with cart property defined -->
+                                        <span class="pro-count blue">
+                                            <%= locals.count.cart %>
+                                        </span>
+                                        <% } else { %>
+                                            <!-- If locals.user doesn't exist or locals.count doesn't exist or cart property is undefined, don't render anything -->
+                                            <!-- Alternatively, you can render a default value or handle the situation differently -->
+                                            <% } %>
+
+                                </a>
+                                <!-- <div class="cart-dropdown-wrap cart-dropdown-hm2">
+                                    <ul>
+                                        <li>
+                                            <div class="shopping-cart-img">
+                                                <a href="shop-product-right.html"><img alt="Evara"
+                                                        src="/user-assets/imgs/shop/thumbnail-3.jpg"></a>
+                                            </div>
+                                            <div class="shopping-cart-title">
+                                                <h4><a href="shop-product-right.html">Daisy Casual Bag</a></h4>
+                                                <h4><span>1 × </span>$800.00</h4>
+                                            </div>
+                                            <div class="shopping-cart-delete">
+                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="shopping-cart-img">
+                                                <a href="shop-product-right.html"><img alt="Evara"
+                                                        src="/user-assets/imgs/shop/thumbnail-2.jpg"></a>
+                                            </div>
+                                            <div class="shopping-cart-title">
+                                                <h4><a href="shop-product-right.html">Corduroy Shirts</a></h4>
+                                                <h4><span>1 × </span>$3200.00</h4>
+                                            </div>
+                                            <div class="shopping-cart-delete">
+                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div class="shopping-cart-footer">
+                                        <div class="shopping-cart-total">
+                                            <h4>Total <span>$4000.00</span></h4>
+                                        </div>
+                                        <div class="shopping-cart-button">
+                                            <a href="shop-cart.html" class="outline">View cart</a>
+                                            <a href="shop-checkout.html">Checkout</a>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
+
+                            <div class="header-action-icon-2">
+
+                                <% if (locals.user) { %>
+                                    <div class="col-nav">
+                                        <ul class="nav">
+                                            <li class="dropdown nav-item">
+                                                <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                                                    id="dropdownAccount" aria-expanded="false"> <img
+                                                        class="img-xs rounded-circle"
+                                                        src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
+                                                <div class="dropdown-menu dropdown-menu-end"
+                                                    aria-labelledby="dropdownAccount">
+                                                    <a class="dropdown-item" href="/edit-profile"><i
+                                                            class="material-icons md-perm_identity"></i>Profile</a>
+                                                    <!-- <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a> -->
+                                                    <!-- <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a> -->
+                                                    <!-- <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a> -->
+                                                    <!-- <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a> -->
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="/logout"><i
+                                                            class="material-icons md-exit_to_app"></i>Logout</a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <% } else { %>
+                                        <div class="col-nav">
+                                            <ul class="nav">
+                                                <li class="dropdown nav-item">
+                                                    <!-- <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
+                                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                                                    <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                                                    <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                                                    <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                                                    <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
+                                                    <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                                                </div> -->
+
+                                                    <a class="btn-md btn-primary rounded fw-bold" href="/login"
+                                                        id="dropdownAccount" aria-expanded="false">Login</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <% } %>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>

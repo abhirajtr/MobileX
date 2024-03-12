@@ -30,7 +30,7 @@ const renderEditProfile = async (req, res) => {
             }
         ])
         console.log('Orders', userOrders);
-        res.render('user/edit-profile', { user, addresses, orders: userOrders });
+        res.render('user/edit-profile', { user, addresses, orders: userOrders, count: req.session.count });
     } catch (error) {
         console.error(error);
     }
@@ -83,7 +83,7 @@ const renderEditAddress = async (req, res) => {
         const currentAddress = await Address.findOne({ userId, 'address._id': addressId });
         const matchedAddress = currentAddress.address.find(addr => addr._id.toString() === addressId);
         console.log(matchedAddress);
-        res.render('user/editAddress', { user: true, matchedAddress });
+        res.render('user/editAddress', { user: true, matchedAddress, count: req.session.count });
     } catch (error) {
         console.error(error);
     }

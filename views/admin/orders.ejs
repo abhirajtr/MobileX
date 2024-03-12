@@ -3,11 +3,11 @@
         <div class="content-header">
             <div>
                 <h2 class="content-title card-title">Order List </h2>
-                <p>Lorem ipsum dolor sit amet.</p>
+                <p>View and manage all orders placed by users.</p>
             </div>
-            <div>
+            <!-- <div>
                 <input type="text" placeholder="Search order ID" class="form-control bg-white">
-            </div>
+            </div> -->
         </div>
         <div class="card mb-4">
             <header class="card-header">
@@ -55,7 +55,7 @@
                                     <td><%= order.user.email %></td>
                                     <td>$ <%= order.products.subtotal %> .00</td>
                                     <td> <% if (order.products.status == 'cancelled') { %>
-                                        <span class="badge rounded-pill alert-danger">Canceled</span>
+                                        <span class="badge rounded-pill alert-danger">Cancelled</span>
                                     <%  } else if (order.products.status == 'pending') { %>
                                         <span class="badge rounded-pill alert-warning">Pending</span>
                                     <% } else if (order.products.status == 'delivered') { %>

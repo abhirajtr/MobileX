@@ -33,6 +33,7 @@
                         <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200" id="status-select">
                             <!-- <option>Change status</option> -->
                             <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
                             <option value="awaiting_payment">Awaiting payment</option>
                             <option value="confirmed">Confirmed</option>
                             <option value="shipped">Shipped</option>
@@ -191,7 +192,10 @@
                     method: 'POST',
                     data: { orderId, productId, status },
                     success: function(response) {
-
+                        // window.location.href = '/admin/orders'
+                        if (response.status == 'success') {
+                            window.location.href = response.redirect;
+                        }
                     }
                 })
             }

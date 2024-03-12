@@ -18,7 +18,7 @@ const orderSchema = mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery'],
+        enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery', 'online_payment', 'razorpay'],
         default: 'cash_on_delivery'
     },
     createdAt: {

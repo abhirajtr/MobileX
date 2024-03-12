@@ -43,11 +43,14 @@
                         
                         <% products.forEach(product => { %>
                             <div class="col">
-                                <div class="card card-product-grid">
-                                    <a href="/admin/product-details?id=<%= product._id %>" class="img-wrap"> <img src="/product-images/<%= product.image[0] %>" alt="Product"> </a>
+                                <div class="card card-product-grid" style="max-height: 25rem; min-height: 25rem;">
+                                    <a href="/admin/product-details?id=<%= product._id %>" class="img-wrap">
+                                        <img style="object-fit: contain;" src="/product-images/<%= product.image[0] %>" alt="Product">
+                                    </a>
                                     <div class="info-wrap">
                                         <a href="#" class="title text-truncate"><%= product.name %></a>
-                                        <div class="price mb-2">$<%= product.promotionalPrice %></div> <!-- price.// -->
+                                        <div class="price mb-2">$<%= product.promotionalPrice %></div>
+                                        <div class="mb-2">Stocks left: <%= product.quantity %></div>
                                         <a href="/admin/edit-product?id=<%= product._id%>" class="btn btn-sm font-sm rounded btn-brand">
                                             <i class="material-icons md-edit"></i> Edit
                                         </a>

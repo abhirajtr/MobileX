@@ -1,4 +1,22 @@
 <%- include('../partials/user-header') %>
+
+    <style>
+        .small-address {
+            font-size: 0.8rem;
+            /* Adjust the font size as needed */
+        }
+
+        .btn-small {
+            font-size: 0.8rem;
+            /* Adjust the font size as needed */
+            padding: 0.20rem 0.3rem;
+            /* Adjust padding as needed */
+        }
+
+        .card-body {
+            padding: 0.4rem;
+        }
+    </style>
     <div class="page-header breadcrumb-wrap">
         <div class="container">
             <div class="breadcrumb">
@@ -76,40 +94,43 @@
                                                 <label class="form-check-label" for="cod" data-bs-toggle="collapse"
                                                     data-target="#cod" aria-controls="cod">Cash On Delivery</label>
                                             </div>
-                                            <input class="form-check-input" required="" type="radio" value="debit_card"
+                                            <input class="form-check-input" required="" type="radio" value="razorpay"
                                                 name="payment_option" id="exampleRadios3">
                                             <label class="form-check-label" for="exampleRadios3"
                                                 data-bs-toggle="collapse" data-target="#bankTranfer"
-                                                aria-controls="bankTranfer">Debit Card</label>
+                                                aria-controls="razorpay">Paywith razorpay</label>
                                         </div>
-                                        <div class="custome-radio">
+                                        <!-- <div class="custome-radio">
                                             <input class="form-check-input" required="" type="radio"
                                                 name="payment_option" id="exampleRadios5">
                                             <label class="form-check-label" for="exampleRadios5"
                                                 data-bs-toggle="collapse" data-target="#paypal"
                                                 aria-controls="paypal">Paypal</label>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
 
 
-                                <% if (addresses && addresses.address && addresses.address.length > 0) { %>
-                                    <% addresses.address.forEach(a => { %>
+                                <% if (addresses && addresses.address && addresses.address.length> 0) { %>
+                                    <% addresses.address.forEach(a=> { %>
                                         <div class="col-lg-6 mb-2">
                                             <div class="card mb-2 mb-lg-0">
                                                 <div class="card-header">
                                                     <div class="row align-items-center">
                                                         <div class="col-1">
                                                             <!-- <span><%= a._id %></span> -->
-                                                            <input type="radio" name="address" class="form-check-input" id="address" value="<%= a._id %>" checked="">
+                                                            <input type="radio" name="address" class="form-check-input"
+                                                                id="address" value="<%= a._id %>" checked="">
                                                         </div>
                                                         <div class="col">
                                                             <!-- <h6><%= a._id %></h6> -->
-                                                            <h5 class="mb-0"><%= a.addressType %></h5>
+                                                            <h5 class="mb-0">
+                                                                <%= a.addressType %>
+                                                            </h5>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="card-body">
+                                                <!-- <div class="card-body">
                                                     <address>
                                                         <%= a.name %><br>
                                                         <%= a.landmark %>, <%= a.city %>, <%= a.state %> <%= a.pincode %><br>
@@ -119,16 +140,30 @@
                                                     
                                                     <a href="/edit-address?id=<%= a._id %>" class="btn-small">Edit</a>
                                                 
+                                                </div> -->
+                                                <div class="card-body">
+                                                    <address class="small-address">
+                                                        <%= a.name %><br>
+                                                            <%= a.landmark %>, <%= a.city %>, <%= a.state %>
+                                                                        <%= a.pincode %><br>
+                                                                            Phone: <%= a.phone %><br>
+                                                                                <!-- Alt. Phone: <%= a.altPhone %> -->
+                                                    </address>
+
+                                                    <a href="/edit-address?id=<%= a._id %>" class="btn-small">Edit</a>
                                                 </div>
+
+
                                             </div>
                                         </div>
-                                    <% }); %>
-                                <% } else { %>
-                                    <p>No addresses found.</p>
-                                <% } %>
+                                        <% }); %>
+                                            <% } else { %>
+                                                <p>No addresses found.</p>
+                                                <% } %>
 
-                                <button onclick="placeOrder()" class="btn btn-fill-out btn-block mt-30">Place
-                                    Order</button>
+                                                    <button onclick="placeOrder()"
+                                                        class="btn btn-fill-out btn-block mt-30">Place
+                                                        Order</button>
                             </div>
                         </div>
 
@@ -140,7 +175,7 @@
             </div>
         </div>
     </section>
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         // $(document).ready(() => {
         //     console.log('ready');
@@ -154,13 +189,61 @@
                 url: '/place-order',
                 method: 'POST',
                 data: { paymentMethod, address },
-                success: function(response) {
-                    if(response.status == "success") {
+                success: function (response) {
+                    console.log(response);
+                    if (response.paymentMethod == 'razorpay') {
+                        var options = {
+                            "key": "rzp_test_2hyTCJ2qBkwleR", // Enter the Key ID generated from the Dashboard
+                            // "amount": "5000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "currency": "INR",
+                            "name": "MobileX",
+                            "description": "Test Transaction",
+                            "image": "https://example.com/your_logo",
+                            "order_id": response.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                            // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                            "prefill": {
+                                "name": "Gaurav Kumar",
+                                "email": "gaurav.kumar@example.com",
+                                "contact": "9000090000"
+                            },
+                            "notes": {
+                                "address": "Razorpay Corporate Office"
+                            },
+                            "handler": function (response) {
+                                alert('Payment successful: ' + response.razorpay_payment_id);
+                                var settings = {
+                                    "url": "/verify-payment",
+                                    "method": "POST",
+                                    "timeout": 0,
+                                    "headers": {
+                                        "Content-Type": "application/json"
+                                    },
+                                    "data": JSON.stringify({ response }),
+                                    success: (response) => {
+                                        console.log(response);
+                                        if (response.redirect) {
+                                            window.location.href = response.redirect;
+                                        }
+                                    }
+                                }
+                                $.ajax(settings);
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }
+                        };
+                        console.log(response);
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    }
+                    else{
                         window.location.href = response.redirect;
                     }
                 }
             })
         }
+
+
     </script>
 
     <%- include('../partials/user-footer') %>

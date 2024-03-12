@@ -127,6 +127,13 @@ input:focus::-moz-placeholder {
   transition: .4s;
 }
 
+nav a {
+  color: #356363;
+}
+nav a:hover {
+  color: #000;
+}
+
 a {
   color: #088178;
 }
