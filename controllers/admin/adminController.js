@@ -23,7 +23,7 @@ const handleLogin = async (req, res) => {
     }
 }
 const renderDashboard = (req, res) => {
-    res.render('admin/dashboard', { dashboard: true });
+    res.render('admin/dashboard', { dashboardActive: true });
 }
 
 
@@ -88,27 +88,7 @@ const handleEditCategory = async (req, res) => {
         console.error(error);
     }
 }
-const renderBrands = async (req, res) => {
-    try {
-        const brands = await Brand.find();
-        res.render('admin/brands', { brands });
-    } catch (error) {
-        console.error(error);
-    }
-}
-const renderAddBrand =  (req, res) => {
-    res.render('admin/brand-add');
-}
-const handleAddBrand = async (req, res) => {
-    try {
-        console.log('body',req.body);
-        const newBrand = new Brand({ name : req.body.name });
-        await newBrand.save();
-        res.status(200).json({ redirect: '/admin/brands' });
-    } catch (error) {
-        console.error(error);
-    }
-}
+
 const handleLogout = (req, res) => {
     delete req.session.admin;
     res.redirect('/admin/login');
@@ -124,8 +104,5 @@ module.exports = {
     handleUnlistCategory,
     renderEditCategory,
     handleEditCategory,
-    renderBrands,
-    renderAddBrand,
-    handleAddBrand,
     handleLogout,
 }

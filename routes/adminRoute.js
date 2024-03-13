@@ -2,6 +2,7 @@ const adminController = require('../controllers/admin/adminController');
 const userController = require('../controllers/admin/userController');
 const productController = require('../controllers/admin/productController');
 const orderController = require('../controllers/admin/orderController');
+const brandController = require('../controllers/admin/brandController');
 const isAuthenticated = require('../middlewares/isAuthenticatedAdmin');
 const { Router } = require('express');
 const router = Router();
@@ -16,6 +17,8 @@ router.get('/block-user', userController.blockUser);
 router.get('/unblock-user', userController.unblockUser);
 router.get('/edit-user', userController.renderEditUser);
 router.post('/edit-user', userController.handleEdituser);
+
+// Products route
 router.get('/products', productController.renderProducts);
 router.get('/add-product', productController.renderAddProduct);
 router.post('/add-product', upload.array('images', 3), productController.handleAddProduct);
@@ -31,14 +34,16 @@ router.get('/category-list', adminController.handleListCategory);
 router.get('/category-unlist', adminController.handleUnlistCategory);
 router.get('/edit-category', adminController.renderEditCategory);
 router.post('/edit-category', adminController.handleEditCategory);
-router.get('/brands', adminController.renderBrands);
-router.get('/brand-add', adminController.renderAddBrand);
-router.post('/brand-add', adminController.handleAddBrand);
-router.get('/logout', adminController.handleLogout);
+
+// Brand
+router.get('/brands', brandController.renderBrands);
+router.get('/brand-add', brandController.renderAddBrand);
+router.post('/brand-add', brandController.handleAddBrand);
 
 router.get('/orders', orderController.renderOrders);
 router.get('/order-details', orderController.renderOrderDetails);
 router.post('/updateOrderStatus', orderController.handleUpdateOrderStatus);
 
+router.get('/logout', adminController.handleLogout);
 
 module.exports = router;

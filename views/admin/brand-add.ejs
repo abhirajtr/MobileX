@@ -17,6 +17,7 @@
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Name</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="name" />
+                                <div class="invalid-feedback" id="brand-error"></div>
                             </div>
                             <!-- <div class="mb-4">
                                 <label for="product_slug" class="form-label">Slug</label>
@@ -44,25 +45,35 @@
     </section> <!-- content-main end// -->
     <%- include('../partials/admin-footer') %>
 
-    <script>
-        $('document').ready(() => {
-            const name = $('#name');
-            $('form').submit(function(event) {
-                event.preventDefault();
-                if (name.val().trim() !== '') {
-                    const data = {
-                        name: name.val().trim()
-                    }
-                    console.log(1);
-                    $.ajax({
-                        url: '/admin/brand-add',
-                        type: 'POST',
-                        data : data,
-                        success: function (response) {
-                            window.location.href = response.redirect;
+        <script>
+            $('document').ready(() => {
+                const name = $('#name');
+                const errorElement = $('#brand-error');
+                $('form').submit(function (event) {
+                    event.preventDefault();
+                    if (name.val().trim() !== '') {
+                        const data = {
+                            name: name.val().trim()
                         }
-                    })
-                }
+                        console.log(1);
+                        $.ajax({
+                            url: '/admin/brand-add',
+                            type: 'POST',
+                            data: data,
+                            success: function (response) {
+                                window.location.href = response.redirect;
+                            },
+                            error: function (xhr) {
+                                console.log(xhr);
+                                name.focus();
+                                name.addClass('is-invalid');
+                                errorElement.innerHTML = xhr.responseJSON.error;
+                                errorElement.html(xhr.responseJSON.error);
+                                errorElement.addClass('d-block');
+                                console.log(xhr.responseJSON.error);
+                            }
+                        })
+                    }
+                })
             })
-        })
-    </script>
+        </script>

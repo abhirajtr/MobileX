@@ -10,9 +10,9 @@ function viewImage3(event) {
     document.getElementById('imgView3').src = URL.createObjectURL(event.target.files[0])
 }
 
-function viewImage4(event) {
-    document.getElementById('imgView4').src = URL.createObjectURL(event.target.files[0])
-}
+// function viewImage4(event) {
+//     document.getElementById('imgView4').src = URL.createObjectURL(event.target.files[0])
+// }
 
 
 function viewImage(event, index) {
@@ -32,7 +32,7 @@ function viewImage(event, index) {
                 aspectRatio: NaN, // Square aspect ratio
                 viewMode: 1,
                 guides: true,
-                background: false,
+                background: true,
                 autoCropArea: 1,
                 zoomable: true,
             });
@@ -100,6 +100,12 @@ $('document').ready(() => {
             name.focus();
             return false;
         }
+        if (category.val().trim() === "") {
+            console.log('cate', category.val());
+            displayMessage('category', 'Please select a category');
+            category.focus();
+            return false;
+        }
         if (brand.val().trim() !== "Apple" && ram.val().trim() === "") {
             console.log(brand.val().trim());
             displayMessage('ram', "Please select a valid ram size");
@@ -131,11 +137,6 @@ $('document').ready(() => {
             promotionalPrice.focus();
             return false;
         }
-        if (!$('input[name="categoryId"]:checked').val()) {
-            displayMessage('category', `Please select a category`);
-            category.focus();
-            return false;
-        }
         if (quantity.val().trim() === "" || isNaN(Number(quantity.val().trim())) || Number(quantity.val().trim()) < 1) {
             displayMessage('qunatity', `Please enter a valid quantity greter than 0`);
             quantity.focus();
@@ -144,13 +145,13 @@ $('document').ready(() => {
         const selectedImages = $('input[type="file"]').filter(function () {
             return this.files && this.files.length > 0;
         });
-        // if(selectedImages.length < 4) {
-        //     $(`#image-error`).addClass('d-block').text('Please upload 4 images of the product');
-        //     setTimeout(() => {
-        //         $(`#image-error`).removeClass('d-block').text('');
-        //     }, 3000);
-        //     return false;
-        // }
+        if(selectedImages.length < 3) {
+            $(`#image-error`).addClass('d-block').text('Please upload 3 images of the product');
+            setTimeout(() => {
+                $(`#image-error`).removeClass('d-block').text('');
+            }, 3000);
+            return false;
+        }
         return true;
     }
     function displayMessage(input, message) {

@@ -53,18 +53,44 @@
                                             <div id="brand-error" class="invalid-feedback"></div>
                                         </div>
                                     </div>
+
+
+
+                                    <div class="mb-4 row">
+                                        <div class="col-lg-4">
+                                            <label class="form-label">Category</label>
+                                            <select class="form-select" name="category" id="category">
+                                                <!-- <option value="Iphone">Iphone</option> -->
+                                                <option value=""></option>
+                                                <% categories.forEach(c=> { %>
+                                                    <% if (product.category==c.name) { %>
+
+                                                        <option value="<%= c.name %>" selected>
+                                                            <%= c.name %>
+                                                                <% } else {%>
+                                                        <option value="<%= c.name %>">
+                                                            <%= c.name %>
+                                                        </option>
+                                                        <% } }) %>
+                                            </select>
+                                            <div id="category-error" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
                                     <div class="mb-4 row">
                                         <div class="col-lg-4">
                                             <label class="form-label">RAM</label>
                                             <select class="form-select" name="ram" id="ram">
                                                 <option value=""></option>
-                                                <option value="1">1 GB</option>
-                                                <option value="2">2 GB</option>
-                                                <option value="3">3 GB</option>
-                                                <option value="4">4 GB</option>
-                                                <option value="6">6 GB</option>
-                                                <option value="8">8 GB</option>
-                                                <option value="12">12 GB</option>
+
+                                                <option value="1" <%=product.ram==1 ? 'selected' : '' %> >1 GB</option>
+                                                <option value="2" <%=product.ram==2 ? 'selected' : '' %> >2 GB</option>
+                                                <option value="3" <%=product.ram==3 ? 'selected' : '' %> >3 GB</option>
+                                                <option value="4" <%=product.ram==4 ? 'selected' : '' %> >4 GB</option>
+                                                <option value="6" <%=product.ram==6 ? 'selected' : '' %> >6 GB</option>
+                                                <option value="8" <%=product.ram==8 ? 'selected' : '' %> >8 GB</option>
+                                                <option value="12" <%=product.ram==12 ? 'selected' : '' %> >12 GB
+                                                </option>
+
                                             </select>
                                             <div id="ram-error" class="invalid-feedback"></div>
                                         </div>
@@ -74,12 +100,19 @@
                                             <label class="form-label">Storage</label>
                                             <select class="form-select" name="storage" id="storage">
                                                 <option value=""></option>
-                                                <option value="16">16 GB</option>
-                                                <option value="32">32 GB</option>
-                                                <option value="64">64 GB</option>
-                                                <option value="128">128 GB</option>
-                                                <option value="256">256 GB</option>
-                                                <option value="512">512 GB</option>
+                                                <option value="16" <%=product.storage==16 ? 'selected' : '' %> >16 GB
+                                                </option>
+                                                <option value="32" <%=product.storage==32 ? 'selected' : '' %> >32 GB
+                                                </option>
+                                                <option value="64" <%=product.storage==64 ? 'selected' : '' %> >64 GB
+                                                </option>
+                                                <option value="128" <%=product.storage==128 ? 'selected' : '' %> >128 GB
+                                                </option>
+                                                <option value="256" <%=product.storage==256 ? 'selected' : '' %> >256 GB
+                                                </option>
+                                                <option value="512" <%=product.storage==512 ? 'selected' : '' %> >512 GB
+                                                </option>
+
                                             </select>
                                             <div id="storage-error" class="invalid-feedback"></div>
                                         </div>
@@ -94,18 +127,9 @@
                                     <div class="mb-4">
                                         <label class="form-label">Description</label>
                                         <textarea placeholder="Type here" class="form-control" rows="4"
-                                            name="description"
-                                            id="description"><%= product.description %></textarea>
+                                            name="description" id="description"><%= product.description %></textarea>
                                         <div id="description-error" class="invalid-feedback"></div>
                                     </div>
-                                    <!-- <div class="mb-4">
-                                    <label class="form-label">Brand name</label>
-                                    <select class="form-select">
-                                        <option> Adidas </option>
-                                        <option> Nike </option>
-                                        <option> Puma </option>
-                                    </select>
-                                </div> -->
                                 </div>
                             </div>
                             <hr class="mb-4 mt-0">
@@ -129,35 +153,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr class="mb-4 mt-0">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <h6>3. Category</h6>
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="mb-4">
-                                        <div id="category-error" class="invalid-feedback"></div>
-                                        <% categories.forEach(category=> { %>
-                                            <label class="mb-2 form-check form-check-inline" style="width: 45%;">
-                                                <%  if (product.category == category._id) { %>
-                                                    <input class="form-check-input" name="categoryId" type="radio"
-                                                            id="category" value="<%= category._id %>" checked>
-                                                        <span class="form-check-label">
-                                                            <%= category.name %>
-                                                        </span>
-                                                    <% } else { %>
-                                                        <input class="form-check-input" name="categoryId" type="radio"
-                                                            id="category" value="<%= category._id %>" checked>
-                                                        <span class="form-check-label">
-                                                            <%= category.name %>
-                                                        </span>
-                                                        <% } %>
-                                            </label>
-                                            <% }) %>
-                                                <div id="category-error" class="invalid-feedback"></div>
-                                    </div>
-                                </div> <!-- col.// -->
-                            </div> <!-- row.// -->
+
 
                             <hr class="mb-4 mt-0">
                             <div class="row">
@@ -180,14 +176,14 @@
                                 </div>
                                 <div class="col-md-9">
 
-                                    <% for( let i = 0; i < product.image.length; i++ ) { %>
+                                    <% for( let i=0; i < product.image.length; i++ ) { %>
                                         <div class="row">
                                             <div class="card-body align-items-center" style="margin-bottom: 20px;">
                                                 <img src="/product-images/<%= product.image[i] %>" alt="" id="imgView1">
                                                 <input class="form-control" type="file" name="images" id="input1"
                                                     accept="image/png, image/jpeg, image/jpg"
                                                     onchange="viewImage1(event), viewImage(event, 1)">
-                                                    data-filename="<%= product.image[i] %>">
+                                                data-filename="<%= product.image[i] %>">
                                                     <button class="delete-icon"
                                                         onclick="deleteImage('<%= product._id %>', '<%= product.image[i] %>')">❌</button>
                                             </div>
@@ -198,9 +194,9 @@
                                                     class="btn-sm btn-primary">Save</button>
                                             </div>
                                         </div>
-                                    <% } %>
-                                    
-                                    <div id="image-error" class="invalid-feedback"></div>
+                                        <% } %>
+
+                                            <div id="image-error" class="invalid-feedback"></div>
                                 </div>
 
 
@@ -229,18 +225,18 @@
     </section>
 
     <%- include('../partials/admin-footer') %>
-    <script>
-        function handleImageChange() {
-            const imageInput = document.getElementById('image');
-            const form = document.getElementById('myForm');
-    
-            if (imageInput.files.length > 0) {
-                form.setAttribute('enctype', 'multipart/form-data');
-            } else {
-                form.removeAttribute('enctype');
+        <script>
+            function handleImageChange() {
+                const imageInput = document.getElementById('image');
+                const form = document.getElementById('myForm');
+
+                if (imageInput.files.length > 0) {
+                    form.setAttribute('enctype', 'multipart/form-data');
+                } else {
+                    form.removeAttribute('enctype');
+                }
             }
-        }
-    </script>
-    
+        </script>
+
         <script src="/js/editProduct.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>

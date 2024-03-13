@@ -68,7 +68,7 @@ const handleAddNewAddress = async (req, res) => {
             await newAddress.save();
 
         }
-        res.redirect('/edit-profile');
+        res.redirect('/profile');
     } catch (error) {
         console.error(error);
     }

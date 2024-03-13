@@ -77,7 +77,8 @@
                                         <tr>
                                             <th>Total</th>
                                             <td colspan="2" class="product-subtotal"><span
-                                                    class="font-xl text-brand fw-900">&#8377;<%= totalPrice %></span></td>
+                                                    class="font-xl text-brand fw-900">&#8377;<%= totalPrice %></span>
+                                            </td>
                                         </tr>
                                     </table>
                                 </div>
@@ -90,7 +91,7 @@
                                         <div class="custome-radio">
                                             <div class="custome-radio">
                                                 <input class="form-check-input" required="" type="radio"
-                                                    name="payment_option" id="cod" checked="" value="cash_on_delivery">
+                                                    name="payment_option" id="cod" value="cash_on_delivery">
                                                 <label class="form-check-label" for="cod" data-bs-toggle="collapse"
                                                     data-target="#cod" aria-controls="cod">Cash On Delivery</label>
                                             </div>
@@ -100,13 +101,6 @@
                                                 data-bs-toggle="collapse" data-target="#bankTranfer"
                                                 aria-controls="razorpay">Paywith razorpay</label>
                                         </div>
-                                        <!-- <div class="custome-radio">
-                                            <input class="form-check-input" required="" type="radio"
-                                                name="payment_option" id="exampleRadios5">
-                                            <label class="form-check-label" for="exampleRadios5"
-                                                data-bs-toggle="collapse" data-target="#paypal"
-                                                aria-controls="paypal">Paypal</label>
-                                        </div> -->
                                     </div>
                                 </div>
 
@@ -120,7 +114,7 @@
                                                         <div class="col-1">
                                                             <!-- <span><%= a._id %></span> -->
                                                             <input type="radio" name="address" class="form-check-input"
-                                                                id="address" value="<%= a._id %>" checked="">
+                                                                id="address" value="<%= a._id %>">
                                                         </div>
                                                         <div class="col">
                                                             <!-- <h6><%= a._id %></h6> -->
@@ -181,7 +175,63 @@
         //     console.log('ready');
 
         // })
+
+        function checkPaymentOption() {
+            const radioButtons = document.querySelectorAll('input[name="payment_option"]');
+
+            let isSelected = false;
+
+            // Iterate through each radio button
+            radioButtons.forEach((radio) => {
+                // Check if the current radio button is checked
+                if (radio.checked) {
+                    isSelected = true;
+                }
+            });
+
+            // Check if none of the radio buttons is selected
+            if (!isSelected) {
+                Swal.fire({
+                    title: "No Payment Option Selected",
+                    text: "Please select a payment option.",
+                    icon: "warning",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK"
+                });
+                return false;
+            }
+            return true;
+        }
+        function checkAddress() {
+            const addresses = document.querySelectorAll('input[name="address"]');
+
+            let isAddressFilled = false;
+
+            // Iterate through each address
+            addresses.forEach((address) => {
+                if (address.checked) {
+                    isAddressFilled = true;
+                }
+            });
+
+            // Check if none of the addresses are filled
+            if (!isAddressFilled) {
+                Swal.fire({
+                    title: "No Address Found",
+                    text: "Please provide an address before proceeding.",
+                    icon: "warning",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK"
+                });
+                return false;
+            }
+            return true;
+        }
+
+
         function placeOrder() {
+            if (!checkPaymentOption()) return
+            if(!checkAddress()) return
             const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
             const address = document.querySelector('input[name="address"]:checked').value;
             console.log(paymentMethod);
@@ -236,7 +286,7 @@
                         var rzp1 = new Razorpay(options);
                         rzp1.open();
                     }
-                    else{
+                    else {
                         window.location.href = response.redirect;
                     }
                 }

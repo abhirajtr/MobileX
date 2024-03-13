@@ -8,6 +8,9 @@ const productSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    category: {
+        type: String
+    },
     ram: {
         type: Number
     },
@@ -36,9 +39,6 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    categoryId: {
-        type: String
-    }
 }, {
     versionKey: false
 });

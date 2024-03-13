@@ -57,20 +57,6 @@ const handlePlaceOrder = async (req, res) => {
                 }
             }
         ]);
-        // console.log('userCart', userCart);
-        // const orderData = userCart.map(cartItem => ({
-        //     productId: cartItem.productId,
-        //     productName: cartItem.name,
-        //     brand: cartItem.brand, // Optional: Include brand if available
-        //     quantity: cartItem.quantity,
-        //     ram: cartItem.ram,
-        //     storage: cartItem.storage,
-        //     color: cartItem.color,
-        //     image: cartItem.image,
-        //     price: cartItem.price,
-        //     subtotal: cartItem.quantity * cartItem.price,
-        //     status: "pending",
-        // }));
         if (paymentMethod == 'razorpay') {
             const orderData = userCart.map(cartItem => ({
                 productId: cartItem.productId,
@@ -136,12 +122,19 @@ const handlePlaceOrder = async (req, res) => {
                 totalPrice: totalPrice,
                 address: orderAddress.address[0]
             });
-            await newOrder.save();
-            await User.findByIdAndUpdate(userId, { $unset: { cart: 1 } });
-            // // Update product quantities based on the order
-            for (const item of orderData) {
-                await Product.updateOne({ _id: item.productId }, { $inc: { quantity: -item.quantity } });
-            }
+            // await newOrder.save();
+            // await User.findByIdAndUpdate(userId, { $set: { cart: [] } });
+            // // // Update product quantities based on the order
+            // for (const item of orderData) {
+            //     await Product.updateOne({ _id: item.productId }, { $inc: { quantity: -item.quantity } });
+            // }
+            await Promise.all([
+                newOrder.save(),
+                User.findByIdAndUpdate(userId, { $set: { cart: [] } }),
+                ...orderData.map(async (item) => {
+                    await Product.updateOne({ _id: item.productId }, { $inc: { quantity: -item.quantity } });
+                })
+            ])
             res.status(200).json({ status: 'success', redirect: '/order-success' });
         }
     } catch (error) {

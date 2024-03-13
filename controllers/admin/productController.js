@@ -4,8 +4,8 @@ const Brand = require('../../models/brandModel');
 
 const renderProducts = async (req, res) => {
     try {
-        const products = await Product.find({});
-        res.render('admin/products', { products });
+        const products = await Product.find();
+        res.render('admin/products', { productsActive: true ,products });
 
     } catch (error) {
         console.error(error);
@@ -13,11 +13,14 @@ const renderProducts = async (req, res) => {
 }
 const renderAddProduct = async (req, res) => {
     try {
-        const categories = await Category.find({ isListed: true }, { _id: 0, name: 1 });
-        // const categories = await Category.find();
-        const brand = await Brand.find({ isBlocked: false });
+        // const categories = await Category.find({ isListed: true }, { _id: 0, name: 1 });
+        // const brand = await Brand.find({ isBlocked: false });
+        const [categories, brand] = await Promise.all([
+            Category.find({ isListed: true }).select('name'),
+            Brand.find({ isBlocked: false }).select('name')
+        ]);
         console.log('categories', categories);
-        res.render('admin/add-product', { products: true, categories, brand });
+        res.render('admin/add-product', { productsActive: true, categories, brand });
     } catch (error) {
         console.error(error);
     }
@@ -41,16 +44,22 @@ const handleAddProduct = async (req, res) => {
 const renderEditProduct = async (req, res) => {
     try {
         const id = req.query.id;
-        console.log('id', req.query.id);
-        const product = await Product.findById(id)
-        console.log('1', product);
-        const categories = await Category.find({ isListed: true }, { name: 1 });
-        const brand = await Brand.find();
-        // console.log(categories);
-        res.render('admin/edit-product', { products: true, categories, brand, product });
+        // console.log('id', req.query.id);
+        // console.log('1', product);
+        // const product = await Product.findById(id);
+        // const categories = await Category.find({ isListed: true }, { name: 1 });
+        // const brand = await Brand.find();
+        const [product, categories, brand] = await Promise.all([
+            Product.findById(id),
+            Category.find({ isListed: true }, { name: 1 }),
+            Brand.find()
+        ]);
+        console.log(categories);
+// console.log(categories);
+res.render('admin/edit-product', { productsActive: true, categories, brand, product });
     } catch (error) {
-        console.error(error);
-    }
+    console.error(error);
+}
 }
 const handleEditProduct = async (req, res) => {
     try {
@@ -73,7 +82,7 @@ const renderProductDetails = async (req, res) => {
     try {
         const productDetails = await Product.findById(req.query.id);
         console.log(productDetails);
-        res.render('admin/product-details', { products: true, product: productDetails });
+        res.render('admin/product-details', { productsActive: true, product: productDetails });
     } catch (error) {
         console.error(error);
     }

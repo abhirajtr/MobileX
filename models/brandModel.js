@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const brandSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique: true
+        unique: true,
+        required: true
     },
     image: {
         type: String

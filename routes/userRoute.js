@@ -48,7 +48,7 @@ router.use(isBlocked);
 router.use(isAuthenticated);
 
 router.post('/addToCart', cartController.handleAddToCart);
-router.get('/edit-profile', profileController.renderEditProfile);
+router.get('/profile', profileController.renderEditProfile);
 router.post('/edit-details', profileController.handleEditDetails);
 router.get('/addNewAddress', profileController.rednerAddNewAddress);
 router.post('/addNewAddress', profileController.handleAddNewAddress);

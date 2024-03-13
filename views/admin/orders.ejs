@@ -53,13 +53,17 @@
                                     <td><%= order._id %></td>
                                     <td><b><%= order.user.username %></b></td>
                                     <td><%= order.user.email %></td>
-                                    <td>$ <%= order.products.subtotal %> .00</td>
+                                    <td>&#8377; <%= order.products.subtotal %> .00</td>
                                     <td> <% if (order.products.status == 'cancelled') { %>
                                         <span class="badge rounded-pill alert-danger">Cancelled</span>
                                     <%  } else if (order.products.status == 'pending') { %>
                                         <span class="badge rounded-pill alert-warning">Pending</span>
                                     <% } else if (order.products.status == 'delivered') { %>
                                         <span class="badge rounded-pill alert-success">Delivered</span>
+                                    <% } else if (order.products.status == 'processing') { %>
+                                        <span class="badge rounded-pill alert-success">Processing</span>
+                                    <% } else if (order.products.status == 'shipped') { %>
+                                        <span class="badge rounded-pill alert-success">Shipped</span>
                                     <% } %>
                                         <!-- <span class="badge rounded-pill alert-warning"><%= order.products.status %></span></td> -->
                                         <td><%= new Date(order.createdAt).toLocaleDateString() %></td>

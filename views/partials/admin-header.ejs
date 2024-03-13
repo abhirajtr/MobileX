@@ -34,12 +34,12 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item <%= locals.dashboard ? 'active': 'inactive '%>">
+                <li class="menu-item <%= locals.dashboardActive ? 'active': ''%>">
                     <a class="menu-link" href="/admin/dashboard"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item <%= locals.products ? 'active': 'inactive '%>">
+                <li class="menu-item <%= locals.productsActive ? 'active': ''%>">
                     <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
