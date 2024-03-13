@@ -45,6 +45,22 @@
                                             <div id="brand-error" class="invalid-feedback"></div>
                                         </div>
                                     </div>
+
+                                    <div class="mb-4 row">
+                                        <div class="col-lg-4">
+                                            <label class="form-label">Category</label>
+                                            <select class="form-select" name="category" id="category">
+                                                <!-- <option value="Iphone">Iphone</option> -->
+                                                <option value=""></option>
+                                                <% categories.forEach(c => { %>
+                                                    <option value="<%= c.name %>"><%= c.name %></option>
+                                                <% }) %>
+                                            </select>
+                                            <div id="category-error" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+
+
                                     <div class="mb-4 row">
                                         <div class="col-lg-4">
                                             <label class="form-label">RAM</label>
@@ -120,7 +136,7 @@
                                 </div>
                             </div>
                             <hr class="mb-4 mt-0">
-                            <div class="row">
+                            <!-- <div class="row">
                                 <div class="col-md-3">
                                     <h6>3. Category</h6>
                                 </div>
@@ -138,13 +154,13 @@
                                             <% }) %>
                                             <div id="category-error" class="invalid-feedback"></div>
                                     </div>
-                                </div> <!-- col.// -->
-                            </div> <!-- row.// -->
+                                </div> 
+                            </div>  -->
 
-                            <hr class="mb-4 mt-0">
+                            <!-- <hr class="mb-4 mt-0"> -->
                             <div class="row">
                                 <div class="col-md-3">
-                                    <h6>4. Quantity</h6>
+                                    <h6>3. Quantity</h6>
                                 </div>
                                 <div class="col-md-9">
                                     <div class="mb-4">
@@ -167,11 +183,11 @@
                                             <img src="/admin-assets/imgs/theme/upload.svg" alt="" id="imgView1">
                                             <input class="form-control" type="file" name="images" id="input1"
                                                 accept="image/png, image/jpeg, image/jpg"
-                                                onchange="viewImage1(event), viewImage(event, 1)">
+                                                onchange="viewImage2(event),viewImage(event, 1)">
                                         </div>
                                         <div class="image-cropper d-flex align-items-center"
                                             style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                            <img src="" id="croppedImg1" alt="" style="width: 10rem; height: auto;">
+                                            <img src="" id="croppedImg1" alt="" style="width: auto; height: 10rem;">
                                             <button type="button" id="saveButton1"
                                                 class="btn-sm btn-primary">Save</button>
                                         </div>
@@ -207,20 +223,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="row">
-                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                            <img src="/admin-assets/imgs/theme/upload.svg" alt="" id="imgView4">
-                                            <input class="form-control" type="file" name="images" id="input4"
-                                                accept="image/png, image/jpeg, image/jpg"
-                                                onchange="viewImage4(event),viewImage(event, 4)">
-                                        </div>
-                                        <div class="image-cropper d-flex align-items-center"
-                                            style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                            <img src="" id="croppedImg4" alt="" style="width: auto; height: 10rem">
-                                            <button type="button" id="saveButton4"
-                                                class="btn-sm btn-primary">Save</button>
-                                        </div>
-                                    </div>
                                     <div id="image-error" class="invalid-feedback"></div>
                                 </div>
 

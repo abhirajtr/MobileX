@@ -7,6 +7,9 @@ const mongodb = require("mongodb")
 
 const handleAddToCart = async (req, res) => {
     try {
+        if (!req.session.user) {
+            res.status(404).json({ redirect: '/login' });
+        }
         const productId = new mongoose.Types.ObjectId(req.body.productId);
         const updatedCart = await User.updateOne(
             { _id: req.session.user, "cart.productId": { $ne: productId } },

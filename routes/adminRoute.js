@@ -18,7 +18,7 @@ router.get('/edit-user', userController.renderEditUser);
 router.post('/edit-user', userController.handleEdituser);
 router.get('/products', productController.renderProducts);
 router.get('/add-product', productController.renderAddProduct);
-router.post('/add-product', upload.array('images', 4), productController.handleAddProduct);
+router.post('/add-product', upload.array('images', 3), productController.handleAddProduct);
 router.get('/edit-product', productController.renderEditProduct);
 router.post('/edit-product', productController.handleEditProduct);
 router.get('/product-block', productController.handleBlockProduct);

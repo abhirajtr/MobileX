@@ -1,6 +1,6 @@
 const Product = require('../../models/productModel');
-const Category =  require('../../models/categoryModel');
-const Brand =  require('../../models/brandModel');
+const Category = require('../../models/categoryModel');
+const Brand = require('../../models/brandModel');
 
 const renderProducts = async (req, res) => {
     try {
@@ -13,9 +13,10 @@ const renderProducts = async (req, res) => {
 }
 const renderAddProduct = async (req, res) => {
     try {
-        const categories = await Category.find({ isListed: true }, { name: 1 });
+        const categories = await Category.find({ isListed: true }, { _id: 0, name: 1 });
+        // const categories = await Category.find();
         const brand = await Brand.find({ isBlocked: false });
-        // console.log(categories);
+        console.log('categories', categories);
         res.render('admin/add-product', { products: true, categories, brand });
     } catch (error) {
         console.error(error);
@@ -28,8 +29,8 @@ const handleAddProduct = async (req, res) => {
         // console.log(req.files);
         const image = req.files.map(file => file.filename);
         // console.log(image);
-        const { name, ram, brand, storage, color, description, regularPrice, promotionalPrice, quantity, categoryId } = req.body;
-        const newProduct = new Product({ name, brand, ram, storage, color, description, regularPrice, promotionalPrice, quantity, image, categoryId });
+        const { name, ram, brand, category, storage, color, description, regularPrice, promotionalPrice, quantity, categoryId } = req.body;
+        const newProduct = new Product({ name, brand, category, ram, storage, color, description, regularPrice, promotionalPrice, quantity, image, categoryId });
         const savedProduct = await newProduct.save();
         console.log(savedProduct);
         res.redirect('/admin/products');
