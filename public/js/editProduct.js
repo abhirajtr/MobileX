@@ -47,11 +47,13 @@ function viewImage(event, index) {
 
         // Update the cropped image when the "Save" button is clicked
         let saveButton = document.querySelector('#saveButton' + index);
+        let updateButton = document.getElementById('updateButton' + index);
         saveButton.addEventListener('click', async function () {
             let croppedCanvas = cropper.getCroppedCanvas();
             let croppedImage = document.getElementById("croppedImg" + index);
             croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
-
+            updateButton.classList.remove('d-none');
+            updateButton.classList.add('d-block');
             // Generate a unique name for the cropped image file based on the current timestamp
             let timestamp = new Date().getTime();
             let fileName = `cropped-img-${timestamp}-${index}.png`;
@@ -142,16 +144,16 @@ $('document').ready(() => {
             quantity.focus();
             return false;
         }
-        const selectedImages = $('input[type="file"]').filter(function () {
-            return this.files && this.files.length > 0;
-        });
-        if(selectedImages.length < 3) {
-            $(`#image-error`).addClass('d-block').text('Please upload 3 images of the product');
-            setTimeout(() => {
-                $(`#image-error`).removeClass('d-block').text('');
-            }, 3000);
-            return false;
-        }
+        // const selectedImages = $('input[type="file"]').filter(function () {
+        //     return this.files && this.files.length > 0;
+        // });
+        // if(selectedImages.length < 3) {
+        //     $(`#image-error`).addClass('d-block').text('Please upload 3 images of the product');
+        //     setTimeout(() => {
+        //         $(`#image-error`).removeClass('d-block').text('');
+        //     }, 3000);
+        //     return false;
+        // }
         return true;
     }
     function displayMessage(input, message) {

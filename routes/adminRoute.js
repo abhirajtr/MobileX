@@ -24,6 +24,7 @@ router.get('/add-product', productController.renderAddProduct);
 router.post('/add-product', upload.array('images', 3), productController.handleAddProduct);
 router.get('/edit-product', productController.renderEditProduct);
 router.post('/edit-product', productController.handleEditProduct);
+router.post('/upload-image', upload.single('image'), productController.handelEditImage);
 router.get('/product-block', productController.handleBlockProduct);
 router.get('/product-unblock', productController.handleUnblockProduct);
 router.get('/product-details', productController.renderProductDetails);

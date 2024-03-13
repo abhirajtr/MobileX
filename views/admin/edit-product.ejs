@@ -158,11 +158,11 @@
                             <hr class="mb-4 mt-0">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <h6>4. Quantity</h6>
+                                    <h6>3. Quantity</h6>
                                 </div>
                                 <div class="col-md-9">
                                     <div class="mb-4">
-                                        <label class="form-label">Qunatity</label>
+                                        <label class="form-label">Quantity</label>
                                         <input type="text" placeholder="" class="form-control" name="quantity"
                                             id="quantity" value="<%= product.quantity %>">
                                         <div id="qunatity-error" class="invalid-feedback"></div>
@@ -176,25 +176,29 @@
                                 </div>
                                 <div class="col-md-9">
 
-                                    <% for( let i=0; i < product.image.length; i++ ) { %>
+                                    <% for(let i=0; i < product.image.length; i++) { %>
                                         <div class="row">
                                             <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                                <img src="/product-images/<%= product.image[i] %>" alt="" id="imgView1">
-                                                <input class="form-control" type="file" name="images" id="input1"
-                                                    accept="image/png, image/jpeg, image/jpg"
-                                                    onchange="viewImage1(event), viewImage(event, 1)">
-                                                data-filename="<%= product.image[i] %>">
-                                                    <button class="delete-icon"
-                                                        onclick="deleteImage('<%= product._id %>', '<%= product.image[i] %>')">❌</button>
+                                                <img src="/product-images/<%= product.image[i] %>" alt=""
+                                                    id="imgView<%= i+1 %>">
+                                                <input class="form-control" type="file" name="images"
+                                                    id="input<%= i+1 %>" accept="image/png, image/jpeg, image/jpg"
+                                                    onchange="viewImage1(event), viewImage(event, '<%= i+1 %>')">
                                             </div>
                                             <div class="image-cropper d-flex align-items-center"
                                                 style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                                <img src="" id="croppedImg1" alt="" style="width: 10rem; height: auto;">
-                                                <button type="button" id="saveButton1"
+                                                <img src="" id="croppedImg<%= i+1 %>" alt=""
+                                                    style="width: 10rem; height: auto;">
+                                                <button type="button" id="saveButton<%= i+1 %>"
                                                     class="btn-sm btn-primary">Save</button>
+                                                <button type="button" id="updateButton<%= i+1 %>"
+                                                    data-img="<%=product.image[i] %>"
+                                                    class="btn-sm btn-success-light ml-10 d-none"
+                                                    onclick="updateImage('<%=i+1 %>', '<%= product._id %>','<%= product.image[i] %>')">Update</button>
                                             </div>
                                         </div>
                                         <% } %>
+
 
                                             <div id="image-error" class="invalid-feedback"></div>
                                 </div>
@@ -236,7 +240,43 @@
                     form.removeAttribute('enctype');
                 }
             }
+
+
+
+            function updateImage(index, productId, imageName) {
+                const input = document.getElementById('input' + index);
+                const imageFile = input.files[0];
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                formData.append('productId', productId);
+                formData.append('imageName', imageName);
+                console.log(formData);
+
+                fetch('/admin/upload-image', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Image uploaded successfully');
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Image updated successfully.',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                            // Add any further processing here
+                        } else {
+                            console.error('Failed to upload image:', response.statusText);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
         </script>
+
 
         <script src="/js/editProduct.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>

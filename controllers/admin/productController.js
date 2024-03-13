@@ -1,11 +1,16 @@
 const Product = require('../../models/productModel');
 const Category = require('../../models/categoryModel');
 const Brand = require('../../models/brandModel');
+const { ObjectId } = require('mongodb');
 
 const renderProducts = async (req, res) => {
     try {
-        const products = await Product.find();
-        res.render('admin/products', { productsActive: true ,products });
+        // const products = await Product.find();
+        const [ products, categories ] = await Promise.all([
+            Product.find(),
+            Category.find().select('name')
+        ])
+        res.render('admin/products', { productsActive: true, products,categories });
 
     } catch (error) {
         console.error(error);
@@ -55,11 +60,11 @@ const renderEditProduct = async (req, res) => {
             Brand.find()
         ]);
         console.log(categories);
-// console.log(categories);
-res.render('admin/edit-product', { productsActive: true, categories, brand, product });
+        // console.log(categories);
+        res.render('admin/edit-product', { productsActive: true, categories, brand, product });
     } catch (error) {
-    console.error(error);
-}
+        console.error(error);
+    }
 }
 const handleEditProduct = async (req, res) => {
     try {
@@ -68,14 +73,41 @@ const handleEditProduct = async (req, res) => {
         // console.log(req.files);
         // const image = req.files.map(file => file.filename);
         // console.log(image);
-        const { id, name, brand, ram, storage, color, description, regularPrice, promotionalPrice, quantity, categoryId } = req.body;
+        const { id, name, brand, category, ram, storage, color, description, regularPrice, promotionalPrice, quantity } = req.body;
         console.log(req.body);
-        const newProduct = await Product.findByIdAndUpdate(id, { name, brand, ram, storage, color, description, regularPrice, promotionalPrice, quantity, categoryId });
+        const newProduct = await Product.findByIdAndUpdate(id, { name, category, brand, ram, storage, color, description, regularPrice, promotionalPrice, quantity });
         console.log(newProduct);
         // console.log(savedProduct);
         res.redirect('/admin/products');
     } catch (error) {
         console.error(error);
+    }
+}
+const handelEditImage = async (req, res) => {
+    try {
+        const file = req.file;
+        console.log(req.file.filename);
+        console.log(req.body);
+        const newImageName = req.file.filename;
+        const { productId, imageName } = req.body;
+        console.log(imageName);
+        // const pId = new ObjectId(productId)
+        // Find the product and get the index of the image name to replace
+        const product = await Product.findById(productId);
+        const imageIndex = product.image.indexOf(imageName);
+        if (imageIndex !== -1) {
+            // Update the image array with the new image name at the found index
+            await Product.findByIdAndUpdate(
+                productId,
+                { $set: { [`image.${imageIndex}`]: newImageName } },
+                { new: true }
+            );
+            res.status(200).json({ status: 'success' });
+        } else {
+            console.log('Image name not found in the product images.');
+        }
+    } catch (error) {
+        console.error('Internal server error');
     }
 }
 const renderProductDetails = async (req, res) => {
@@ -113,4 +145,5 @@ module.exports = {
     handleEditProduct,
     handleBlockProduct,
     handleUnblockProduct,
+    handelEditImage,
 }

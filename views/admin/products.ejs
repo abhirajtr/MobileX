@@ -1,88 +1,98 @@
 <%- include('../partials/admin-header') %>
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Products grid</h2>
-                    <p>Lorem ipsum dolor sit amet.</p>
-                </div>
-                <div>
-                    <!-- <a href="#" class="btn btn-light rounded font-md">Export</a> -->
-                    <!-- <a href="#" class="btn btn-light rounded  font-md">Import</a> -->
-                    <div class="">
-                        
-                        <a href="/admin/add-product" class="btn btn-primary btn-sm rounded"><i class="material-icons md-add_box align-middle"></i>Create new</a>
-                    </div>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Products</h2>
+                <p>Manage your products here.</p>
+            </div>
+            <div>
+                <!-- <a href="#" class="btn btn-light rounded font-md">Export</a> -->
+                <!-- <a href="#" class="btn btn-light rounded  font-md">Import</a> -->
+                <div class="">
+
+                    <a href="/admin/add-product" class="btn btn-primary btn-sm rounded"><i
+                            class="material-icons md-add_box align-middle"></i>Create new</a>
                 </div>
             </div>
-            <div class="card mb-4">
-                <header class="card-header">
-                    <div class="row gx-3">
-                        <div class="col-lg-4 col-md-6 me-auto">
-                            <input type="text" placeholder="Search..." class="form-control">
-                        </div>
-                        <div class="col-lg-2 col-6 col-md-3">
-                            <select class="form-select">
-                                <option>All category</option>
-                                <option>Electronics</option>
-                                <option>Clothings</option>
-                                <option>Something else</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-2 col-6 col-md-3">
-                            <select class="form-select">
-                                <option>Latest added</option>
-                                <option>Cheap first</option>
-                                <option>Most viewed</option>
-                            </select>
-                        </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control">
                     </div>
-                </header> <!-- card-header end// -->
-                <div class="card-body">
-                    
-                    <div class="row gx-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5">
-                        
-                        <% products.forEach(product => { %>
-                            <div class="col">
-                                <div class="card card-product-grid" style="max-height: 25rem; min-height: 25rem;">
-                                    <a href="/admin/product-details?id=<%= product._id %>" class="img-wrap">
-                                        <img style="object-fit: contain;" src="/product-images/<%= product.image[0] %>" alt="Product">
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select class="form-select">
+                            <option>All category</option>
+                            <% categories.forEach(c=> { %>
+                                <option><%= c.name %></option>
+                                <% }) %>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select class="form-select">
+                            <option>Latest added</option>
+                            <option>Cheap first</option>
+                            <option>Most viewed</option>
+                        </select>
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body">
+
+                <div class="row gx-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5">
+
+                    <% products.forEach(product=> { %>
+                        <div class="col">
+                            <div class="card card-product-grid" style="max-height: 25rem; min-height: 25rem;">
+                                <a href="/admin/product-details?id=<%= product._id %>" class="img-wrap">
+                                    <img style="object-fit: contain;" src="/product-images/<%= product.image[0] %>"
+                                        alt="Product">
+                                </a>
+                                <div class="info-wrap">
+                                    <a href="#" class="title text-truncate">
+                                        <%= product.name %>
                                     </a>
-                                    <div class="info-wrap">
-                                        <a href="#" class="title text-truncate"><%= product.name %></a>
-                                        <div class="price mb-2">$<%= product.promotionalPrice %></div>
-                                        <div class="mb-2">Stocks left: <%= product.quantity %></div>
-                                        <a href="/admin/edit-product?id=<%= product._id%>" class="btn btn-sm font-sm rounded btn-brand">
-                                            <i class="material-icons md-edit"></i> Edit
+                                    <div class="price mb-2">&#8377;<%= product.promotionalPrice %>
+                                    </div>
+                                    <div class="mb-2">Stocks left: <%= product.quantity %>
+                                    </div>
+                                    <a href="/admin/edit-product?id=<%= product._id%>"
+                                        class="btn btn-sm font-sm rounded btn-brand">
+                                        <i class="material-icons md-edit"></i> Edit
+                                    </a>
+                                    <% if (product.isBlocked) { %>
+                                        <a href="/admin/product-unblock?id=<%= product._id %>"
+                                            class="btn btn-sm font-sm btn-success-light rounded">
+                                            Unblock
                                         </a>
-                                        <% if (product.isBlocked) { %>
-                                            <a href="/admin/product-unblock?id=<%= product._id %>" class="btn btn-sm font-sm btn-success-light rounded">
-                                                Unblock
-                                            </a>
-                                        <%  } else { %>
-                                            <a href="/admin/product-block?id=<%= product._id %>" class="btn btn-sm font-sm btn-outline-danger rounded">
+                                        <% } else { %>
+                                            <a href="/admin/product-block?id=<%= product._id %>"
+                                                class="btn btn-sm font-sm btn-outline-danger rounded">
                                                 Block
                                             </a>
-                                        <% } %>
-                                    </div>
+                                            <% } %>
                                 </div>
                             </div>
+                        </div>
                         <% }) %>
-                        
-                    </div> <!-- row.// -->
-                </div> <!-- card-body end// -->
-            </div> <!-- card end// -->
-            <div class="pagination-area mt-30 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                    </ul>
-                </nav>
-            </div>
-        </section> <!-- content-main end// -->
 
-<%- include('../partials/admin-footer') %>
+                </div> <!-- row.// -->
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i
+                                class="material-icons md-chevron_right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </section> <!-- content-main end// -->
+
+    <%- include('../partials/admin-footer') %>
