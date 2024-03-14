@@ -16,7 +16,7 @@ const renderHome = async (req, res) => {
         const products = await Product.find({ isBlocked: false });
         // console.log(products);
         // req.session.user ? res.render('user/home', { user: req.session.user, products }) : res.render('user/home', { products });
-        res.render('user/home', { home:true, products, user: req.session.user ? req.session.user : false, count: req.session.count });
+        res.render('user/home', { home: true, products, user: req.session.user ? req.session.user : false, count: req.session.count });
         // res.render('user/order-success');
     } catch (error) {
         console.error(error);
@@ -25,10 +25,31 @@ const renderHome = async (req, res) => {
 const renderShop = async (req, res) => {
     try {
         console.log(req.session);
+        const productsCount = await Product.find({ isBlocked: false }).countDocuments();
         const products = await Product.find({ isBlocked: false });
-        res.render('user/shop', {shop:true, products, user: req.session.user ? req.session.user : false, count: req.session.count });
+
+        res.render('user/shop', { shop: true, products, productsCount, user: req.session.user ? req.session.user : false, count: req.session.count });
     } catch (error) {
         console.log(error);
+    }
+}
+const renderSortByProducts = async (req, res) => {
+    try {
+        console.log('hit');
+        console.log(req.body);
+        const { sortBy } = req.body;
+        let products;
+        if (sortBy == 'price-high') {
+            products = await Product.find({}).sort({ promotionalPrice: -1 });
+        } else if (sortBy == 'price-low') {
+            products = await Product.find({}).sort({ promotionalPrice: 1 });
+        } else if (sortBy == 'latest') {
+            products = await Product.find({}).sort({ _id: -1 });
+        }
+        // console.log(products);
+        res.status(200).json({ products });
+    } catch (error) {
+
     }
 }
 const renderProductDetails = async (req, res) => {
@@ -239,5 +260,6 @@ module.exports = {
     handleForgotPasswordOtp,
     renderForgotPassword,
     handleForgotPassword,
-    renderShop
+    renderShop,
+    renderSortByProducts
 }

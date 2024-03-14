@@ -6,11 +6,11 @@ const { ObjectId } = require('mongodb');
 const renderProducts = async (req, res) => {
     try {
         // const products = await Product.find();
-        const [ products, categories ] = await Promise.all([
+        const [products, categories] = await Promise.all([
             Product.find(),
             Category.find().select('name')
         ])
-        res.render('admin/products', { productsActive: true, products,categories });
+        res.render('admin/products', { productsActive: true, products, categories });
 
     } catch (error) {
         console.error(error);
@@ -66,6 +66,7 @@ const renderEditProduct = async (req, res) => {
         console.error(error);
     }
 }
+
 const handleEditProduct = async (req, res) => {
     try {
         console.log(req.body);

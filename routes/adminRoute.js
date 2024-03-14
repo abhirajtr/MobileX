@@ -29,6 +29,7 @@ router.get('/product-block', productController.handleBlockProduct);
 router.get('/product-unblock', productController.handleUnblockProduct);
 router.get('/product-details', productController.renderProductDetails);
 
+
 router.get('/category', adminController.renderCategory);
 router.post('/create-category', adminController.handleCreateCategory);
 router.get('/category-list', adminController.handleListCategory);

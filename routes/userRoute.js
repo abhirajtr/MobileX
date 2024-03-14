@@ -30,6 +30,7 @@ router.get('/logout', userController.handleLogout);
 router.get('/', isBlocked, userController.renderHome);
 router.get('/shop', isBlocked, userController.renderShop);
 router.get('/product-details', userController.renderProductDetails);
+router.post('/products-sort', userController.renderSortByProducts);
 
 
 // Route for initiating Google OAuth 2.0 authentication
