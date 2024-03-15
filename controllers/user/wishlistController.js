@@ -6,7 +6,7 @@ const renderWishlist = async (req, res) => {
     try {
 
         const userId = new ObjectId(req.session.user);
-        console.log(userId);
+        // console.log(userId);
         const wishlist = await User.aggregate([
             {
                 $match: {
@@ -38,7 +38,7 @@ const renderWishlist = async (req, res) => {
                 }
             }
         ]);
-        console.log(wishlist);
+        // console.log(wishlist);
 
         res.render('user/wishlist', { wishlist, user: req.session.user, count: req.session.count });
     } catch (error) {
@@ -48,12 +48,13 @@ const renderWishlist = async (req, res) => {
 
 const handleAddToWishlist = async (req, res) => {
     try {
-        console.log(req.body);
+        // console.log(req.body);
         const productId = new ObjectId(req.body.productId);
         await User.findByIdAndUpdate(
             req.session.user,
             { $addToSet: { wishlist: { productId: productId } } }
         );
+        req.session.count.wishlist++;
         res.status(200).json({ redirect: '/wishlist' });
     } catch (error) {
         console.log(error);
@@ -66,6 +67,7 @@ const handleRemoveFromWishlist = async (req, res) => {
         const productId = new ObjectId(req.query.id);
 
         // Remove the specific product from the wishlist
+        req.session.count.wishlist--;
         await User.findByIdAndUpdate(
             req.session.user,
             { $pull: { wishlist: { productId: productId } } }

@@ -39,6 +39,10 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    purchaseCount: {
+        type: Number,
+        default: 0
+    }
 }, {
     versionKey: false
 });

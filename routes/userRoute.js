@@ -48,7 +48,7 @@ router.get('/auth/failure', (req, res) => {
 router.use(isBlocked);
 router.use(isAuthenticated);
 
-router.post('/addToCart', cartController.handleAddToCart);
+// Profile Controller
 router.get('/profile', profileController.renderEditProfile);
 router.post('/edit-details', profileController.handleEditDetails);
 router.get('/addNewAddress', profileController.rednerAddNewAddress);
@@ -56,18 +56,27 @@ router.post('/addNewAddress', profileController.handleAddNewAddress);
 router.get('/edit-Address', profileController.renderEditAddress);
 router.post('/edit-Address', profileController.handleEditAddress);
 router.get('/delete-Address', profileController.handleDeleteAddress);
+router.post('/add-wallet-balance', profileController.handleAddWalletBalance);
+
+// Wishlist Controller
+router.get("/wishlist", wishlistController.renderWishlist);
+router.post("/add-to-wishlist", wishlistController.handleAddToWishlist);
+router.get("/wishlist-remove", wishlistController.handleRemoveFromWishlist);
+
+// Cart Controller
+router.post('/addToCart', cartController.handleAddToCart);
 router.get('/cart', cartController.renderCart);
 router.post("/changeQuantity", cartController.changeQuantity)
 router.post("/cartQuantityUpdate", cartController.handleUpdateQuantity);
 router.get("/checkout", cartController.renderCheckout);
+router.post("/remove-product", cartController.handleRemoveProduct);
+
+// Order Controller
 router.post("/place-order", orderController.handlePlaceOrder);
 router.post("/cancel-order", orderController.handleCancelOrder);
-router.post("/remove-product", cartController.handleRemoveProduct);
 router.post("/verify-payment", orderController.verifypayment);
 router.get("/order-success", orderController.renderOrderSuccess);
-router.get("/wishlist", wishlistController.renderWishlist);
-router.post("/add-to-wishlist", wishlistController.handleAddToWishlist);
-router.get("/wishlist-remove", wishlistController.handleRemoveFromWishlist);
+
 
 
 module.exports = router;

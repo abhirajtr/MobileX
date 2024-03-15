@@ -57,8 +57,8 @@
                                     </ul>
                                 </div>
                             </div> -->
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                <div class="dropdown" id="sort-dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle sort-dropdown" type="button"
                                         id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         Sort by: Featured
                                     </button>
@@ -156,9 +156,9 @@
         // });
 
 
-        $('.dropdown-menu').on('click', 'a', function () {
+        $('#sort-dropdown').on('click', 'a', function () {
             var sortBy = $(this).text();
-            $('.dropdown-toggle').text('Sort by: ' + sortBy);
+            $('.sort-dropdown').text('Sort by: ' + sortBy);
             var selectedValue = $(this).data('value'); 
 
 
@@ -193,12 +193,11 @@
                                     </a>
                                 </div>
                                 <div class="product-badges product-badges-position product-badges-mrg">
-                                    <!-- <span class="hot">Hot</span> -->
                                 </div>
                             </div>
                             <div class="product-content-wrap">
                                 <div class="product-category">
-                                    <!-- <a href="shop-grid-right.html">Music</a> -->
+                                    
                                 </div>
                                 <h2 style="min-height: 4rem;">
                                     <a href="shop-product-right.html">
@@ -226,7 +225,7 @@
 
     </script>
 
-    <script>
+    <!-- <script>
         document.querySelectorAll('.dropdown-item').forEach(item => {
             item.addEventListener('click', function (event) {
                 event.preventDefault(); // Prevent the default action of the link
@@ -248,5 +247,5 @@
                     });
             });
         });
-    </script>
+    </script> -->
     <%- include('../partials/user-footer') %>

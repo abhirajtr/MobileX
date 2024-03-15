@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Address = require('../../models/addressModel');
 const User = require('../../models/userModel');
 const Order = require('../../models/orderModel');
+const { ObjectId } = require('mongodb');
 const renderEditProfile = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
@@ -30,7 +31,7 @@ const renderEditProfile = async (req, res) => {
             }
         ])
         console.log('Orders', userOrders);
-        res.render('user/edit-profile', { user, addresses, orders: userOrders, count: req.session.count });
+        res.render('user/profile', { user, addresses, orders: userOrders, count: req.session.count });
     } catch (error) {
         console.error(error);
     }
@@ -138,6 +139,18 @@ const handleDeleteAddress = async (req, res) => {
     }
 }
 
+const handleAddWalletBalance = async (req, res) => {
+    try {
+        console.log('wall',req.body);
+        const userId = new ObjectId(req.session.user);
+        const { amount } = req.body;
+        const updatedBalance = await User.findByIdAndUpdate(userId, { $inc: {walletBalance: amount } });
+        res.status(200).json({ status : true, walletBalance: updatedBalance.walletBalance });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
     renderEditProfile,
     handleEditDetails,
@@ -145,5 +158,6 @@ module.exports = {
     handleAddNewAddress,
     renderEditAddress,
     handleEditAddress,
-    handleDeleteAddress
+    handleDeleteAddress,
+    handleAddWalletBalance
 }

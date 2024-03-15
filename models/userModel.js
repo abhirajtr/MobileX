@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
             ref: 'Product'
         }
     }],
-    wallet: {
+    walletBalance: {
         type: Number,
         default: 0
     },
