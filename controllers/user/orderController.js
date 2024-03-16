@@ -18,6 +18,45 @@ const handlePlaceOrder = async (req, res) => {
         const { paymentMethod, address } = req.body;
         const addressId = new mongoose.Types.ObjectId(address);
         const userId = new mongoose.Types.ObjectId(req.session.user);
+        if (req.session.productId) {
+            const productId = new ObjectId(req.session.productId);
+            delete req.session.productId;
+            const [orderAddress, findProduct] = await Promise.all([
+                Address.findOne({ userId: userId, "address._id": addressId }, { "address.$": 1 }),
+                Product.findById(productId),
+            ])
+
+            const product = [{
+                productId: productId,
+                productName: findProduct.name,
+                brand: findProduct.brand,
+                quantity: 1,
+                ram: findProduct.ram,
+                storage: findProduct.storage,
+                color: findProduct.color,
+                image: findProduct.image[0],
+                price: findProduct.promotionalPrice,
+                subtotal: findProduct.promotionalPrice,
+                status: 'pending'
+            }]
+            const newOrder = new Order({
+                userId: userId,
+                products: product,
+                paymentMethod: paymentMethod,
+                totalPrice: req.session.totalPrice,
+                address: orderAddress.address[0]
+            });
+
+            const updateProductPromise = Product.updateOne(
+                { _id: productId },
+                { $inc: { quantity: -1, purchaseCount: 1 } }
+            );
+
+            const saveOrderPromise = newOrder.save();
+
+            await Promise.all([updateProductPromise, saveOrderPromise]);
+            return res.status(200).json({ status: 'success', redirect: '/order-success' });
+        }
         const [orderAddress, userCart] = await Promise.all([
             Address.findOne({ userId: userId, "address._id": addressId }, { "address.$": 1 }),
             User.aggregate([
@@ -125,10 +164,10 @@ const handlePlaceOrder = async (req, res) => {
             await newOrder.save();
             await User.findByIdAndUpdate(userId, { $set: { cart: [] } });
             // // Update product quantities based on the order
-            for (const item of orderData) {
-                await Product.updateOne({ _id: item.productId },
-                    { $inc: { quantity: -item.quantity, purchaseCount: 1 } });
-            }
+            // for (const item of orderData) {
+            //     await Product.updateOne({ _id: item.productId },
+            //         { $inc: { quantity: -item.quantity, purchaseCount: item.quantity } });
+            // }
             await Promise.all([
                 newOrder.save(),
                 User.findByIdAndUpdate(userId, { $set: { cart: [] } }),
@@ -165,7 +204,7 @@ const verifypayment = async (req, res) => {
             orderId, // Replace with the actual order ID
             { $set: { 'products.$[].status': 'Payment Done' } }
         );
-        
+
         // console.log('o', orderData);
         await Promise.all(orderData.map(async (item) => {
             await Product.updateOne({ _id: item.productId }, { $inc: { quantity: -item.quantity, purchaseCount: item.quantity } });

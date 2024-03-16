@@ -17,7 +17,7 @@ const handleAddToCart = async (req, res) => {
         );
         // console.log(updatedCart.modifiedCount);
         if (updatedCart.modifiedCount) {
-            req.session.count.cart ++;
+            req.session.count.cart++;
             res.status(200).json({ status: 'success' });
             console.log(req.session);
         }
@@ -166,41 +166,66 @@ const renderCheckout = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
         const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
-        // console.log('add', addresses);
-        const cart = await User.aggregate([
-            {
-                $match: {
-                    _id: userId // Match the specific user by their _id
+        let cart = [];
+        let totalPrice;
+        console.log(req.query);
+        if (req.query.product == 'single') {
+            console.log('p', req.query);
+            const product = await Product.findById(req.query.productId);
+            console.log('product',product);
+            cart.push({
+                productId: product._id,
+                productName: product.name,
+                brand: product.brand,
+                ram: product.ram,
+                storage: product.storage,
+                color: product.color,
+                productPrice: product.promotionalPrice,
+                quantity: 1,
+                image: product.image,
+                subtotal: product.promotionalPrice
+            });
+            // totalPrice = product.promotionalPrice;
+            // req.session.cart = cart;
+            // req.session.totalPrice = totalPrice;
+            req.session.productId = req.query.productId;
+        } else {
+            cart = await User.aggregate([
+                {
+                    $match: {
+                        _id: userId // Match the specific user by their _id
+                    }
+                },
+                {
+                    $unwind: "$cart"
+                },
+                {
+                    $lookup: {
+                        from: "products", // The collection to join with
+                        localField: "cart.productId", // Field from the users collection
+                        foreignField: "_id", // Field from the products collection
+                        as: "cartItems" // Output array field
+                    }
+                },
+                {
+                    $unwind: "$cartItems"
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        productId: "$cartItems._id",
+                        productName: "$cartItems.name",
+                        productPrice: "$cartItems.promotionalPrice",
+                        quantity: "$cart.quantity",
+                        image: "$cartItems.image",
+                        subtotal: { $multiply: ["$cartItems.promotionalPrice", "$cart.quantity"] }
+                    }
                 }
-            },
-            {
-                $unwind: "$cart"
-            },
-            {
-                $lookup: {
-                    from: "products", // The collection to join with
-                    localField: "cart.productId", // Field from the users collection
-                    foreignField: "_id", // Field from the products collection
-                    as: "cartItems" // Output array field
-                }
-            },
-            {
-                $unwind: "$cartItems"
-            },
-            {
-                $project: {
-                    _id: 0,
-                    productId: "$cartItems._id",
-                    productName: "$cartItems.name",
-                    productPrice: "$cartItems.promotionalPrice",
-                    quantity: "$cart.quantity",
-                    image: "$cartItems.image",
-                    subtotal: { $multiply: ["$cartItems.promotionalPrice", "$cart.quantity"] }
-                }
-            }
-        ]);
-        const totalPrice = cart.reduce((total, item) => total + item.subtotal, 0);
-        // console.log(cart);
+            ]);
+            totalPrice = cart.reduce((total, item) => total + item.subtotal, 0);
+        }
+
+        console.log(cart);
         res.render('user/checkout', { user: true, cart, totalPrice, addresses });
     } catch (error) {
         console.error(error);
