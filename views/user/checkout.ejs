@@ -77,11 +77,38 @@
                                         <tr>
                                             <th>Total</th>
                                             <td colspan="2" class="product-subtotal"><span
-                                                    class="font-xl text-brand fw-900">&#8377;<%= totalPrice %></span>
+                                                    class="font-xl text-brand fw-900">&#8377;<span id="totalPrice">
+                                                        <%= totalPrice %>
+                                                    </span></span>
                                             </td>
                                         </tr>
                                     </table>
                                 </div>
+                                <div class="mb-30 mt-50">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Apply Coupon</h4>
+                                    </div>
+                                    <div class="total-amount">
+                                        <div class="left">
+                                            <div class="coupon">
+                                                <form action="#" target="_blank">
+                                                    <div class="form-row row justify-content-center">
+                                                        <div class="form-group col-lg-6">
+                                                            <input class="form-control font-medium" name="Coupon"
+                                                                id="couponInput" placeholder="Enter Your Coupon">
+                                                            <div id="errorMessage" class="text-danger"></div>
+                                                        </div>
+                                                        <div class="form-group col-lg-6">
+                                                            <button class="btn btn-sm" id="applyCouponBtn"><i
+                                                                    class="fi-rs-label mr-10"></i>Apply</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- <div class="bt-1 border-color-1 mt-30 mb-30"></div> -->
                                 <div class="payment_method ml-5">
                                     <div class="mb-25">
@@ -231,7 +258,7 @@
 
         function placeOrder() {
             if (!checkPaymentOption()) return
-            if(!checkAddress()) return
+            if (!checkAddress()) return
             const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
             const address = document.querySelector('input[name="address"]:checked').value;
             console.log(paymentMethod);
@@ -293,6 +320,38 @@
             })
         }
 
+
+        document.getElementById('applyCouponBtn').addEventListener('click', function (event) {
+            event.preventDefault();
+            var couponValue = document.getElementById('couponInput').value;
+            const totalPriceElement = document.getElementById('totalPrice');
+            const totalPrice = parseInt(totalPriceElement.innerText); // Convert total price to a float number
+            // console.log(couponValue);
+            // Now you can use the 'couponValue' variable to do whatever you need with the entered coupon code
+            $.ajax({
+                url: '/apply-coupon',
+                method: 'POST',
+                data: { couponCode: couponValue, totalPrice },
+                success: function (response) {
+                    // console.log(response);
+                    // const couponDiscountPercentage = response.couponDiscount; // Get the discount percentage
+                    // console.log(totalPrice);
+                    // const discountAmount = (totalPrice * couponDiscountPercentage) / 100; // Calculate discount amount
+                    // const finalPrice = totalPrice - discountAmount; // Subtract discount amount from total price
+
+                    // Render the final price in the totalPriceElement
+                    totalPriceElement.innerText = response.finalPrice
+                },
+                error: function (xhr) {
+                    displayMessage(xhr.responseJSON.error)
+                }
+            })
+        });
+
+        function displayMessage(error) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.innerText = error;
+        }
 
     </script>
 

@@ -28,6 +28,12 @@
                                     name="discount_percentage" required value="<%= coupon.discountPercentage %>">
                                 <div class="invalid-feedback">Please enter a discount percentage between 0 and 50.</div>
                             </div>
+                            <div class="mb-4">
+                                <label for="discount_percentage" class="form-label">Maximum Discount Amount</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="maxDiscount"
+                                    name="discount_percentage" required value="<%= coupon.maxDiscountAmount %>">
+                                <div class="invalid-feedback">Please enter a maximum discount amount that is greater than or equal to 100.</div>
+                            </div>
 
                             <div class="mb-4">
                                 <label for="valid_from" class="form-label">Valid From</label>
@@ -70,6 +76,7 @@
             const validFrom = document.getElementById('valid_from');
             const validUntil = document.getElementById('valid_until');
             const status = document.getElementById('status');
+            const maxDiscount = document.getElementById('maxDiscount');
 
             //date
             var currentDate = new Date();
@@ -89,7 +96,8 @@
                         discountPercentage: discountPercentage.value,
                         validFrom: validFrom.value,
                         validUntil: validUntil.value,
-                        active: status.checked
+                        active: status.checked,
+                        maxDiscountAmount: maxDiscount.value
                     };
                     // console.log(alert('s'));
                     console.log(data);
@@ -132,6 +140,13 @@
                     return false;
                 } else {
                     discountPercentage.classList.remove('is-invalid');
+                }
+                if (isNaN(maxDiscount.value) || maxDiscount.value < 100) {
+                    maxDiscount.focus();
+                    maxDiscount.classList.add('is-invalid');
+                    return false;
+                } else {
+                    maxDiscount.classList.remove('is-invalid');
                 }
 
                 if (validFrom.value.trim() === '') {

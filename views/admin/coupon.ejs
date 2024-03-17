@@ -29,6 +29,12 @@
                                     name="discount_percentage" required>
                                 <div class="invalid-feedback">Please enter a discount percentage between 1 and 50.</div>
                             </div>
+                            <div class="mb-4">
+                                <label for="discount_percentage" class="form-label">Maximum Discount Amount</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="maxDiscount"
+                                    name="discount_percentage" required >
+                                <div class="invalid-feedback">Please enter a maximum discount amount that is greater than or equal to 100.</div>
+                            </div>
 
                             <div class="mb-4">
                                 <label for="valid_from" class="form-label">Valid From</label>
@@ -53,7 +59,7 @@
 
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit">Create
-                                    category</button>
+                                    coupon</button>
                             </div>
 
                         </form>
@@ -65,6 +71,7 @@
                                     <tr>
                                         <th>Code</th>
                                         <th>Discount Percentage</th>
+                                        <th>Maximum Discount</th>
                                         <th>Valid From</th>
                                         <th>Valid Until</th>
                                         <th>Current Uses</th>
@@ -78,8 +85,11 @@
                                             <td><b>
                                                     <%= c.couponCode %>
                                                 </b></td>
-                                            <td>
+                                            <td class="text-center">
                                                 <%= c.discountPercentage %> %
+                                            </td>
+                                            <td class="text-center">
+                                                <%= c.maxDiscountAmount %>
                                             </td>
                                             <td>
                                                 <%= new Date(c.validFrom).toLocaleDateString() %>
@@ -87,7 +97,7 @@
                                             <td>
                                                 <%= new Date(c.validUntil).toLocaleDateString() %>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 <%= c.currentUses %>
                                             </td>
                                             <td>
@@ -129,6 +139,7 @@
             const validFrom = document.getElementById('valid_from');
             const validUntil = document.getElementById('valid_until');
             const status = document.getElementById('status');
+            const maxDiscount = document.getElementById('maxDiscount');
 
             //date
             var currentDate = new Date();
@@ -147,7 +158,8 @@
                         discountPercentage: discountPercentage.value,
                         validFrom: validFrom.value,
                         validUntil: validUntil.value,
-                        active: status.checked
+                        active: status.checked,
+                        maxDiscountAmount: maxDiscount.value
                     };
                     // console.log(alert('s'));
                     console.log(data);
@@ -163,6 +175,7 @@
                                 <tr>
                                     <td><b>${newCoupon.couponCode}</b></td>
                                     <td>${newCoupon.discountPercentage}%</td>
+                                    <td>${newCoupon.maxDiscountAmount}</td>
                                     <td>${new Date(newCoupon.validFrom).toLocaleDateString()}</td>
                                     <td>${new Date(newCoupon.validUntil).toLocaleDateString()}</td>
                                     <td>${newCoupon.currentUses}</td>
@@ -206,6 +219,13 @@
                     return false;
                 } else {
                     discountPercentage.classList.remove('is-invalid');
+                }
+                if (isNaN(maxDiscount.value) || maxDiscount.value < 100) {
+                    maxDiscount.focus();
+                    maxDiscount.classList.add('is-invalid');
+                    return false;
+                } else {
+                    maxDiscount.classList.remove('is-invalid');
                 }
                 if (validFrom.value.trim() === '') {
                     validFrom.focus()

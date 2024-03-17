@@ -134,9 +134,10 @@ const renderCart = async (req, res) => {
         ]);
         // Calculate the total amount
         const totalAmount = cart.reduce((total, item) => total + item.subtotal, 0);
+        req.session.totalAmount = totalAmount;
         // console.log(totalAmount);
         // console.log(cart);
-        res.render('user/cart', { cart, totalAmount, user: req.session.user, count: req.session.count });
+        res.render('user/cart', { cart, totalAmount: req.session.totalAmount, user: req.session.user, count: req.session.count });
     } catch (error) {
         console.error(error);
     }
@@ -152,6 +153,38 @@ const handleUpdateQuantity = async (req, res) => {
         // console.log(userId, productId, count);
         const updated = await User.findOneAndUpdate({ _id: userId, 'cart.productId': productId },
             { $set: { 'cart.$.quantity': newQuantity } });
+
+        const totalAmount = await User.aggregate([
+            {
+                $match: { "_id": userId } // Match the user document
+            },
+            {
+                $unwind: "$cart" // Deconstruct the cart array
+            },
+            {
+                $lookup: {
+                    from: "products", // Assuming the name of the products collection is "products"
+                    localField: "cart.productId",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {
+                $unwind: "$product" // Deconstruct the product array
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalPrice: { $sum: { $multiply: ["$cart.quantity", "$product.promotionalPrice"] } } // Calculate the total price
+                }
+            },
+            {
+                $project: { _id: 0, totalPrice: 1 } // Project only the totalPrice field
+            }
+        ]);
+        req.session.totalAmount = totalAmount[0].totalPrice;
+        console.log(req.session);
+
         // Find the updated item in the cart array
         // console.log(updated);
         // const updatedItem = updated.cart.find(item => item.productId == productId);
@@ -172,7 +205,7 @@ const renderCheckout = async (req, res) => {
         if (req.query.product == 'single') {
             console.log('p', req.query);
             const product = await Product.findById(req.query.productId);
-            console.log('product',product);
+            console.log('product', product);
             cart.push({
                 productId: product._id,
                 productName: product.name,
@@ -185,7 +218,7 @@ const renderCheckout = async (req, res) => {
                 image: product.image,
                 subtotal: product.promotionalPrice
             });
-            // totalPrice = product.promotionalPrice;
+            totalPrice = product.promotionalPrice;
             // req.session.cart = cart;
             // req.session.totalPrice = totalPrice;
             req.session.productId = req.query.productId;

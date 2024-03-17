@@ -11,7 +11,7 @@ const renderCoupon = async (req, res) => {
 const handleAddCoupen = async (req, res) => {
     try {
         console.log(req.body);
-        const { couponCode, discountPercentage, validFrom, validUntil, active } = req.body;
+        const { couponCode, discountPercentage, validFrom, validUntil, active, maxDiscountAmount } = req.body;
         // const status = statusString === "true";
         // console.log(status);
         const newCoupon = new Coupon({
@@ -19,7 +19,8 @@ const handleAddCoupen = async (req, res) => {
             discountPercentage,
             validFrom,
             validUntil,
-            active
+            active,
+            maxDiscountAmount
         });
         await newCoupon.save();
         res.status(200).json({ status: true, newCoupon });
@@ -42,8 +43,8 @@ const renderEditCoupon = async (req, res) => {
 const handleEditCoupon = async (req, res) => {
     try {
         console.log(req.body);
-        const { couponCode, discountPercentage, validFrom, validUntil, active, couponId } = req.body;
-        await Coupon.findByIdAndUpdate(couponId,{$set: { couponCode, discountPercentage, validFrom, validUntil, active, couponId } });
+        const { couponCode, discountPercentage, validFrom, validUntil, active, couponId, maxDiscountAmount } = req.body;
+        await Coupon.findByIdAndUpdate(couponId,{$set: { couponCode, discountPercentage, validFrom, validUntil, active, couponId, maxDiscountAmount } });
         res.status(200).json({ status:true, redirect: '/admin/coupon' });
     } catch (error) {
         console.error(error);

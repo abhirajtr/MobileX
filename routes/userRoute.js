@@ -3,6 +3,7 @@ const profileController = require('../controllers/user/profileController');
 const cartController = require('../controllers/user/cartController');
 const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistController');
+const couponController = require('../controllers/user/couponController');
 const { Router } = require('express');
 const router = Router();
 const userFound = require('../middlewares/userFound');
@@ -76,6 +77,10 @@ router.post("/place-order", orderController.handlePlaceOrder);
 router.post("/cancel-order", orderController.handleCancelOrder);
 router.post("/verify-payment", orderController.verifypayment);
 router.get("/order-success", orderController.renderOrderSuccess);
+
+// Coupon Controller
+
+router.post('/apply-coupon', couponController.handleApplyCoupon);
 
 
 

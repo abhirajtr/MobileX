@@ -13,6 +13,10 @@ const couponSchema = new mongoose.Schema({
     min: 0,
     max: 50
   },
+  maxDiscountAmount: {
+    type: Number,
+    min: 100
+  },
   validFrom: {
     type: String,
     required: true
