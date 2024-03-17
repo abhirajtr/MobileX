@@ -1,0 +1,231 @@
+<%- include('../partials/admin-header') %>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Welcome to Coupon Management!</h2>
+                <p>Here, you can add, edit, or block coupons.</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <form id="couponForm" novalidate>
+                            <div class="mb-4">
+                                <label for="code" class="form-label">Coupon Code</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="code" name="code"
+                                    required>
+                                <div id="codeError" class="invalid-feedback">Please enter a code with at least 6
+                                    characters.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="discount_percentage" class="form-label">Discount Percentage</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="discount_percentage"
+                                    name="discount_percentage" required>
+                                <div class="invalid-feedback">Please enter a discount percentage between 1 and 50.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="valid_from" class="form-label">Valid From</label>
+                                <input type="date" class="form-control" id="valid_from" name="valid_from" required>
+                                <div class="invalid-feedback">Please select a valid from date.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="valid_until" class="form-label">Valid Until</label>
+                                <input type="date" class="form-control" id="valid_until" name="valid_until" required>
+                                <div class="invalid-feedback">Valid until date must be greater than or equal to valid from date.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input ml-10" type="checkbox" id="status" name="status"
+                                        style="width: 3rem; height: 1.5rem;" checked>
+                                    <label class="form-check-label" for="status"></label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Create
+                                    category</button>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Discount Percentage</th>
+                                        <th>Valid From</th>
+                                        <th>Valid Until</th>
+                                        <th>Current Uses</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="couponTableBody">
+                                    <% coupons.forEach(c=> { %>
+                                        <tr>
+                                            <td><b>
+                                                    <%= c.couponCode %>
+                                                </b></td>
+                                            <td>
+                                                <%= c.discountPercentage %> %
+                                            </td>
+                                            <td>
+                                                <%= new Date(c.validFrom).toLocaleDateString() %>
+                                            </td>
+                                            <td>
+                                                <%= new Date(c.validUntil).toLocaleDateString() %>
+                                            </td>
+                                            <td>
+                                                <%= c.currentUses %>
+                                            </td>
+                                            <td>
+                                                <%= c.active==true ? 'Active' : 'Inactive' %>
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="/admin/coupon-edit?couponId=<%= c._id %>"
+                                                    class="btn-sm-primary">
+                                                    <i class="bi bi-pen">Edit</i> <!-- Edit icon -->
+                                                </a>
+                                            </td>
+                                            <!-- <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="#" data-bs-toggle="dropdown"
+                                                        class="btn btn-light rounded btn-sm font-sm"> <i
+                                                            class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">View detail</a>
+                                                        <a class="dropdown-item" href="#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="#">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </td> -->
+                                        </tr>
+                                        <% }) %>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const code = document.getElementById('code');
+            const discountPercentage = document.getElementById('discount_percentage');
+            const validFrom = document.getElementById('valid_from');
+            const validUntil = document.getElementById('valid_until');
+            const status = document.getElementById('status');
+
+            //date
+            var currentDate = new Date();
+            var year = currentDate.getFullYear();
+            var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            var day = currentDate.getDate().toString().padStart(2, '0');
+            var minDate = year + '-' + month + '-' + day;
+            document.getElementById('valid_from').min = minDate;
+            document.getElementById('valid_until').min = minDate;
+
+            document.getElementById('couponForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (validateForm()) {
+                    const data = {
+                        couponCode: code.value,
+                        discountPercentage: discountPercentage.value,
+                        validFrom: validFrom.value,
+                        validUntil: validUntil.value,
+                        active: status.checked
+                    };
+                    // console.log(alert('s'));
+                    console.log(data);
+                    $.ajax({
+                        url: '/admin/coupon-add',
+                        method: 'POST',
+                        data: data,
+                        success: function (response) {
+                            if (status) {
+                                console.log(response);
+                                const newCoupon = response.newCoupon;
+                                let newRow = `
+                                <tr>
+                                    <td><b>${newCoupon.couponCode}</b></td>
+                                    <td>${newCoupon.discountPercentage}%</td>
+                                    <td>${new Date(newCoupon.validFrom).toLocaleDateString()}</td>
+                                    <td>${new Date(newCoupon.validUntil).toLocaleDateString()}</td>
+                                    <td>${newCoupon.currentUses}</td>
+                                    <td>${newCoupon.active ? 'Active' : 'Inactive'}</td>
+                                    <td class="text-end">
+                                        <a href="/admin/coupon-edit?couponId=${newCoupon._id}" class="btn-sm-primary">
+                                            <i class="bi bi-pen">Edit</i> <!-- Edit icon -->
+                                        </a>
+                                    </td> 
+                                </tr>
+                                `;
+                                $('#couponTableBody').append(newRow);
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr);
+                            const codeError = document.getElementById('codeError');
+                            codeError.textContent = xhr.responseJSON.message;
+                            code.focus()
+                            code.classList.add('is-invalid');
+                        }
+                    })
+                }
+            });
+
+
+
+            function validateForm() {
+                if (code.value.trim() === '' || code.value.trim().length < 6) {
+                    code.focus()
+                    code.classList.add('is-invalid');
+                    return false;
+                } else {
+                    code.classList.remove('is-invalid');
+                }
+                // let discountPercentageValue = parseFloat(discountPercentage.value);
+                // console.log(discountPercentageValue);
+                if (isNaN(discountPercentage.value) || discountPercentage.value <= 0 || discountPercentage.value > 50) {
+                    discountPercentage.focus();
+                    discountPercentage.classList.add('is-invalid');
+                    return false;
+                } else {
+                    discountPercentage.classList.remove('is-invalid');
+                }
+                if (validFrom.value.trim() === '') {
+                    validFrom.focus()
+                    validFrom.classList.add('is-invalid');
+                    return false;
+                } else {
+                    validFrom.classList.remove('is-invalid');
+                }
+                const fromDate = new Date(validFrom.value);
+                const untilDate = new Date(validUntil.value);
+
+                if (validUntil.value.trim() === '' || untilDate < fromDate) {
+                    validUntil.focus()
+                    validUntil.classList.add('is-invalid');
+                    return false;
+                } else {
+                    validUntil.classList.remove('is-invalid');
+                }
+                return true;
+            }
+        })
+    </script>
+    <%- include('../partials/admin-footer') %>

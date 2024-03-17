@@ -1,0 +1,161 @@
+<%- include('../partials/admin-header') %>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Edit Coupon</h2>
+                <p>You can modify the details of the coupon below. </p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card col-6">
+            <div class="card-body ">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="couponForm" novalidate>
+                            <div class="mb-4">
+                                <label for="code" class="form-label">Coupon Code</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="code" name="code"
+                                    required value="<%= coupon.couponCode %>">
+                                <div id="codeError" class="invalid-feedback">Please enter a code with at least 6 characters.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="discount_percentage" class="form-label">Discount Percentage</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="discount_percentage"
+                                    name="discount_percentage" required value="<%= coupon.discountPercentage %>">
+                                <div class="invalid-feedback">Please enter a discount percentage between 0 and 50.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="valid_from" class="form-label">Valid From</label>
+                                <input type="date" class="form-control" id="valid_from" name="valid_from" required value="<%= coupon.validFrom %>">
+                                <div class="invalid-feedback">Please select a valid from date.</div>
+                            </div>
+                            
+
+                            <div class="mb-4">
+                                <label for="valid_until" class="form-label">Valid Until</label>
+                                <input type="date" class="form-control" id="valid_until" name="valid_until" required value="<%= coupon.validUntil %>">
+                                <div class="invalid-feedback">Valid until date must be greater than or equal to valid from date.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input ml-10" type="checkbox" id="status" name="status"
+                                           style="width: 3rem; height: 1.5rem;" <%= coupon.active ? 'checked' : '' %> >
+                                    <label class="form-check-label" for="status"></label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Update Coupon</button>
+                            </div>
+
+                        </form>
+                    </div>
+                    
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const code = document.getElementById('code');
+            const discountPercentage = document.getElementById('discount_percentage');
+            const validFrom = document.getElementById('valid_from');
+            const validUntil = document.getElementById('valid_until');
+            const status = document.getElementById('status');
+
+            //date
+            var currentDate = new Date();
+            var year = currentDate.getFullYear();
+            var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            var day = currentDate.getDate().toString().padStart(2, '0');
+            var minDate = year + '-' + month + '-' + day;
+            document.getElementById('valid_from').min = minDate;
+            document.getElementById('valid_until').min = minDate;
+
+            document.getElementById('couponForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (validateForm()) {
+                    const data = {
+                        couponId : '<%= coupon._id%>',
+                        couponCode: code.value,
+                        discountPercentage: discountPercentage.value,
+                        validFrom: validFrom.value,
+                        validUntil: validUntil.value,
+                        active: status.checked
+                    };
+                    // console.log(alert('s'));
+                    console.log(data);
+                    $.ajax({
+                        url: '/admin/coupon-edit',
+                        method: 'POST',
+                        data: data,
+                        success: function (response) {
+                            if (status) {
+                                console.log(response);
+                                window.location.href = response.redirect;
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr);
+                            const codeError = document.getElementById('codeError');
+                            codeError.textContent = xhr.responseJSON.message;
+                            code.focus()
+                            code.classList.add('is-invalid');
+                        }
+                    })
+                }
+            });
+
+
+
+            function validateForm() {
+                if (code.value.trim() === '' || code.value.trim().length < 6) {
+                    code.focus()
+                    code.classList.add('is-invalid');
+                    return false;
+                } else {
+                    code.classList.remove('is-invalid');
+                }
+                // let discountPercentageValue = parseFloat(discountPercentage.value);
+                // console.log(discountPercentageValue);
+                if (isNaN(discountPercentage.value) || discountPercentage.value <= 0 || discountPercentage.value > 50) {
+                    discountPercentage.focus();
+                    discountPercentage.classList.add('is-invalid');
+                    return false;
+                } else {
+                    discountPercentage.classList.remove('is-invalid');
+                }
+
+                if (validFrom.value.trim() === '') {
+                    validFrom.focus()
+                    validFrom.classList.add('is-invalid');
+                    return false;
+                } else {
+                    validFrom.classList.remove('is-invalid');
+                }
+
+                const fromDate = new Date(validFrom.value);
+                const untilDate = new Date(validUntil.value);
+
+                if (validUntil.value.trim() === '' || untilDate < fromDate) {
+                    validUntil.focus()
+                    validUntil.classList.add('is-invalid');
+                    return false;
+                } else {
+                    validUntil.classList.remove('is-invalid');
+                }
+                return true;
+            }
+        })
+    </script>
+    <%- include('../partials/admin-footer') %>
+
+        

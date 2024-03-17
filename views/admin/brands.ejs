@@ -2,8 +2,8 @@
     <section class="content-main">
         <div class="content-header">
             <div>
-                <h2 class="content-title card-title">Brand </h2>
-                <p>Brand and vendor management</p>
+                <h2 class="content-title card-title">Welcome to Brand Management!</h2>
+                <p>This section allows you to manage brands associated with our products.</p>
             </div>
             <div>
                 <a href="/admin/brand-add" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Add New
@@ -48,6 +48,19 @@
                                     <h6 class="card-title m-0"><%= brand.name %></h6>
                                     <!-- <a href="#"> 398 items </a> -->
                                 </figcaption>
+                                <div class="d-flex">
+                                    <!-- <a type="button" class=" btn-secondary btn-sm">
+                                        <i class="bi bi-pencil-fill"></i> Block
+                                    </a> -->
+                                    <a type="button" class=" btn-primary btn-sm">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
+                                    <div class="form-check form-switch ml-20">
+                                        <input class="form-check-input" type="checkbox" id="status" name="status"
+                                        style="height: 1.6rem; width: 3rem;"    checked>
+                                        <label class="form-check-label mt-5 fw-bold" for="status"><span id="status">Active</span></label>
+                                    </div>
+                                </div>
                             </figure>
                         </div>
                     <% }) %>
