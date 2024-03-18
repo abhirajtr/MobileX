@@ -15,6 +15,11 @@ var instance = new Razorpay({
 
 const handlePlaceOrder = async (req, res) => {
     try {
+        if (req.session.couponCode && req.session.finalPrice) {
+            req.session.totalPrice = req.session.finalPrice;
+            delete req.session.couponCode;
+            delete req.session.finalPrice;
+        }
         const { paymentMethod, address } = req.body;
         const addressId = new mongoose.Types.ObjectId(address);
         const userId = new mongoose.Types.ObjectId(req.session.user);
@@ -39,6 +44,7 @@ const handlePlaceOrder = async (req, res) => {
                 subtotal: findProduct.promotionalPrice,
                 status: 'pending'
             }]
+            
             const newOrder = new Order({
                 userId: userId,
                 products: product,
@@ -116,7 +122,7 @@ const handlePlaceOrder = async (req, res) => {
                 userId: userId,
                 products: orderData,
                 paymentMethod: paymentMethod,
-                totalPrice: totalPrice,
+                totalPrice: req.session.totalAmount,
                 address: orderAddress.address[0]
             });
 
@@ -158,7 +164,7 @@ const handlePlaceOrder = async (req, res) => {
                 userId: userId,
                 products: orderData,
                 paymentMethod: paymentMethod,
-                totalPrice: totalPrice,
+                totalPrice: req.session.totalPrice,
                 address: orderAddress.address[0]
             });
             await newOrder.save();

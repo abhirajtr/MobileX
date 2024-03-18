@@ -220,7 +220,7 @@ const renderCheckout = async (req, res) => {
             });
             totalPrice = product.promotionalPrice;
             // req.session.cart = cart;
-            // req.session.totalPrice = totalPrice;
+            req.session.totalAmount = totalPrice;
             req.session.productId = req.query.productId;
         } else {
             cart = await User.aggregate([

@@ -115,9 +115,8 @@
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow">Home</a>
-                    <span></span> Pages
-                    <span></span> Account
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Profile
                 </div>
             </div>
         </div>
@@ -149,6 +148,11 @@
                                             <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet"
                                                 role="tab" aria-controls="wallet" aria-selected="true"><i
                                                     class="fi-rs-apps mr-10"></i>Wallet</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="walletHistory-tab" data-bs-toggle="tab"
+                                                href="#walletHistory" role="tab" aria-controls="walletHistory"
+                                                aria-selected="true"><i class="fi-rs-apps mr-10"></i>Wallet History</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab"
@@ -214,9 +218,15 @@
                                                                 <!-- Display price for 1 item -->
                                                                 <p>Unit price: &#8377;<%=order.products.price %>
                                                                 </p>
-                                                                <p class="total-amount">Total Amount: &#8377;<span
+                                                                <p class="total-amount">Subtotal: &#8377;<span
                                                                         class="fw-900 font-lg">
                                                                         <%= order.products.subtotal.toFixed(2) %>
+                                                                    </span>
+                                                                </p>
+                                                                </p>
+                                                                <p class="total-amount">Total Amount: &#8377;<span
+                                                                        class="fw-900 font-lg">
+                                                                        <%= order.totalPrice %>
                                                                     </span>
                                                                 </p>
                                                             </div>
@@ -320,6 +330,51 @@
 
 
                                     </div>
+                                    <div class="tab-pane fade" id="walletHistory" role="tabpanel"
+                                        aria-labelledby="orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Wallet History</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date and Time</th>
+                                                                <th>Type</th>
+                                                                <th>Amount</th>
+                                                                <th>Balance</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% // Sort the wallet history by date in descending order
+                                                                user.walletHistory.sort((a, b)=> new Date(b.date) - new
+                                                                Date(a.date));
+                                                                // Iterate over the sorted wallet history
+                                                                user.walletHistory.forEach(w => {
+                                                                %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%= new Date(w.date).toLocaleString() %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= w.type %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= w.amount %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= w.balance %>
+                                                                    </td>
+                                                                </tr>
+                                                                <% }) %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
 
 
@@ -387,7 +442,7 @@
             </div>
         </section>
     </main>
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         $('document').ready(() => {
             console.log(1);
@@ -487,39 +542,81 @@
         }
     </script>
     <script>
-        document.getElementById('addBalanceBtn').addEventListener('click', function () {
-            let addAmount = parseFloat(document.getElementById('addBalanceInput').value);
-            console.log(addAmount);
-            if (isNaN(addAmount) || addAmount <= 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Amount',
-                    text: 'Please enter a valid amount.',
-                });
-                return;
-            }
-
-            fetch('/add-wallet-balance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ amount: addAmount })
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Failed to add wallet balance. Status: ' + response.status);
+        $(document).ready(function () {
+            $('#addBalanceBtn').on('click', function () {
+                var addAmount = parseInt($('#addBalanceInput').val());
+                // console.log(addAmount);
+                if (isNaN(addAmount) || addAmount <= 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Amount',
+                        text: 'Please enter a valid amount.'
+                    });
+                    return;
                 }
-            })
-            .then(data => {
-                // console.log(data);
-                let  currentBalance = data.walletBalance; // Replace with actual current balance fetched from server
-                document.querySelector('.wallet-balance').innerText = `Balance: ₹${currentBalance}.00`
-                document.getElementById('addBalanceInput').value = '';
 
-            })
+                $.ajax({
+                    url: '/add-wallet-balance',
+                    method: 'POST',
+                    data: { amount: addAmount },
+                    success: function (response) {
+                        console.log(response);
+
+                        var options = {
+                            "key": "rzp_test_2hyTCJ2qBkwleR", // Enter the Key ID generated from the Dashboard
+                            // "amount": "5000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "currency": "INR",
+                            "name": "MobileX",
+                            "description": "Test Transaction",
+                            "image": "https://example.com/your_logo",
+                            "order_id": response.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                            // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                            "prefill": {
+                                "name": "Gaurav Kumar",
+                                "email": "gaurav.kumar@example.com",
+                                "contact": "9000090000"
+                            },
+                            "notes": {
+                                "address": "Razorpay Corporate Office"
+                            },
+                            "handler": function (response) {
+                                alert('Payment successful: ' + response.razorpay_payment_id);
+                                var settings = {
+                                    "url": "/verify-wallet-payment",
+                                    "method": "POST",
+                                    "timeout": 0,
+                                    "headers": {
+                                        "Content-Type": "application/json"
+                                    },
+                                    "data": JSON.stringify({ response, addAmount }),
+                                    success: (response) => {
+                                        console.log('updatedBalance', response);
+                                        // if (response.redirect) {
+                                        //     window.location.href = response.redirect;
+                                        // }
+                                        var updatedBalance = response.walletBalance;
+
+                                        // Update the text content of the element with the class "wallet-balance"
+                                        $('.wallet-balance').html('Balance: &#8377;' + updatedBalance.toFixed(2))
+                                        // $('#wallet-balance').text('₹' + response.walletBalance);
+                                    }
+                                }
+                                $.ajax(settings);
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }
+                        };
+                        console.log(response);
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+
+                    }
+                })
+
+
+            });
         });
     </script>
+
     <%- include('../partials/user-footer') %>

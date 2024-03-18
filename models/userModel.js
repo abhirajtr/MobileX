@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    walletHistory: {
+        type: Array
+    },
     isBlocked: {
         type: Boolean,
         default: false
