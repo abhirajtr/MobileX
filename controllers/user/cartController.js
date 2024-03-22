@@ -181,7 +181,7 @@ const renderCheckout = async (req, res) => {
         }
 
         console.log(cart);
-        res.render('user/checkout', { user: true, cart, totalPrice, addresses, walletBalance, couponCode: res.locals.couponCode, finalPrice: res.locals.finalPrice  });
+        res.render('user/checkout', { user: true, cart, totalPrice, addresses, walletBalance,  count: req.session.count});
     } catch (error) {
         console.error(error);
     }

@@ -28,11 +28,14 @@ const handlePlaceOrder = async (req, res) => {
         // This is for buyNow
         if (req.session.productId) {
             const productId = new ObjectId(req.session.productId);
+            console.log('pid', productId);
             delete req.session.productId;
             const [orderAddress, findProduct] = await Promise.all([
                 Address.findOne({ userId: userId, "address._id": addressId }, { "address.$": 1 }),
                 Product.findById(productId),
-            ])
+            ]);
+            const p = await Product.findById(productId);
+            console.log('>>>>>>>', findProduct);
 
             const product = [{
                 productId: productId,
@@ -74,8 +77,9 @@ const handlePlaceOrder = async (req, res) => {
                 products: product,
                 paymentMethod: paymentMethod,
                 totalPrice: totalPrice,
+                status: 'verified',
                 address: orderAddress.address[0],
-                discount : product.orginalPrice- product.price,
+                discount : product[0].orginalPrice- product[0].price,
                 coupon: 1,
             });
 
@@ -150,6 +154,7 @@ const handlePlaceOrder = async (req, res) => {
             req.session.orderData = orderData;
             let totalPrice = orderData.reduce((total, item) => total + item.quantity * item.price, 0);
             totalPrice = totalPrice - couponDiscount;
+            totalPrice += 40;
             const originalPrice = orderData.reduce((total, item) => total + item.quantity * item.orginalPrice, 0);
             const discount = originalPrice - totalPrice;
             const newOrder = new Order({
@@ -157,7 +162,7 @@ const handlePlaceOrder = async (req, res) => {
                 products: orderData,
                 paymentMethod: paymentMethod,
                 status: 'awaiting_payment',
-                totalPrice: totalAmount,
+                totalPrice: totalPrice,
                 address: orderAddress.address[0],
                 discount: discount
             });
@@ -196,9 +201,10 @@ const handlePlaceOrder = async (req, res) => {
                 subtotal: cartItem.quantity * cartItem.price,
                 orginalPrice: cartItem.orginalPrice
             }));
-            console.log(orderData);
+            // console.log(orderData);
             let totalPrice = orderData.reduce((total, item) => total + item.quantity * item.price, 0);
             totalPrice = totalPrice - couponDiscount;
+            totalPrice += 40;
             let originalPrice = orderData.reduce((total, item) => total + item.quantity * item.orginalPrice, 0);
             const discount = originalPrice - totalPrice;
             console.log('offer:', discount);
@@ -238,6 +244,7 @@ const handlePlaceOrder = async (req, res) => {
                     await Product.updateOne({ _id: item.productId }, { $inc: { quantity: -item.quantity, purchaseCount: item.quantity } });
                 })
             ])
+            req.session.count.cart = 0;
             res.status(200).json({ status: 'success', redirect: '/order-success' });
         }
     } catch (error) {
@@ -511,7 +518,7 @@ const verifypayment = async (req, res) => {
 // }
 const renderOrderSuccess = (req, res) => {
     // req.session.cout.cart = 
-    res.render('user/order-success', { user: req.session.user });
+    res.render('user/order-success', { user: req.session.user, count: req.session.count });
 }
 
 const handleReturnProduct = async (req, res) => {

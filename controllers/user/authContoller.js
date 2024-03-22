@@ -9,121 +9,6 @@ const sendMail = require('../../configs/nodemailer');
 // const { v4: uuidv4 } = require('uuid');
 const generateReferralCode = require('../../configs/generateReferralCode');
 
-const renderHome = async (req, res) => {
-    try {
-        // console.log('1',req.session);
-        if (req.session.passport) {
-            req.session.user = req.session.passport.user._id;
-        }
-        const products = await Product.find({ isBlocked: false });
-        // console.log(products);
-        // req.session.user ? res.render('user/home', { user: req.session.user, products }) : res.render('user/home', { products });
-        res.render('user/home', { home: true, products, user: req.session.user ? req.session.user : false, count: req.session.count });
-        // res.render('user/order-success');
-    } catch (error) {
-        console.error(error);
-    }
-}
-const renderShop = async (req, res) => {
-    try {
-        console.log(req.query);
-        let products;
-        let productsCount;
-
-        productsCount = await Product.find({ isBlocked: false }).countDocuments();
-        products = await Product.find({ isBlocked: false });
-        res.render('user/shop', { shop: true, products, productsCount, user: req.session.user ? req.session.user : false, count: req.session.count });
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const sortAndFilter = async (req, res) => {
-    try {
-        console.log(req.body);
-        const { sort, filter, search, page } = req.body;
-        let pageNumber = parseInt(page);
-        pageNumber = pageNumber == 1? 0: (pageNumber-1) * 8;
-        let sortQuery = {};
-        if (sort == "") {
-            sortQuery = { _id: 1 }
-        } else if (sort == "price-low") {
-            sortQuery = { promotionalPrice: 1 }
-        } else if (sort == "price-high") {
-            sortQuery = { promotionalPrice: -1 }
-        }
-        let filterQuery = {};
-        if (filter == "" || filter == "all") {
-            filterQuery = { isBlocked: false };
-        } else if (filter == "inStock") {
-            filterQuery = { isBlocked: false, quantity: { $gt: 0 } };
-        }
-        let searchQuery = {};
-        if (search !== "") {
-            searchQuery = { name: { $regex: search, $options: 'i' } }; // Case-insensitive search for product name
-        }
-        const finalQuery = { ...filterQuery, ...searchQuery };
-        const productsCount = await Product.countDocuments(finalQuery);
-        console.log(pageNumber);
-        const products = await Product.find(finalQuery).sort(sortQuery).limit(8).skip(pageNumber);
-        res.status(200).json({ products, productsCount });
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-
-const renderSearchProduct = async (req, res) => {
-    try {
-        console.log('hit');
-        const { searchvalue } = req.body;
-        const products = await Product.find({
-            isBlocked: false,
-            name: { $regex: searchvalue, $options: 'i' } // Case-insensitive search by name only
-        });
-        console.log('Searched:', products);
-        res.status(200).json({ products });
-    } catch (error) {
-        console.error(error);
-    }
-}
-const renderSortByProducts = async (req, res) => {
-    try {
-        console.log('hit');
-        console.log(req.body);
-        const { sortBy } = req.body;
-        let products;
-        if (sortBy == 'price-high') {
-            products = await Product.find({}).sort({ promotionalPrice: -1 });
-        } else if (sortBy == 'price-low') {
-            products = await Product.find({}).sort({ promotionalPrice: 1 });
-        } else if (sortBy == 'latest') {
-            products = await Product.find({}).sort({ _id: -1 });
-        } else if (sortBy == 'featured') {
-            products = await Product.find({}).sort({ purchaseCount: -1 });
-        }
-        // console.log(products);
-        res.status(200).json({ products });
-    } catch (error) {
-
-    }
-}
-const renderProductDetails = async (req, res) => {
-    try {
-        const productId = new ObjectId(req.query.id);
-        const productDetails = await Product.findById(req.query.id);
-        if (req.session.user) {
-            const userId = new ObjectId(req.session.user);
-            const itemInCart = await User.findOne({ _id: userId, cart: { $elemMatch: { productId: productId } } });
-            // console.log(cart);
-            return res.render('user/product-details', { user: req.session.user ? true : false, product: productDetails, count: req.session.count, itemInCart });
-        }
-        // console.log(productDetails);
-        res.render('user/product-details', { user: req.session.user ? true : false, product: productDetails });
-    } catch (error) {
-        console.error(error);
-    }
-}
 const renderLogin = (req, res) => {
     if (req.session.user) {
         // console.log(req.session.user);
@@ -300,7 +185,6 @@ const handleForgotPassword = async (req, res) => {
 }
 
 module.exports = {
-    renderHome,
     renderLogin,
     handleLogin,
     renderSignup,
@@ -309,15 +193,10 @@ module.exports = {
     handleVerifyEmail,
     handleResendOtp,
     handleLogout,
-    renderProductDetails,
     renderForgotPasswordEmail,
     handleForgotPasswordEmail,
     forgotPasswordOtp,
     handleForgotPasswordOtp,
     renderForgotPassword,
     handleForgotPassword,
-    renderShop,
-    renderSortByProducts,
-    renderSearchProduct,
-    sortAndFilter
 }

@@ -1,4 +1,5 @@
-const userController = require('../controllers/user/userController');
+const authController = require('../controllers/user/authContoller');
+const userController = require('../controllers/user/productsController');
 const profileController = require('../controllers/user/profileController');
 const cartController = require('../controllers/user/cartController');
 const orderController = require('../controllers/user/orderController');
@@ -12,28 +13,30 @@ const isAuthenticated = require('../middlewares/isAuthenticatedUser');
 const passport = require('passport');
 // const cartCount = require('../middlewares/cartCount');
 
-// router.use(cartCount);
-router.get('/login', userFound, userController.renderLogin);
-router.post('/login', userFound, userController.handleLogin);
-router.get('/signup', userFound, userController.renderSignup);
-router.post('/signup', userFound, userController.handleSignup);
-router.get('/verify-email', userFound, userController.renderVerifyEmail);
-router.post('/verify-email', userFound, userController.handleVerifyEmail);
-router.get('/resend-otp', userFound, userController.handleResendOtp);
-router.get('/forgot-password-email', userFound, userController.renderForgotPasswordEmail);
-router.post('/forgot-password-email', userFound, userController.handleForgotPasswordEmail);
-router.get('/forgot-password-otp', userFound, userController.forgotPasswordOtp);
-router.post('/forgot-password-otp', userFound, userController.handleForgotPasswordOtp);
-router.get('/forgot-password', userFound, userController.renderForgotPassword);
-router.post('/forgot-password', userFound, userController.handleForgotPassword);
 
-router.get('/logout', userController.handleLogout);
+// Products controller
 router.get('/', isBlocked, userController.renderHome);
 router.get('/shop', isBlocked, userController.renderShop);
 router.post('/shop', isBlocked, userController.sortAndFilter);
 router.get('/product-details', userController.renderProductDetails);
-router.post('/products-sort', userController.renderSortByProducts);
-router.post('/products-search', userController.renderSearchProduct);
+
+// Authentication contollers
+router.get('/login', userFound, authController.renderLogin);
+router.post('/login', userFound, authController.handleLogin);
+router.get('/signup', userFound, authController.renderSignup);
+router.post('/signup', userFound, authController.handleSignup);
+router.get('/verify-email', userFound, authController.renderVerifyEmail);
+router.post('/verify-email', userFound, authController.handleVerifyEmail);
+router.get('/resend-otp', userFound, authController.handleResendOtp);
+router.get('/forgot-password-email', userFound, authController.renderForgotPasswordEmail);
+router.post('/forgot-password-email', userFound, authController.handleForgotPasswordEmail);
+router.get('/forgot-password-otp', userFound, authController.forgotPasswordOtp);
+router.post('/forgot-password-otp', userFound, authController.handleForgotPasswordOtp);
+router.get('/forgot-password', userFound, authController.renderForgotPassword);
+router.post('/forgot-password', userFound, authController.handleForgotPassword);
+router.get('/logout', authController.handleLogout);
+
+
 
 
 // Route for initiating Google OAuth 2.0 authentication
@@ -52,7 +55,7 @@ router.use(isBlocked);
 router.use(isAuthenticated);
 
 // Profile Controller
-router.get('/profile', profileController.renderEditProfile);
+router.get('/profile', profileController.renderProfile);
 router.post('/edit-details', profileController.handleEditDetails);
 router.get('/addNewAddress', profileController.rednerAddNewAddress);
 router.post('/addNewAddress', profileController.handleAddNewAddress);

@@ -11,7 +11,7 @@ var instance = new Razorpay({
     key_secret: 'gJQKhh0UcUekJlYa3oqdKttw',
 });
 
-const renderEditProfile = async (req, res) => {
+const renderProfile = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
         // const user = await User.findOne({ _id: userId });
@@ -37,7 +37,7 @@ const renderEditProfile = async (req, res) => {
                 }
             ])
         ])
-        console.log('user', user);
+        // console.log('user', user);
         // console.log(addresses);
         // const userOrders = await Order.find({ userId }, { address: 0, userId: 0, });
         // const userOrders = await Order.aggregate([
@@ -60,7 +60,7 @@ const renderEditProfile = async (req, res) => {
         //         }
         //     }
         // ])
-        console.log('Orders', userOrders);
+        // console.log('Orders', userOrders);
         res.render('user/profile', { user, addresses, orders: userOrders, count: req.session.count });
     } catch (error) {
         console.error(error);
@@ -213,7 +213,8 @@ const verifyWalletPayment = async (req, res) => {
                     walletHistory: { // Push a new transaction object to the wallet history array
                         type: "credit", // Type of transaction (e.g., credit)
                         amount: addAmount, // Amount credited
-                        balance: updatedBalance, // Updated wallet balance after the credit
+                        balance: updatedBalance,
+                        description: "Added funds manually by user", 
                         date: Date.now()
                     }
                 }
@@ -232,8 +233,8 @@ const renderOrderDeatils = async (req, res) => {
     try {
         const orderId = new ObjectId(req.query.id);
         const order = await Order.findById(orderId);
-        console.log('o', order);
-        res.render('user/order-details', { user: true, order });
+        // console.log('o', order);
+        res.render('user/order-details', { user: true, order, count: req.session.count });
     } catch (error) {
         console.error(error);
     }
@@ -276,7 +277,7 @@ const redeemReferralCode = async (req, res) => {
 }
 
 module.exports = {
-    renderEditProfile,
+    renderProfile,
     handleEditDetails,
     rednerAddNewAddress,
     handleAddNewAddress,

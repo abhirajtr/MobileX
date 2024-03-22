@@ -230,7 +230,7 @@
                                                                     <td>
                                                                         <%= o.status %>
                                                                     </td>
-                                                                    <td>$<%= o.totalPrice %>
+                                                                    <td>₹<%= o.totalPrice %>
                                                                     </td>
                                                                     <td><a href="/order-details?id=<%= o._id %>"
                                                                             class="btn-small d-block">View</a></td>
@@ -318,15 +318,15 @@
                                                             <tr>
                                                                 <th>Date and Time</th>
                                                                 <th>Type</th>
+                                                                <th>Description</th>
                                                                 <th>Amount</th>
                                                                 <th>Balance</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <% // Sort the wallet history by date in descending order
+                                                            <%
                                                                 user.walletHistory.sort((a, b)=> new Date(b.date) - new
                                                                 Date(a.date));
-                                                                // Iterate over the sorted wallet history
                                                                 user.walletHistory.forEach(w => {
                                                                 %>
                                                                 <tr>
@@ -335,6 +335,9 @@
                                                                     </td>
                                                                     <td>
                                                                         <%= w.type %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= w.description %>
                                                                     </td>
                                                                     <td>
                                                                         <%= w.amount %>

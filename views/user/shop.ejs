@@ -34,7 +34,7 @@
                     <div class="col-lg-12">
                         <div class="shop-product-fillter">
                             <div class="totall-product">
-                                <p> We found <strong class="text-brand">
+                                <p> We found <strong class="text-brand" id="productsCount">
                                         <%= productsCount %>
                                     </strong> items for you!</p>
                             </div>
@@ -87,7 +87,7 @@
                                 </div>
 
                                 <div class="dropdown ml-10" id="filter-dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle sort-dropdown" type="button"
+                                    <button class="btn btn-warning dropdown-toggle sort-dropdown" type="button"
                                         id="filter-btn" data-bs-toggle="dropdown" aria-expanded="false">
                                         Filter
                                     </button>
@@ -129,7 +129,7 @@
                                                         alt="">
                                                 </a>
                                             </div>
-                                            <div class="product-action-1">
+                                            <!-- <div class="product-action-1">
                                                 <a aria-label="Quick view" class="action-btn hover-up"
                                                     data-bs-toggle="modal" data-bs-target="#quickViewModal">
                                                     <i class="fi-rs-search"></i></a>
@@ -137,7 +137,7 @@
                                                     href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
                                                 <a aria-label="Compare" class="action-btn hover-up"
                                                     href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                            </div>
+                                            </div> -->
                                             <div class="product-badges product-badges-position product-badges-mrg">
                                                 <!-- <span class="hot">Hot</span> -->
                                             </div>
@@ -158,10 +158,10 @@
                                                 <span>&#8377;<%= p.promotionalPrice %></span>
                                                 <span class="old-price">&#8377;<%= p.regularPrice %></span>
                                             </div>
-                                            <div class="product-action-1 show">
+                                            <!-- <div class="product-action-1 show">
                                                 <a aria-label="Add To Cart" class="action-btn hover-up"
                                                     href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -171,9 +171,14 @@
                         <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
                             <nav aria-label="Page navigation example">
                                 <ul class="pagination justify-content-start" id="pagination">
-                                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                                    <% const totalPages=Math.ceil(productsCount / 8); %>
+                                        <% for (let i=1; i <=totalPages; i++) { %>
+                                            <li class="page-item <%= i === 1 ? 'active' : '' %>">
+                                                <a class="page-link" href="#">
+                                                    <%= i < 10 ? '0' + i : i %>
+                                                </a>
+                                            </li>
+                                            <% } %>
                                 </ul>
                             </nav>
                         </div>
@@ -199,7 +204,7 @@
 
         $('#sort-dropdown').on('click', 'a', function () {
             var sortBy = $(this).text();
-            $('#sort-btn').text('Sort by: ' + sortBy);
+            $('#sort-btn').text(sortBy);
             var selectedValue = $(this).data('value');
             sort = selectedValue; // Update 'sort' variable
             console.log(sort);
@@ -259,6 +264,7 @@
                 method: 'POST',
                 data: { sort: sort, filter: filter, search: search, page: page },
                 success: function (response) {
+                    document.getElementById('productsCount').innerHTML = response.productsCount;
                     // Clear the current product list
                     $('#product-list').empty();
                     // Iterate over the sorted products and append them to the product list
@@ -311,6 +317,7 @@
                 `;
                         $('#product-list').append(productHtml);
                     });
+
                 }
             });
         }
