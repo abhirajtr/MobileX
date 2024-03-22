@@ -26,84 +26,13 @@ const handleAddToCart = async (req, res) => {
     }
 }
 
-
-
-const changeQuantity = async (req, res) => {
-    try {
-        // console.log('herere--------');
-        const id = req.body.productId;
-        const user = req.session.user;
-        const count = req.body.count;
-
-        // console.log(user);
-        // console.log(id, "productId");
-
-        const findUser = await User.findOne({ _id: user });
-        // console.log(findUser);
-        const findProduct = await Product.findOne({ _id: id });
-
-        if (findUser) {
-            // console.log('iam here--');
-            const productExistinCart = findUser.cart.find(item => item.productId === id);
-            // console.log(productExistinCart, 'this is product in cart');
-            let newQuantity
-            if (productExistinCart) {
-                // console.log('iam in the carrt----------------------mm');
-                // console.log(count);
-                if (count == 1) {
-                    // console.log("count + 1");
-                    newQuantity = productExistinCart.quantity + 1
-                } else if (count == -1) {
-                    // console.log("count - 1");
-                    newQuantity = productExistinCart.quantity - 1
-                } else {
-                    // console.log("errrrrrrrr");
-                    return res.status(400).json({ status: false, error: "Invalid count" })
-                }
-            } else {
-                // console.log('hhihihihihihi../');
-            }
-            // console.log('hiiiiiiiiiiiiiiiiiiii',newQuantity);
-            console.log(newQuantity, 'this id new Quantity');
-            if (newQuantity > 0 && newQuantity <= findProduct.quantity) {
-                let quantityUpdated = await User.updateOne(
-                    { _id: user, "cart.productId": id },
-                    {
-                        $set: {
-                            "cart.$.quantity": newQuantity
-                        }
-                    }
-                )
-                const totalAmount = findProduct.salePrice
-
-
-                // console.log(totalAmount,"totsll");
-                if (quantityUpdated) {
-                    // console.log('iam here inside the cart', quantityUpdated, 'ok');
-
-                    res.json({ status: true, quantityInput: newQuantity, count: count, totalAmount: totalAmount })
-                } else {
-                    res.json({ status: false, error: 'cart quantity is less' });
-
-                }
-            } else {
-                res.json({ status: false, error: 'out of stock' });
-            }
-        }
-
-    } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ status: false, error: "Server error" });
-    }
-}
 const renderCart = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
-        console.log(userId);
         const cart = await User.aggregate([
             {
                 $match: {
-                    _id: userId // Match the specific user by their _id
+                    _id: userId
                 }
             },
             {
@@ -111,10 +40,10 @@ const renderCart = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "products", // The collection to join with
-                    localField: "cart.productId", // Field from the users collection
-                    foreignField: "_id", // Field from the products collection
-                    as: "cartItems" // Output array field
+                    from: "products", 
+                    localField: "cart.productId", 
+                    foreignField: "_id", 
+                    as: "cartItems" 
                 }
             },
             {
@@ -132,12 +61,9 @@ const renderCart = async (req, res) => {
                 }
             }
         ]);
-        // Calculate the total amount
         const totalAmount = cart.reduce((total, item) => total + item.subtotal, 0);
-        req.session.totalAmount = totalAmount;
-        // console.log(totalAmount);
-        // console.log(cart);
-        res.render('user/cart', { cart, totalAmount: req.session.totalAmount, user: req.session.user, count: req.session.count });
+        req.session.totalPrice = totalAmount;
+        res.render('user/cart', { cart, totalAmount: req.session.totalPrice, user: req.session.user, count: req.session.count });
     } catch (error) {
         console.error(error);
     }
@@ -145,12 +71,13 @@ const renderCart = async (req, res) => {
 
 const handleUpdateQuantity = async (req, res) => {
     try {
-        // console.log(req.body);
         const userId = new mongoose.Types.ObjectId(req.session.user);
         const productId = new mongoose.Types.ObjectId(req.body.productId);
         const newQuantity = parseInt(req.body.newQuantity);
-        // const count = Number(req.body.count);
-        // console.log(userId, productId, count);
+        const product = await Product.findOne({ _id: productId });
+        if (product.quantity < newQuantity) {
+            return res.status(400).json({ status: 'error', message: 'Insufficient product quantity', newQuantity: newQuantity-1 });
+        }
         const updated = await User.findOneAndUpdate({ _id: userId, 'cart.productId': productId },
             { $set: { 'cart.$.quantity': newQuantity } });
 
@@ -182,13 +109,8 @@ const handleUpdateQuantity = async (req, res) => {
                 $project: { _id: 0, totalPrice: 1 } // Project only the totalPrice field
             }
         ]);
-        req.session.totalAmount = totalAmount[0].totalPrice;
+        req.session.totalPrice = totalAmount[0].totalPrice;
         console.log(req.session);
-
-        // Find the updated item in the cart array
-        // console.log(updated);
-        // const updatedItem = updated.cart.find(item => item.productId == productId);
-        // console.log(updatedItem);
         res.status(200).json({ status: 'success' });
     } catch (error) {
         console.error(error);
@@ -199,13 +121,13 @@ const renderCheckout = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.user);
         const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
+        let walletBalance = await User.findById(userId, { walletBalance: 1 });
+        walletBalance = walletBalance.walletBalance;
         let cart = [];
         let totalPrice;
-        console.log(req.query);
+        // buyNow
         if (req.query.product == 'single') {
-            console.log('p', req.query);
             const product = await Product.findById(req.query.productId);
-            console.log('product', product);
             cart.push({
                 productId: product._id,
                 productName: product.name,
@@ -219,7 +141,6 @@ const renderCheckout = async (req, res) => {
                 subtotal: product.promotionalPrice
             });
             totalPrice = product.promotionalPrice;
-            // req.session.cart = cart;
             req.session.totalAmount = totalPrice;
             req.session.productId = req.query.productId;
         } else {
@@ -256,10 +177,11 @@ const renderCheckout = async (req, res) => {
                 }
             ]);
             totalPrice = cart.reduce((total, item) => total + item.subtotal, 0);
+            req.totalPrice = totalPrice;
         }
 
         console.log(cart);
-        res.render('user/checkout', { user: true, cart, totalPrice, addresses });
+        res.render('user/checkout', { user: true, cart, totalPrice, addresses, walletBalance, couponCode: res.locals.couponCode, finalPrice: res.locals.finalPrice  });
     } catch (error) {
         console.error(error);
     }
@@ -281,10 +203,11 @@ const handleRemoveProduct = async (req, res) => {
 
 
 
+
+
 module.exports = {
     renderCart,
     handleAddToCart,
-    changeQuantity,
     handleUpdateQuantity,
     renderCheckout,
     handleRemoveProduct,

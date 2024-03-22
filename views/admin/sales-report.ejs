@@ -1,0 +1,336 @@
+<%- include("../partials/admin-header") %>
+
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+        }
+
+
+
+        .active {
+            /* Add styles for the active page */
+
+            color: #fff;
+        }
+
+        .btn:hover {
+            /* Add styles for button hover state */
+            background-color: #ddd;
+        }
+
+        .table-spacing th,
+        .table-spacing td {
+            padding-left: 80px;
+            /* Adjust the value as needed for the desired spacing */
+        }
+
+        th,
+        td,
+        tr,
+        thead {
+            border: 1px solid;
+        }
+    </style>
+    <section class="content-main">
+        <div class="content-header row">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="content-title card-title">Sales Report</h2>
+
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+
+
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select id="salesOption" class="form-select">
+                            <option value="" disabled selected>Select an option</option>
+                            <option value="salesToday">Sales Today</option>
+                            <option value="salesWeekly">Sales This Week</option>
+                            <option value="salesMonthly">Sales This Month</option>
+                            <option value="salesYearly">Sales This Year</option>
+                        </select>
+
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <input type="date" id="salesDate" class="form-control" value="<%= locals.date ? date : '' %>"
+                            onchange="dateWiseFilter()">
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <a href="" id="createSalesReport" class="btn btn-primary mb-2">Generate PDF</a>
+                        <a href="" id="downloadExcelReport" class="btn btn-success mb-2">Download Excel</a>
+                    </div>
+
+                </div>
+            </header>
+        </div>
+
+
+
+
+        <div class="right mt-5 container">
+            <div class="table-responsive">
+                <table id="salesTable" class="table table-hover border">
+                    <thead>
+                        <tr class="border">
+                            <th>#</th>
+                            <th> Data ID</th>
+                            <th scope="col">Customer Name</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">payment</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Discount</th>
+                            <th scope="col" class="text-end"> Total Price </th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <% for (let i=0; i < data.length; i++) { %>
+                            <tr>
+                                <td>
+                                    <%= i + 1 %>
+                                </td>
+                                <td>
+                                    <%= data[i]._id %>
+                                </td>
+                                <td><b>
+                                        <%= data[i].address.name %>
+                                    </b></td>
+
+                                <td>
+                                    <%= data[i].createdAt.toLocaleString('en-IN') %>
+                                </td>
+                                <td>
+                                    <%= data[i].paymentMethod %>
+                                </td>
+                                <td>
+                                    <%= data[i].status %>
+                                </td>
+                                <td class="text-end">
+                                    <%= data[i].discount %>
+                                </td>
+                                <td class="text-end">
+                                    <%= data[i].totalPrice %>
+                                </td>
+
+
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+
+        document.getElementById('salesOption').addEventListener('change', function () {
+            var selectedOption = this.value;
+            if (selectedOption) {
+                fetch('/admin/getSalesData?option=' + selectedOption)
+                    .then(response => response.json())
+                    .then(data => {
+                        var tableBody = document.getElementById('salesTableBody');
+                        tableBody.innerHTML = ''; // Clear the table body
+                        data.forEach((item, index) => {
+                            var row = document.createElement('tr');
+                            row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item._id}</td>
+                        <td><b>${item.address.name}</b></td>
+                        <td>${new Date(item.createdAt).toLocaleString('en-IN')}</td>
+                        <td>${item.paymentMethod}</td>
+                        <td>${item.status}</td>
+                        <td>${item.discount}</td>
+                        <td class="text-end">${item.totalPrice}</td>
+                    `;
+                            tableBody.appendChild(row);
+                        });
+                    });
+            }
+        });
+
+
+        document.getElementById('createSalesReport').addEventListener('click', async (event) => {
+            event.preventDefault();
+            // Get a reference to the table
+            const salesTable = document.getElementById('salesTable');
+
+            const tableBody = salesTable.querySelector('tbody');
+
+            const salesData = []
+            // Iterate through rows in the table
+            for (const row of tableBody.rows) {
+                // Access individual cells in the row
+                const dataId = row.cells[1].textContent
+                const name = row.cells[2].textContent;
+                const dateFull = row.cells[4].textContent;
+                const dateOnly = dateFull.split(',')[0].trim();
+                let totalAmount = row.cells[6].textContent.trim();
+                totalAmount = parseFloat(totalAmount.replace(/[^0-9]/g, ''), 10);
+                // Do something with these values, for example, log them                
+                const dataData = {
+                    dataId: dataId,
+                    name: name,
+                    date: dateOnly,
+                    totalAmount: totalAmount
+                }
+
+                salesData.push(dataData);
+            }
+
+
+            try {
+                const response = await fetch('/admin/generatePdf', {
+                    method: 'post',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify(salesData)
+                })
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'report.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    console.error('Failed to generate PDF');
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+
+        })
+
+
+        document.getElementById('downloadExcelReport').addEventListener('click', async (event) => {
+            event.preventDefault();
+            // Get a reference to the table
+            const salesTable = document.getElementById('salesTable');
+
+            const tableBody = salesTable.querySelector('tbody');
+
+            const salesData = []
+            // Iterate through rows in the table
+            for (const row of tableBody.rows) {
+                // Access individual cells in the row
+                const orderId = row.cells[1].textContent
+                const name = row.cells[2].textContent;
+                const date = row.cells[3].textContent;
+                const payment = row.cells[4].textContent
+                let totalAmount = row.cells[6].textContent.trim();
+                totalAmount = parseFloat(totalAmount.replace(/[^0-9]/g, ''), 10);
+                // Do something with these values, for example, log them                
+                const dataData = {
+                    orderId: orderId,
+                    name: name,
+                    date: date,
+                    totalAmount: totalAmount,
+                    payment: payment
+                }
+
+                salesData.push(dataData);
+            }
+
+            try {
+                const response = await fetch('/admin/downloadExcel', {
+                    method: 'post',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify(salesData)
+                })
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'report.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    console.error('Failed to download Excel file');
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        })
+
+        function dateWiseFilter() {
+            const salesDate = document.getElementById('salesDate').value;
+            fetch(`/admin/salesDateWise?date=${salesDate}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    var tableBody = document.getElementById('salesTableBody');
+                    tableBody.innerHTML = ''; // Clear the table body
+                    data.forEach((item, index) => {
+                        var row = document.createElement('tr');
+                        row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item._id}</td>
+                        <td><b>${item.address.name}</b></td>
+                        <td>${new Date(item.createdAt).toLocaleString('en-IN')}</td>
+                        <td>${item.paymentMethod}</td>
+                        <td>${item.status}</td>
+                        <td>${item.discount}</td>
+                        <td class="text-end">${item.totalPrice}</td>
+                    `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+
+
+        // function dateWiseFilter() {
+        //     const selectedDate = document.getElementById("selectedDate").value;
+        //     // alert(selectedDate);
+        //     window.location.href = `/admin/dateWiseFilter?date=${selectedDate}`
+        //     // $.ajax({
+        //     //     url : "/admin/dateWiseFilter",
+        //     //     method : "post",
+        //     //     data : {
+        //     //         date : selectedDate
+        //     //     },
+        //     //     success : (response)=>{
+        //     //         if(response.status  === true){
+        //     //             alert("done")
+        //     //         }
+        //     //     }
+        //     // })
+        // }
+
+
+
+    </script>
+
+
+
+
+
+
+
+    <%- include("../partials/admin-footer") %>

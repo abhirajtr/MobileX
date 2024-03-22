@@ -1,4 +1,5 @@
-<%- include('../partials/admin-header') %>
+<%- include('../partials/user-header') %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script
     <!-- Template CSS -->
     <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
     <section class="content-main">
@@ -29,17 +30,15 @@
                         <small class="text-muted">Order ID: <%= order._id %></small>
                     </div>
                     <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                        <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200" id="status-select">
-                            <!-- <option>Change status</option> -->
-                            <option value="pending">Pending</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="awaiting_payment">Awaiting payment</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                        </select>
-                        <button class="btn btn-primary" id="status-btn" onclick="updateStatus('<%= order._id %>')">Save</button>
-                        <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
+                        <% if (order.status == 'delivered') { %>
+                            <a class="btn btn-light" onclick="confirmReturn('<%= order._id %>')">Return</a>
+                        <% } else if (order.status == 'cancelled') { %>
+                            <a class="btn btn-secondary disabled" href="#">Cancelled</a>
+                        <% } else if (order.status == 'returned') { %>
+                            <a class="btn btn-secondary disabled" href="#">Returned</a>
+                        <% } else { %>
+                            <a class="btn btn-danger" onclick="confirmCancel('<%= order._id %>')">Cancel Order</a>
+                        <% } %>
                     </div>
                 </div>
             </header> <!-- card-header end// -->
@@ -152,21 +151,44 @@
         </div> <!-- card end// -->
     </section> <!-- content-main end// -->
 
+
     <script>
-        function updateStatus(orderId) {
-            const selectElement = document.getElementById('status-select');
-            const status = selectElement.value;
-            $.ajax({
-                url: '/admin/updateOrderStatus',
-                method: 'POST',
-                data: { orderId,status },
-                success: function(response) {
-                    // window.location.href = '/admin/orders'
-                    if (response.status == 'success') {
-                        window.location.href = response.redirect;
-                    }
-                }
+        function confirmCancel(orderId) {
+            swal({
+                title: "Are you sure?",
+                text: "Once cancelled, you will not be able to undo this action!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
             })
+            .then((willCancel) => {
+                if (willCancel) {
+                    window.location.href = "/cancel-order?id=" + orderId;
+                }
+            });
         }
+    
+        function confirmReturn(orderId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Once returned, you will not be able to undo this action!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, return it!',
+                cancelButtonText: 'No, cancel!',
+                customClass: {
+                    title: 'custom-title',
+                    confirmButton: 'custom-confirm-button',
+                    cancelButton: 'custom-cancel-button'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/return-order?id=" + orderId;
+                }
+            });
+        }
+        
     </script>
-    <%- include('../partials/admin-footer') %>
+    <%- include('../partials/user-footer') %>

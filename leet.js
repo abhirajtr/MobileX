@@ -1,12 +1,11 @@
-var isIsomorphic = function (s, t) {
-    for (let i = 0; i < s.length; i++) {
-        if (s.indexOf(s[i], i + 1) != t.indexOf(t[i], i + 1)) {
-            return false;
-        }
-      }
-      return true;
-};
+function outer () {
+    let x = 1;
+    function inner() {
+        console.log(x);
+    }
+    return inner;
+}
 
-const s = "foo"
-const t = "bar"
-console.log(isIsomorphic(s, t));
+let a = outer();
+
+a();

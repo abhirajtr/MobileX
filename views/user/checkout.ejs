@@ -122,11 +122,25 @@
                                                 <label class="form-check-label" for="cod" data-bs-toggle="collapse"
                                                     data-target="#cod" aria-controls="cod">Cash On Delivery</label>
                                             </div>
-                                            <input class="form-check-input" required="" type="radio" value="razorpay"
-                                                name="payment_option" id="exampleRadios3">
-                                            <label class="form-check-label" for="exampleRadios3"
-                                                data-bs-toggle="collapse" data-target="#bankTranfer"
-                                                aria-controls="razorpay">Paywith razorpay</label>
+                                            <div class="custome-radio">
+
+                                                <input class="form-check-input" required="" type="radio"
+                                                    value="razorpay" name="payment_option" id="exampleRadios3">
+                                                <label class="form-check-label" for="exampleRadios3"
+                                                    data-bs-toggle="collapse" data-target="#bankTranfer"
+                                                    aria-controls="razorpay">Paywith razorpay</label>
+                                            </div>
+                                            <div class="custome-radio">
+
+                                                <input class="form-check-input" required="" type="radio" value="wallet"
+                                                    name="payment_option" id="wall">
+                                                <label class="form-check-label" for="wall" data-bs-toggle="collapse"
+                                                    data-target="#bankTranfer" aria-controls="razorpay">Wallet</label>
+                                                Balance: <span id="walletBalance">
+                                                    <%= walletBalance %>
+                                                </span>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -181,7 +195,7 @@
                                             <% } else { %>
                                                 <p>No addresses found.</p>
                                                 <% } %>
-
+                                                <a  href="/addNewAddress" style="width: max-content;" class="btn btn-sm d-block">Add new address</a>
                                                     <button onclick="placeOrder()"
                                                         class="btn btn-fill-out btn-block mt-30">Place
                                                         Order</button>
@@ -202,6 +216,34 @@
         //     console.log('ready');
 
         // })
+        function handlePaymentOptionChange() {
+            // Get the selected payment option
+            const paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
+            const paymentOptionBtn = document.querySelector('input[name="payment_option"]:checked');
+
+
+            // If the selected payment option is "wallet"
+            if (paymentOption === "wallet") {
+                // Get the wallet balance
+                const walletBalance = parseFloat(document.getElementById('walletBalance').textContent);
+
+                // Get the total amount
+                const totalAmount = parseFloat(document.getElementById('totalPrice').textContent); // Assuming you have an element with id "totalAmount" displaying the total amount
+
+                // If total amount is greater than wallet balance, show SweetAlert
+                if (totalAmount > walletBalance) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Insufficient Wallet Balance',
+                        text: 'Please choose a different payment option or recharge your wallet.',
+                    });
+                    paymentOptionBtn.checked = false;
+                }
+            }
+        }
+
+        const walletRadioButton = document.getElementById('wall');
+        walletRadioButton.addEventListener('change', handlePaymentOptionChange);
 
         function checkPaymentOption() {
             const radioButtons = document.querySelectorAll('input[name="payment_option"]');
@@ -255,7 +297,35 @@
             return true;
         }
 
+        // coupon
+        let couponApplied = false;
+        let discount = 0;
+        let coupon = "";
+        document.getElementById('applyCouponBtn').addEventListener('click', function (event) {
+            event.preventDefault();
+            if (couponApplied) {
+                displayMessage('Coupon has already been applied.');
+                return;
 
+            }
+            let couponValue = document.getElementById('couponInput').value;
+            const totalPriceElement = document.getElementById('totalPrice');
+            const totalPrice = parseInt(totalPriceElement.innerText);
+            $.ajax({
+                url: '/apply-coupon',
+                method: 'POST',
+                data: { couponCode: couponValue, totalPrice },
+                success: function (response) {
+                    couponApplied = true;
+                    discount = response.discountAmount;
+                    coupon = couponValue;
+                    totalPriceElement.innerText = response.finalPrice
+                },
+                error: function (xhr) {
+                    displayMessage(xhr.responseJSON.error)
+                }
+            })
+        });
         function placeOrder() {
             if (!checkPaymentOption()) return
             if (!checkAddress()) return
@@ -265,7 +335,7 @@
             $.ajax({
                 url: '/place-order',
                 method: 'POST',
-                data: { paymentMethod, address },
+                data: { paymentMethod, address, coupon, discount },
                 success: function (response) {
                     console.log(response);
                     if (response.paymentMethod == 'razorpay') {
@@ -320,33 +390,7 @@
             })
         }
 
-
-        document.getElementById('applyCouponBtn').addEventListener('click', function (event) {
-            event.preventDefault();
-            var couponValue = document.getElementById('couponInput').value;
-            const totalPriceElement = document.getElementById('totalPrice');
-            const totalPrice = parseInt(totalPriceElement.innerText); // Convert total price to a float number
-            // console.log(couponValue);
-            // Now you can use the 'couponValue' variable to do whatever you need with the entered coupon code
-            $.ajax({
-                url: '/apply-coupon',
-                method: 'POST',
-                data: { couponCode: couponValue, totalPrice },
-                success: function (response) {
-                    // console.log(response);
-                    // const couponDiscountPercentage = response.couponDiscount; // Get the discount percentage
-                    // console.log(totalPrice);
-                    // const discountAmount = (totalPrice * couponDiscountPercentage) / 100; // Calculate discount amount
-                    // const finalPrice = totalPrice - discountAmount; // Subtract discount amount from total price
-
-                    // Render the final price in the totalPriceElement
-                    totalPriceElement.innerText = response.finalPrice
-                },
-                error: function (xhr) {
-                    displayMessage(xhr.responseJSON.error)
-                }
-            })
-        });
+        
 
         function displayMessage(error) {
             const errorMessage = document.getElementById('errorMessage');

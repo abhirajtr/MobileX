@@ -1,11 +1,13 @@
 <%- include('../partials/admin-header') %>
-    <!-- Template CSS -->
-    <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
+<style>
+    
+</style>
     <section class="content-main">
         <div class="content-header">
             <div>
                 <h2 class="content-title card-title">Order detail</h2>
-                <p>Details for Order ID: <%= order._id %></p>
+                <p>Details for Order ID: <%= order._id %>
+                </p>
             </div>
         </div>
         <div class="card">
@@ -13,8 +15,8 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
                         <span>
-                            <i class="material-icons md-calendar_today"></i> <b>
-                                <%= order.createdAt.toLocaleString().split(' ')[0] %>
+                            <i class="material-icons md-calendar_today"></i>
+                            <%= order.createdAt.toLocaleString().split(' ')[0] %>
                             <!-- <%= new Date(order.createdAt).toLocaleDateString() %> -->
                             <% function formatAMPM(date) { var hours=date.getHours(); var minutes=date.getMinutes(); var
                                 ampm=hours>= 12 ? 'PM' : 'AM';
@@ -24,7 +26,6 @@
                                     + ' ' + ampm; return strTime; } var formattedDate=formatAMPM(new
                                     Date(order.createdAt)); %>
                                     <%= formattedDate %>
-                            </b>
                         </span> <br>
                         <small class="text-muted">Order ID: <%= order._id %></small>
                     </div>
@@ -38,7 +39,7 @@
                             <option value="shipped">Shipped</option>
                             <option value="delivered">Delivered</option>
                         </select>
-                        <button class="btn btn-primary" id="status-btn" onclick="updateStatus('<%= order._id %>')">Save</button>
+                        <button class="btn btn-primary" id="status-btn" onclick="updateStatus('<%= order._id %>','<%= order.products[0].productId %>')">Save</button>
                         <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
                     </div>
                 </div>
@@ -53,9 +54,8 @@
                             <div class="text">
                                 <h6 class="mb-1">Customer</h6>
                                 <p class="mb-1">
-                                    <%= order.address.name %> <br> <template class="__cf_email__"
-                                        data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template>
-                                    <br> +91 <%= order.address.phone %>
+                                    <%= order.address.name %>
+                                        <br> +91<%= order.address.phone %>
                                 </p>
                                 <!-- <a href="#">View profile</a> -->
                             </div>
@@ -69,7 +69,8 @@
                             <div class="text">
                                 <h6 class="mb-1">Order info</h6>
                                 <p class="mb-1">
-                                    Shipping: Fargo express <br> Payment method: <%= order.paymentMethod %> <br> Status: <%= order.status %>
+                                    Shipping: Fargo express <br> Pay method: <%= order.paymentMethod %>
+                                        <br>Status:<span class="badge rounded-pill alert-success text-sm" style="width: min-content;"><%= order.products[0].status %></span>
                                 </p>
                                 <!-- <a href="#">Download info</a> -->
                             </div>
@@ -83,7 +84,8 @@
                             <div class="text">
                                 <h6 class="mb-1">Deliver to</h6>
                                 <p class="mb-1">
-                                   Landmark: <%= order.address.city %>  <br>City:<%= order.address.landmark %> <br> Po Box <%= order.address.pincode %>
+                                    City: <%= order.address.city %> <br>Landmark: <%= order.address.landmark %> <br>
+                                            Pincode: <%= order.address.pincode %>
                                 </p>
                                 <!-- <a href="#">View profile</a> -->
                             </div>
@@ -91,7 +93,7 @@
                     </div> <!-- col// -->
                 </div> <!-- row // -->
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-lg-10">
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
@@ -103,43 +105,52 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% order.products.forEach(p => { %>
-                                        <tr>
-                                            <td>
-                                                <a class="itemside" href="#">
-                                                    <div class="left" style="object-fit: contain;">
-                                                        <img style="object-fit: contain;" src="/product-images/<%= p.image %>" width="40" height="40"
-                                                            class="img-xs" alt="Item">
-                                                    </div>
-                                                    <div class="info"><%= p.productName %>(<%= p.color %>, <%= p.storage %>GB)(<%= p.ram %> RAM)</div>
-                                                </a>
-                                            </td>
-                                            <td> &#8377; <%= p.price  %> </td>
-                                            <td> <%= p.quantity %> </td>
-                                            <td class="text-end"> &#8377;<%= p.subtotal %> </td>
-                                        </tr>
-                                    <% }) %>
+                                    <tr>
+                                        <td>
+                                            <a class="itemside" href="#">
+                                                <div class="left">
+                                                    <img style="object-fit: contain;"
+                                                        src="/product-images/<%= order.products[0].image %>" width="40"
+                                                        height="40" class="img-xs" alt="Item">
+                                                </div>
+                                                <div class="info">
+                                                    <%= order.products[0].productName %> (<%= order.products[0].color %>
+                                                            , <%= order.products[0].storage %> GB)
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td> &#8377;<%= order.products[0].price %>
+                                        </td>
+                                        <td>
+                                            <span class="ml-10"> <%= order.products[0].quantity %></span>
+                                        </td>
+                                        <td class="text-end">&#8377;<%= order.products[0].subtotal %>
+                                        </td>
+                                    </tr>
+
                                     <tr>
                                         <td colspan="4">
-                                            <article class="float-end">
+                                            <article class="float-end mt-3">
                                                 <!-- <dl class="dlist">
                                                     <dt>Subtotal:</dt>
                                                     <dd>$973.35</dd>
-                                                </dl> -->
-                                                <!-- <dl class="dlist">
+                                                </dl>
+                                                <dl class="dlist">
                                                     <dt>Shipping cost:</dt>
                                                     <dd>$10.00</dd>
                                                 </dl> -->
                                                 <dl class="dlist">
                                                     <dt>Grand total:</dt>
-                                                    <dd> <b class="h5">&#8377;<%= order.totalPrice %></b> </dd>
+                                                    <dd> <b class="h5">&#8377;<%= order.products[0].subtotal%>.00</b> </dd>
                                                 </dl>
-                                                <dl class="dlist">
+                                                <!-- <dl class="dlist">
                                                     <dt class="text-muted">Status:</dt>
                                                     <dd>
-                                                        <span class="badge rounded-pill alert-success text-success"><%= order.status %></span>
+                                                        <span
+                                                            class="badge rounded-pill alert-success text-success">Payment
+                                                            done</span>
                                                     </dd>
-                                                </dl>
+                                                </dl> -->
                                             </article>
                                         </td>
                                     </tr>
@@ -147,26 +158,45 @@
                             </table>
                         </div> <!-- table-responsive// -->
                     </div> <!-- col// -->
+                    <div class="col-lg-1"></div>
+                    <!-- <div class="col-lg-4">
+                    <div class="box shadow-sm bg-light">
+                        <h6 class="mb-15">Payment info</h6>
+                        <p>
+                            <img src="assets/imgs/card-brands/2.png" class="border" height="20"> Master Card **** ****
+                            4768 <br>
+                            Business name: Grand Market LLC <br>
+                            Phone: +1 (800) 555-154-52
+                        </p>
+                    </div>
+                    <div class="h-25 pt-4">
+                        <div class="mb-3">
+                            <label>Notes</label>
+                            <textarea class="form-control" name="notes" id="notes"
+                                placeholder="Type some note"></textarea>
+                        </div>
+                        <button class="btn btn-primary">Save note</button>
+                    </div>
+                </div> -->
                 </div>
-            </div> <!-- card-body end// -->
-        </div> <!-- card end// -->
-    </section> <!-- content-main end// -->
-
-    <script>
-        function updateStatus(orderId) {
-            const selectElement = document.getElementById('status-select');
-            const status = selectElement.value;
-            $.ajax({
-                url: '/admin/updateOrderStatus',
-                method: 'POST',
-                data: { orderId,status },
-                success: function(response) {
-                    // window.location.href = '/admin/orders'
-                    if (response.status == 'success') {
-                        window.location.href = response.redirect;
-                    }
-                }
-            })
-        }
-    </script>
+            </div>
+        </div>
+    </section>
     <%- include('../partials/admin-footer') %>
+        <script>
+            function updateStatus(orderId, productId) {
+                const selectElement = document.getElementById('status-select');
+                const status = selectElement.value;
+                $.ajax({
+                    url: '/admin/updateOrderStatus',
+                    method: 'POST',
+                    data: { orderId, productId, status },
+                    success: function(response) {
+                        // window.location.href = '/admin/orders'
+                        if (response.status == 'success') {
+                            window.location.href = response.redirect;
+                        }
+                    }
+                })
+            }
+        </script>

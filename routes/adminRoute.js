@@ -3,6 +3,7 @@ const userController = require('../controllers/admin/userController');
 const productController = require('../controllers/admin/productController');
 const orderController = require('../controllers/admin/orderController');
 const brandController = require('../controllers/admin/brandController');
+const categoryController = require('../controllers/admin/categoryControler');
 const couponController = require('../controllers/admin/couponController');
 const isAuthenticated = require('../middlewares/isAuthenticatedAdmin');
 const { Router } = require('express');
@@ -11,7 +12,7 @@ const upload = require('../configs/multer');
 
 router.get('/login', adminController.renderLogin);
 router.post('/login', adminController.handleLogin);
-// router.use(isAuthenticated);
+router.use(isAuthenticated);
 router.get('/dashboard', adminController.renderDashboard); 
 router.get('/users', userController.renderUsers);
 router.get('/block-user', userController.blockUser);
@@ -54,5 +55,12 @@ router.get('/coupon-edit', couponController.renderEditCoupon);
 router.post('/coupon-edit', couponController.handleEditCoupon);
 
 router.get('/logout', adminController.handleLogout);
+
+router.get('/sales-report', adminController.renderSalesReport);
+router.get('/getSalesData', adminController.getSalesData);
+router.get('/salesDateWise', adminController.dateWiseFiter);
+router.post('/downloadExcel', adminController.downloadExcel);
+
+router.post('/category-addOffer', categoryController.handleAddOffer)
 
 module.exports = router;

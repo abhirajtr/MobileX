@@ -39,28 +39,55 @@
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>List/Unlist</th>
+                                        <th>Offer</th>
+                                        <th>Add Offer</th>
                                         <th class="text-end">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
-                                    <% category.forEach(c => { %>
+
+                                    <% category.forEach(c=> { %>
                                         <tr>
                                             <!-- <td class="align-middle"><%= c._id %></td> -->
-                                            <td class="align-middle"><b><%= c.name %></b></td>
-                                            <td style="max-width: 12rem;"><%= c.description %></td>
+                                            <td class="align-middle"><b>
+                                                    <%= c.name %>
+                                                </b></td>
+                                            <td style="max-width: 12rem;">
+                                                <%= c.description %>
+                                            </td>
                                             <td class="align-middle">
                                                 <% if (c.isListed) { %>
-                                                    <a href="/admin/category-unlist?id=<%= c._id %>"class="btn btn-danger rounded btn-sm font-sm w-100">Unlist</a>
-                                                    <%  } else { %>
-                                                        <a href="/admin/category-list?id=<%= c._id %>"class="btn btn-success rounded btn-sm font-sm w-100">List</a>
-                                                <% } %>
+                                                    <a href="/admin/category-unlist?id=<%= c._id %>"
+                                                        class="btn btn-danger rounded btn-sm font-sm w-100">Unlist</a>
+                                                    <% } else { %>
+                                                        <a href="/admin/category-list?id=<%= c._id %>"
+                                                            class="btn btn-success rounded btn-sm font-sm w-100">List</a>
+                                                        <% } %>
+                                            </td>
+                                            <td class="align-middle">
+                                                <%= c.offer %>%
+                                            </td>
+                                            <td class="align-middle">
+                                                <% if (c.offer> 0) { %>
+                                                    <a href="#"
+                                                        onclick="removeOffer(event, '<%= c.name%>', '<%= c.offer%>')"
+                                                        class="btn btn-info rounded btn-sm font-sm"><i
+                                                            class="material-icons md-edit align-baseline"></i></span>Remove
+                                                        Offer</a>
+                                                    <% } else {%>
+                                                        <a href="#" onclick="addOffer(event, '<%= c.name%>',)"
+                                                            class="btn btn-info rounded btn-sm font-sm"><i
+                                                                class="material-icons md-edit align-baseline"></i></span>Add
+                                                            Offer</a>
+                                                        <% } %>
                                             </td>
                                             <td class="text-end align-middle">
-                                                <a href="/admin/edit-category?id=<%= c._id %>"class="btn btn-info rounded btn-sm font-sm"><i class="material-icons md-edit align-baseline"></i></span>Edit</a>
+                                                <a href="/admin/edit-category?id=<%= c._id %>"
+                                                    class="btn btn-info rounded btn-sm font-sm"><i
+                                                        class="material-icons md-edit align-baseline"></i></span>Edit</a>
                                             </td>
                                         </tr>
-                                    <% }) %>    
+                                        <% }) %>
 
                                 </tbody>
                             </table>
@@ -85,10 +112,10 @@
                             url: '/admin/create-category',
                             type: 'POST',
                             data: formData,
-                            success : function(response) {
+                            success: function (response) {
                                 window.location.reload();
                             },
-                            error : function(xhr) {
+                            error: function (xhr) {
                                 console.log(xhr.responseJSON);
                                 displayMessage(name, xhr.responseJSON.error)
                             }
@@ -119,4 +146,79 @@
                     }, 2000);
                 }
             })
+            function addOffer(event, categoryName) {
+                event.preventDefault();
+                Swal.fire({
+                    title: 'Add Offer',
+                    text: 'Enter the offer percentage:',
+                    input: 'number',
+                    inputPlaceholder: 'Enter offer percentage here',
+                    showCancelButton: true,
+                    confirmButtonText: 'Add Offer',
+                    cancelButtonText: 'Cancel',
+                    inputAttributes: {
+                        min: 0,
+                        max: 100,
+                        step: 1
+                    },
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'You need to enter a percentage!';
+                        } else if (value > 50) {
+                            return 'The offer percentage should be below 50!';
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const offerPercentage = result.value;
+                        console.log('Offer Percentage:', offerPercentage);
+                        $.ajax({
+                            url: '/admin/category-addOffer',
+                            method: 'POST',
+                            data: { categoryName: categoryName, offerPercentage: offerPercentage },
+                            success: function (response) {
+                                window.location.reload();
+                            }
+                        })
+                    }
+                });
+            }
+
+            function removeOffer(event, categoryName, offerPercentage) {
+                console.log(offerPercentage);
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This will remove the offer for category '" + categoryName + "'.",
+                    icon: "warning",
+                    input: 'number',
+                    inputPlaceholder: 'Enter removal offer percentage here',
+                    inputAttributes: {
+                        min: 0,
+                        max: 100,
+                        step: 1
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Remove Offer',
+                    cancelButtonText: 'Cancel',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'You need to enter a percentage!';
+                        } else if (value > offerPercentage) {
+                            return 'The removal offer percentage should not be less than the original offer percentage!';
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const removalOfferPercentage = result.value;
+                        $.ajax({
+                            url: '/admin/category-addOffer',
+                            method: 'POST',
+                            data: { categoryName: categoryName, offerPercentage: offerPercentage - parseInt(removalOfferPercentage) },
+                            success: function (response) {
+                                window.location.reload();
+                            }
+                        })
+                    }
+                });
+            }
         </script>

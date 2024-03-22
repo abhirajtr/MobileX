@@ -179,6 +179,8 @@
     </main>
 
     <script>
+        
+
         function changeQuantity(userId, productId, change, price) {
             console.log('price', price);
             // Retrieve the current quantity from the span element
@@ -217,14 +219,22 @@
                     // console.log(newQuantity, subtotal);
                     console.log(newQuantity, subtotal);
                     subtotalElement.text(newQuantity * parseInt(price));
-
-                    totalAmountElement.text(newQuantity * parseInt(price));
-                    // if (change == 1) {
-                    //     totalAmountElement.text(parseInt(totalAmountElement.text()) + parseInt(price));
-                    // } else if (change == -1) {
-
-                    //     totalAmountElement.text(parseInt(totalAmountElement.text()) - parseInt(price));
-                    // }
+                    let total = parseInt(totalAmountElement.text());
+                    if (change == 1) {
+                        totalAmountElement.text(total + parseInt(price));
+                    } else {
+                        totalAmountElement.text(total - parseInt(price));
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON.status == 'error') {
+                        currentQuantityElement.text(xhr.responseJSON.newQuantity);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Insufficient Quantity',
+                            text: xhr.responseJSON.message
+                        });
+                    }
                 }
             })
         }

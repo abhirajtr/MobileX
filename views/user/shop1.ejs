@@ -1,24 +1,21 @@
 <%- include('../partials/user-header') %>
-    <style>
-        /* Customize the checkbox appearance */
-        .form-check-input:checked {
-            background-color: #007bff;
-            /* Change the background color when checked */
-            border-color: #007bff;
-            /* Change the border color when checked */
-        }
-
-        /* Add a custom icon for the checked state */
-        .form-check-input:checked::after {
-            content: "✔";
-            /* Unicode checkmark */
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-        }
-    </style>
+<style>
+    /* Customize the checkbox appearance */
+    .form-check-input:checked {
+       background-color: #007bff; /* Change the background color when checked */
+       border-color: #007bff; /* Change the border color when checked */
+    }
+   
+    /* Add a custom icon for the checked state */
+    .form-check-input:checked::after {
+       content: "✔"; /* Unicode checkmark */
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+       color: white;
+    }
+   </style>
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
@@ -82,25 +79,29 @@
                                 </div>
                             </div> -->
                                 <div class="col-lg-4 col-md-6 me-auto">
-                                    <input id="searchInput" onkeyup="searchRequest()" type="text"
-                                        placeholder="Search..." class="form-control">
+                                    <input id="searchInput" onkeyup="search()" type="text" placeholder="Search..."
+                                        class="form-control">
                                 </div>
 
-                                <div class="dropdown ml-10" id="filter-dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle sort-dropdown" type="button"
-                                        id="filter-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Filter
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                       Filter by Category
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <li><a class="dropdown-item" href="#" data-value="all">All</a></li>
-                                        <li><a class="dropdown-item" href="#" data-value="inStock">In stock</a></li>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                       <li><a class="dropdown-item" href="#">Category 1</a></li>
+                                       <li><a class="dropdown-item" href="#">Category 2</a></li>
+                                       <li><a class="dropdown-item" href="#">Category 3</a></li>
+                                       <li><hr class="dropdown-divider"></li>
+                                       <li><a class="dropdown-item" href="#">All Categories</a></li>
                                     </ul>
-                                </div>
+                                   </div>
+                                   
+
 
                                 <div class="dropdown ml-10" id="sort-dropdown">
                                     <button class="btn btn-secondary dropdown-toggle sort-dropdown" type="button"
-                                        id="sort-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Sort by
+                                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Sort by: Select an Option
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <!-- <li><a class="dropdown-item" href="#" data-value="">Select an option</a></li> -->
@@ -112,6 +113,7 @@
                                         <li><a class="dropdown-item" href="#" data-value="latest">Latest</a></li>
                                         <!-- <li><a class="dropdown-item" href="#" data-value="avg-rating">Avg. Rating</a></li> -->
                                     </ul>
+
                                 </div>
 
                             </div>
@@ -170,94 +172,115 @@
                         <!--pagination-->
                         <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
                             <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-start" id="pagination">
+                                <ul class="pagination justify-content-start">
                                     <li class="page-item active"><a class="page-link" href="#">01</a></li>
                                     <li class="page-item"><a class="page-link" href="#">02</a></li>
                                     <li class="page-item"><a class="page-link" href="#">03</a></li>
+                                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                                    <li class="page-item"><a class="page-link" href="#"><i
+                                                class="fi-rs-angle-double-small-right"></i></a></li>
                                 </ul>
                             </nav>
                         </div>
-
                     </div>
                 </div>
             </div>
         </section>
     </main>
     <script>
-        let sort = "";
-        let filter = "";
-        let search = "";
-        let page = 1
-        $('#filter-dropdown').on('click', 'a', function () {
-            let filterBy = $(this).text();
-            $('#filter-btn').text('Filter: ' + filterBy);
-            var selectedValue = $(this).data('value');
-            filter = selectedValue;
-            console.log(filter);
-            makeAjaxCall();
-        });
+        // $('.dropdown-menu').on('click', 'a', function () {
+        //     var text = $(this).text(); // Use .text() instead of .html() to get the text content
+        //     var htmlText = text + ' <span class="caret"></span>';
+        //     $(this).closest('.dropdown').find('.dropdown-toggle').html(htmlText);
+
+        // });
+
 
         $('#sort-dropdown').on('click', 'a', function () {
             var sortBy = $(this).text();
-            $('#sort-btn').text('Sort by: ' + sortBy);
+            $('.sort-dropdown').text('Sort by: ' + sortBy);
             var selectedValue = $(this).data('value');
-            sort = selectedValue; // Update 'sort' variable
-            console.log(sort);
-            makeAjaxCall();
+
+
+            $.ajax({
+                url: '/products-sort',
+                method: 'POST',
+                data: { sortBy: selectedValue },
+                success: function (response) {
+                    // Clear the current product list
+                    $('#product-list').empty();
+                    // Iterate over the sorted products and append them to the product list
+                    response.products.forEach(function (p) {
+                        var productHtml = `
+                    <div class="col-lg-3 col-md-4">
+                        <div class="product-cart-wrap mb-30">
+                            <div class="product-img-action-wrap">
+                                <div class="product-img product-img-zoom">
+                                    <a href="shop-product-right.html">
+                                        <img class="default-img" src="/product-images/${p.image[0]}" alt="">
+                                        <img class="hover-img" src="/product-images/${p.image[1]}" alt="">
+                                    </a>
+                                </div>
+                                <div class="product-action-1">
+                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
+                                        <i class="fi-rs-search"></i>
+                                    </a>
+                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html">
+                                        <i class="fi-rs-heart"></i>
+                                    </a>
+                                    <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html">
+                                        <i class="fi-rs-shuffle"></i>
+                                    </a>
+                                </div>
+                                <div class="product-badges product-badges-position product-badges-mrg">
+                                </div>
+                            </div>
+                            <div class="product-content-wrap">
+                                <div class="product-category">
+                                    
+                                </div>
+                                <h2 style="min-height: 4rem;">
+                                    <a href="shop-product-right.html">
+                                        ${p.name}(${p.color}, ${p.storage} GB)(${p.ram} RAM)
+                                    </a>
+                                </h2>
+                                <div class="product-price">
+                                    <span>&#8377;${p.promotionalPrice}</span>
+                                    <span class="old-price">&#8377;${p.regularPrice}</span>
+                                </div>
+                                <div class="product-action-1 show">
+                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html">
+                                        <i class="fi-rs-shopping-bag-add"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                        $('#product-list').append(productHtml);
+                    });
+                }
+            });
         });
 
         // search 
         let timeoutId;
-        function searchRequest() {
+        function search() {
 
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
-                search = searchInput.value
-                makeAjaxCall();
+                searchRequest();
             }, 500);
         }
 
-        // pagination
-        document.addEventListener("DOMContentLoaded", function () {
-            // Get all pagination links
-            const paginationLinks = document.querySelectorAll("#pagination .page-link");
-
-            // Loop through each pagination link
-            paginationLinks.forEach(function (link) {
-                // Add click event listener to each link
-                link.addEventListener("click", function (event) {
-                    // Prevent the default link behavior
-                    event.preventDefault();
-
-                    // Remove the 'active' class from all pagination links' parent <li> elements
-                    paginationLinks.forEach(function (link) {
-                        link.parentNode.classList.remove("active");
-                    });
-
-                    // Add the 'active' class to the clicked link's parent <li> element
-                    link.parentNode.classList.add("active");
-
-                    // Get the page number from the clicked link's text content
-                    if (link.textContent.trim() !== page) {
-                        page = link.textContent.trim();
-                        makeAjaxCall();
-                        console.log("Clicked page:", page);
-                    }
-
-                    // Do whatever you need with the page number
-                    // Store the page number in a variable, pass it to a function, etc.
-                });
-            });
-        });
-
-
-
-        // make fetch request
-        function makeAjaxCall() {
+        function searchRequest() {
+            let searchInputValue = searchInput.value;
+            console.log(searchInputValue);
             $.ajax({
-                url: '/shop',
+                url: '/products-search',
                 method: 'POST',
-                data: { sort: sort, filter: filter, search: search, page: page },
+                data: { searchvalue: searchInputValue },
                 success: function (response) {
                     // Clear the current product list
                     $('#product-list').empty();
@@ -316,4 +339,28 @@
         }
 
     </script>
+
+    <!-- <script>
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent the default action of the link
+                const sortBy = this.textContent; // Get the sorting criteria from the clicked item
+                fetch(`/products-sort?sortBy=${sortBy}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        // Update the product list in the DOM with the sorted products
+                        const productList = document.getElementById('product-list');
+                        productList.innerHTML = ''; // Clear the current product list
+                        products.forEach(p => {
+                            // Create and append new product elements based on the sorted products
+                            const productElement = document.createElement('div');
+                            productElement.innerHTML = `
+                            
+                        `;
+                            productList.appendChild(productElement);
+                        });
+                    });
+            });
+        });
+    </script> -->
     <%- include('../partials/user-footer') %>

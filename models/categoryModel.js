@@ -11,6 +11,10 @@ const categorySchema = new mongoose.Schema({
     isListed: {
         type: Boolean,
         default: true
+    },
+    offer: {
+        type: Number,
+        default: 0
     }
 }, {
     versionKey: false

@@ -39,6 +39,13 @@ const userSchema = new mongoose.Schema({
     isAdmin: {
         type: Boolean,
         default: false
+    }, 
+    referralCode: {
+        type: String
+    },
+    redeemed: {
+        type: Boolean,
+        default: false
     }
 }, {
     versionKey: false

@@ -26,9 +26,6 @@ const renderEditProfile = async (req, res) => {
                     }
                 },
                 {
-                    $unwind: "$products"
-                },
-                {
                     $project: {
                         "address": 0
                     }
@@ -197,37 +194,14 @@ const handleAddWalletBalance = async (req, res) => {
 }
 
 const verifyWalletPayment = async (req, res) => {
-    console.log(req.body);
     const paymentInfo = req.body.response;
-    const orderId = new ObjectId(req.session.orderId);
-    delete req.session.orderId;
-    const { orderData } = req.session;
-    delete req.session.orderData;
-    // console.log('payment info', paymentInfo);
-    // Construct the string to be signed
     const signatureString = `${paymentInfo.razorpay_order_id}|${paymentInfo.razorpay_payment_id}`;
-    // Recalculate the signature using your Razorpay secret
     const expectedSignature = crypto.createHmac('sha256', 'gJQKhh0UcUekJlYa3oqdKttw')
         .update(signatureString)
         .digest('hex');
     // Compare the recalculated signature with the signature received from Razorpay
     if (expectedSignature === paymentInfo.razorpay_signature) {
-        // console.log('Payment verified');
-        // await Order.findByIdAndUpdate(
-        //     orderId, // Replace with the actual order ID
-        //     { $set: { 'products.$[].status': 'Payment Done' } }
-        // );
-
-        // console.log('o', orderData);
-        // await Promise.all(orderData.map(async (item) => {
-        //     await Product.updateOne({ _id: item.productId }, { $inc: { quantity: -item.quantity, purchaseCount: item.quantity } });
-        // }));
-
-        // res.status(200).json({ redirect: '/order-success', user: req.session.user });
-        // const updatedBalance = await User.findByIdAndUpdate(req.session.user, { $inc: {walletBalance: parseInt(req.body.addAmount) } });
         const addAmount = parseInt(req.body.addAmount);
-
-        // Assuming you have the current wallet balance stored in a variable named currentBalance
         const Balance = await User.findById(req.session.user, { _id: 0, walletBalance: 1 });
         const currentBalance = Balance.walletBalance;
         const updatedBalance = currentBalance + addAmount;
@@ -254,6 +228,53 @@ const verifyWalletPayment = async (req, res) => {
     }
 }
 
+const renderOrderDeatils = async (req, res) => {
+    try {
+        const orderId = new ObjectId(req.query.id);
+        const order = await Order.findById(orderId);
+        console.log('o', order);
+        res.render('user/order-details', { user: true, order });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const redeemReferralCode = async (req, res) => {
+    try {
+        const { referralCode } = req.body;
+        // const foundReferralCode = await User.findOne({ referralCode: referralCode }, { referralCode: 1, _id: 0 });
+        const [foundReferralCode, user] = await Promise.all([
+            User.findOne({ referralCode: referralCode }, { referralCode: 1, _id: 0 }),
+            User.findOne({ _id: req.session.user }, { _id: 0, walletBalance: 1, redeemed: 1 })
+        ])
+        if (user.redeemed) {
+            return res.status(400).json({ error: 'Referral code has already been redeemed.' });
+        }
+        if (foundReferralCode) {
+            await User.updateOne(
+                { _id: req.session.user }, 
+                { 
+                    $set: { redeemed: true },
+                    $inc: { walletBalance: 100 },
+                    $push: {
+                        walletHistory: { 
+                            type: "credit",
+                            amount: 100,
+                            balance: user.walletBalance + 100,
+                            date: Date.now()
+                        }
+                    }
+                }
+            );
+            
+            return res.status(200).json({status: true, message: 'Referral code successfully redeemed. ₹100 added to your wallet balance.' });
+        }
+        res.status(400).json({ error: 'Invalid referral code. Please provide a valid referral code and try again.' });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
     renderEditProfile,
     handleEditDetails,
@@ -263,5 +284,7 @@ module.exports = {
     handleEditAddress,
     handleDeleteAddress,
     handleAddWalletBalance,
-    verifyWalletPayment
+    verifyWalletPayment,
+    renderOrderDeatils,
+    redeemReferralCode
 }

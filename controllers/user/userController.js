@@ -6,6 +6,8 @@ const Address = require('../../models/addressModel');
 const ObjectId = require('mongoose').Types.ObjectId;
 const bcrypt = require('bcrypt');
 const sendMail = require('../../configs/nodemailer');
+// const { v4: uuidv4 } = require('uuid');
+const generateReferralCode = require('../../configs/generateReferralCode');
 
 const renderHome = async (req, res) => {
     try {
@@ -24,13 +26,65 @@ const renderHome = async (req, res) => {
 }
 const renderShop = async (req, res) => {
     try {
-        console.log(req.session);
-        const productsCount = await Product.find({ isBlocked: false }).countDocuments();
-        const products = await Product.find({ isBlocked: false });
+        console.log(req.query);
+        let products;
+        let productsCount;
 
+        productsCount = await Product.find({ isBlocked: false }).countDocuments();
+        products = await Product.find({ isBlocked: false });
         res.render('user/shop', { shop: true, products, productsCount, user: req.session.user ? req.session.user : false, count: req.session.count });
     } catch (error) {
         console.log(error);
+    }
+}
+
+const sortAndFilter = async (req, res) => {
+    try {
+        console.log(req.body);
+        const { sort, filter, search, page } = req.body;
+        let pageNumber = parseInt(page);
+        pageNumber = pageNumber == 1? 0: (pageNumber-1) * 8;
+        let sortQuery = {};
+        if (sort == "") {
+            sortQuery = { _id: 1 }
+        } else if (sort == "price-low") {
+            sortQuery = { promotionalPrice: 1 }
+        } else if (sort == "price-high") {
+            sortQuery = { promotionalPrice: -1 }
+        }
+        let filterQuery = {};
+        if (filter == "" || filter == "all") {
+            filterQuery = { isBlocked: false };
+        } else if (filter == "inStock") {
+            filterQuery = { isBlocked: false, quantity: { $gt: 0 } };
+        }
+        let searchQuery = {};
+        if (search !== "") {
+            searchQuery = { name: { $regex: search, $options: 'i' } }; // Case-insensitive search for product name
+        }
+        const finalQuery = { ...filterQuery, ...searchQuery };
+        const productsCount = await Product.countDocuments(finalQuery);
+        console.log(pageNumber);
+        const products = await Product.find(finalQuery).sort(sortQuery).limit(8).skip(pageNumber);
+        res.status(200).json({ products, productsCount });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+const renderSearchProduct = async (req, res) => {
+    try {
+        console.log('hit');
+        const { searchvalue } = req.body;
+        const products = await Product.find({
+            isBlocked: false,
+            name: { $regex: searchvalue, $options: 'i' } // Case-insensitive search by name only
+        });
+        console.log('Searched:', products);
+        res.status(200).json({ products });
+    } catch (error) {
+        console.error(error);
     }
 }
 const renderSortByProducts = async (req, res) => {
@@ -45,6 +99,8 @@ const renderSortByProducts = async (req, res) => {
             products = await Product.find({}).sort({ promotionalPrice: 1 });
         } else if (sortBy == 'latest') {
             products = await Product.find({}).sort({ _id: -1 });
+        } else if (sortBy == 'featured') {
+            products = await Product.find({}).sort({ purchaseCount: -1 });
         }
         // console.log(products);
         res.status(200).json({ products });
@@ -148,7 +204,7 @@ const handleVerifyEmail = async (req, res) => {
         if (differenceInSeconds < 60) {
             if (req.session.tempUser.otp == req.body.enteredOtp) {
                 const { username, email, password } = req.session.tempUser;
-                const newUser = new User({ username, email, password });
+                const newUser = new User({ username, email, password, referalCode: generateReferralCode() });
                 const savedUser = await newUser.save();
                 console.log(savedUser);
                 return res.status(200).json({ status: 'success', redirect: '/login' });
@@ -261,5 +317,7 @@ module.exports = {
     renderForgotPassword,
     handleForgotPassword,
     renderShop,
-    renderSortByProducts
+    renderSortByProducts,
+    renderSearchProduct,
+    sortAndFilter
 }
