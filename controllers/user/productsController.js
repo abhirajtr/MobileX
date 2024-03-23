@@ -51,7 +51,30 @@ const renderHome = async (req, res) => {
 const renderShop = async (req, res) => {
     try {
         const productsCount = await Product.find({ isBlocked: false }).countDocuments();
-        const products = await Product.find({ isBlocked: false }).limit(8);
+        // const products = await Product.find({ isBlocked: false }).limit(8);
+        const products = await Product.aggregate([
+            // Perform a left outer join with the Category collection
+            {
+                $lookup: {
+                    from: "categories", // assuming the name of your categories collection is "categories"
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            // Unwind the "category" array to destructure it
+            { $unwind: "$category" },
+            // Filter out products with blocked categories
+            {
+                $match: {
+                    "category.isListed": false,
+                    isBlocked: false
+                }
+            },
+            // Limit the results to 8 products
+            { $limit: 8 }
+        ]);
+
         res.render('user/shop', { shopActive: true, products, productsCount, user: req.session.user ? req.session.user : false, count: req.session.count });
     } catch (error) {
         console.log(error);

@@ -230,13 +230,13 @@
             const paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
             const paymentOptionBtn = document.querySelector('input[name="payment_option"]:checked');
 
-
+            // Get the wallet balance
+            const walletBalance = parseFloat(document.getElementById('walletBalance').textContent);
+            // Get the total amount
+            const totalAmount = parseFloat(document.getElementById('totalPrice').textContent); // Assuming you have an element with id "totalPrice" displaying the total amount
+            
             // If the selected payment option is "wallet"
             if (paymentOption === "wallet") {
-                // Get the wallet balance
-                const walletBalance = parseFloat(document.getElementById('walletBalance').textContent);
-                // Get the total amount
-                const totalAmount = parseFloat(document.getElementById('totalPrice').textContent); // Assuming you have an element with id "totalAmount" displaying the total amount
                 // If total amount is greater than wallet balance, show SweetAlert
                 if (totalAmount > walletBalance) {
                     Swal.fire({
@@ -247,9 +247,25 @@
                     paymentOptionBtn.checked = false;
                 }
             }
+
+            // If the selected payment option is "cash_on_delivery"
+            if (paymentOption === "cash_on_delivery") {
+                // If total amount is greater than wallet balance, show SweetAlert
+                if (totalAmount > 1000) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Maximum Amount Exceeded',
+                        text: 'Cash on delivery is only available for amounts up to 1000. Please choose a different payment option.',
+                    });
+                    paymentOptionBtn.checked = false;
+                }
+            }
         }
+
         const walletRadioButton = document.getElementById('wall');
+        const codRadioButton = document.getElementById('cod');
         walletRadioButton.addEventListener('change', handlePaymentOptionChange);
+        codRadioButton.addEventListener('change', handlePaymentOptionChange);
 
         function checkPaymentOption() {
             const radioButtons = document.querySelectorAll('input[name="payment_option"]');

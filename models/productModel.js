@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
@@ -42,6 +43,9 @@ const productSchema = new mongoose.Schema({
     purchaseCount: {
         type: Number,
         default: 0
+    },
+    categoryId: {
+        type: ObjectId
     }
 }, {
     versionKey: false
