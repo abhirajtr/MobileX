@@ -29,7 +29,12 @@ const renderDashboard = async (req, res) => {
     const filter = req.query.filter ? req.query.filter : 'weekly';
     console.log('filter', filter);
     // let salesdata;
-    const [data, productsCount] = await Promise.all([
+    // Get the current month and year
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // Months are zero-based, so add 1 to get the correct month
+    const currentYear = currentDate.getFullYear();
+
+    const [data, productsCount, currentMonthRevenue] = await Promise.all([
         Order.aggregate([
             { $match: { status: 'delivered' } }, // Filter only delivered orders
             {
@@ -40,180 +45,235 @@ const renderDashboard = async (req, res) => {
                 }
             }
         ]),
-        Product.find().countDocuments()
+        Product.find().countDocuments(),
+        Order.aggregate([
+            {
+                $match: {
+                    status: "delivered", // Filter only delivered orders
+                    createdAt: {
+                        $gte: new Date(currentYear, currentMonth - 1, 1), // Start of the current month
+                        $lt: new Date(currentYear, currentMonth, 1) // Start of the next month
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: null, // Group all results
+                    totalRevenue: { $sum: "$totalPrice" } // Calculate total revenue for the current month
+                }
+            }
+        ])
     ])
+    const currentMonthTotalRevenue = currentMonthRevenue.length > 0 ? currentMonthRevenue[0].totalRevenue : 0;
+
     //////////////////// weekly
     if (filter == 'weekly' || filter == null) {
-        const recentSales = await Order.aggregate([
-            {
-                $match: {
-                    status: "delivered",
-                    createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0) - 6 * 24 * 60 * 60 * 1000) } // Filter orders from the beginning of 7 days ago
+
+        // Retrieve recent sales data
+        // Execute all aggregate queries concurrently
+        const [recentSales, recentUsers, recentProducts] = await Promise.all([
+            Order.aggregate([
+                {
+                    $match: {
+                        status: "delivered",
+                        createdAt: { $gte: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) } // Filter orders from the beginning of 7 days ago
+                    }
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group by date
+                        totalSales: { $sum: 1 } // Calculate total sales for each day
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        date: "$_id", // Rename _id as date
+                        totalSales: 1
+                    }
+                },
+                {
+                    $sort: { date: 1 } // Sort by date in ascending order
                 }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group by date
-                    totalSales: { $sum: 1 } // Calculate total sales for each day
+            ]),
+            User.aggregate([
+                {
+                    $match: {
+                        createdAt: { $gte: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) } // Filter users created within the last 7 days
+                    }
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group users by creation date
+                        totalUsers: { $sum: 1 } // Count the number of users for each day
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        date: "$_id", // Rename _id as date
+                        totalUsers: 1
+                    }
+                },
+                {
+                    $sort: { date: 1 } // Sort by date in ascending order
                 }
-            },
-            {
-                $project: {
-                    _id: 0, // Exclude _id field
-                    date: "$_id", // Rename _id as date
-                    totalSales: 1
+            ]),
+            Product.aggregate([
+                {
+                    $match: {
+                        createdAt: { $gte: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) } // Filter products created within the last 7 days
+                    }
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group products by creation date
+                        totalProducts: { $sum: 1 } // Count the number of products for each day
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        date: "$_id", // Rename _id as date
+                        totalProducts: 1
+                    }
+                },
+                {
+                    $sort: { date: 1 } // Sort by date in ascending order
                 }
-            },
-            {
-                $sort: { date: 1 } // Sort by date in ascending order
-            }
+            ])
         ]);
-        const salesCountArray = Array.from({ length: 7 }, (_, i) => {
-            const currentDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-            const formattedDate = currentDate.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
-            const matchingDay = recentSales.find(day => day.date === formattedDate);
-            return matchingDay ? matchingDay.totalSales : 0;
-        }).reverse();
-        console.log('s>>>',salesCountArray);
-        const recentUsers = await User.aggregate([
-            {
-                $match: {
-                    createdAt: { $gte: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) } // Filter users created within the last 7 days
-                }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group users by creation date
-                    totalUsers: { $sum: 1 } // Count the number of users for each day
-                }
-            },
-            {
-                $project: {
-                    _id: 0, // Exclude _id field
-                    date: "$_id", // Rename _id as date
-                    totalUsers: 1
-                }
-            },
-            {
-                $sort: { date: 1 } // Sort by date in ascending order
-            }
-        ]);
-        
-        console.log(recentUsers);
-        
-        const usersCountArray = Array.from({ length: 7 }, (_, i) => {
-            const currentDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-            const formattedDate = currentDate.toISOString().slice(0, 10); // Format date as "YYYY-MM-DD"
-            const usersSignedUpOnDay = recentUsers.find(day => day.date === formattedDate);
-            return usersSignedUpOnDay ? usersSignedUpOnDay.totalUsers : 0; // Access 'totalUsers' property instead of 'userCount'
-        }).reverse();        
-        console.log('u>>>', usersCountArray);
-        const recentProducts = await Product.aggregate([
-            {
-                $match: {
-                    createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0) - 6 * 24 * 60 * 60 * 1000) } // Filter orders from the beginning of 7 days ago
-                }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group by date
-                    totalProducts: { $sum: 1 } // Calculate total sales for each day
-                }
-            },
-            {
-                $project: {
-                    _id: 0, // Exclude _id field
-                    date: "$_id", // Rename _id as date
-                    totalProducts: 1
-                }
-            },
-            {
-                $sort: { date: 1 } // Sort by date in ascending order
-            }
-        ]);
-        const productsCountArray = Array.from({ length: 7 }, (_, i) => {
-            const currentDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-            const formattedDate = currentDate.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
-            const usersSignedUpOnDay = recentProducts.find(day => day.date === formattedDate);
-            return usersSignedUpOnDay ? usersSignedUpOnDay.userCount : 0;
-        }).reverse();
-        return res.render('admin/dashboard', { dashboardActive: true, salesData: salesCountArray, filter, data, productsCount, usersData: usersCountArray, productsData: productsCountArray });
+
+        console.log('Recent sales:', recentSales);
+        console.log('Recent users:', recentUsers);
+        console.log('Recent products:', recentProducts);
+
+        // Map sales data to array
+        const salesCountArray = mapDataToCountArray(recentSales);
+
+        // Map users data to array
+        const usersCountArray = mapDataToCountArray(recentUsers);
+
+        // Map products data to array
+        const productsCountArray = mapDataToCountArray(recentProducts);
+
+        // Render dashboard with data
+        return res.render('admin/dashboard', {
+            dashboardActive: true,
+            salesData: salesCountArray,
+            filter,
+            data,
+            productsCount,
+            usersData: usersCountArray,
+            productsData: productsCountArray,
+            currentMonthTotalRevenue
+        });
+
+        // Function to map data to count array
+        function mapDataToCountArray(data) {
+            return Array.from({ length: 7 }, (_, i) => {
+                const currentDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+                const formattedDate = currentDate.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
+                const matchingDay = data.find(day => day.date === formattedDate);
+                return matchingDay ? matchingDay.totalSales || matchingDay.totalUsers || matchingDay.totalProducts : 0;
+            }).reverse();
+        }
+
     }
     if (filter == 'monthly') {
-        const salesMonthly = await Order.aggregate([
-            {
-                $match: { status: "delivered" } // Filter only delivered orders
-            },
-            {
-                $group: {
-                    _id: { $month: "$createdAt" }, // Group by month and year
-                    totalSales: { $sum: 1 } // Calculate total sales for each month
+        // Execute all aggregate queries concurrently using Promise.all
+        const [salesMonthly, usersMonthly, productsMonthly] = await Promise.all([
+            // Retrieve monthly sales data
+            Order.aggregate([
+                {
+                    $match: { status: "delivered" } // Filter only delivered orders
+                },
+                {
+                    $group: {
+                        _id: { $month: "$createdAt" }, // Group by month and year
+                        totalSales: { $sum: 1 } // Calculate total sales for each month
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        month: "$_id", // Rename _id as month
+                        totalSales: 1
+                    }
+                },
+                {
+                    $sort: { month: 1 } // Sort by month in ascending order
                 }
-            },
-            {
-                $project: {
-                    _id: 0, // Exclude _id field
-                    date: "$_id", // Rename _id as month
-                    totalSales: 1
+            ]),
+            // Retrieve monthly users data
+            Order.aggregate([
+                {
+                    $group: {
+                        _id: { $month: "$createdAt" }, // Group by month and year
+                        totalUsers: { $sum: 1 } // Calculate total users for each month
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        month: "$_id", // Rename _id as month
+                        totalUsers: 1
+                    }
+                },
+                {
+                    $sort: { month: 1 } // Sort by month in ascending order
                 }
-            },
-            {
-                $sort: { date: 1 } // Sort by month in ascending order
-            }
+            ]),
+            // Retrieve monthly products data
+            Order.aggregate([
+                {
+                    $group: {
+                        _id: { $month: "$createdAt" }, // Group by month and year
+                        totalProducts: { $sum: 1 } // Calculate total products for each month
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        month: "$_id", // Rename _id as month
+                        totalProducts: 1
+                    }
+                },
+                {
+                    $sort: { month: 1 } // Sort by month in ascending order
+                }
+            ])
         ]);
 
-        const monthlySalesArray = Array.from({ length: 12 }, (_, index) => {
-            const monthData = salesMonthly.find(item => item.date === index + 1);
-            return monthData ? monthData.totalSales : 0; // Fixed property name 'count' to 'totalSales'
-        });
-        const salesMonthlyArray = Array.from(monthlySalesArray);
-        console.log(salesMonthlyArray);
-        const usersMonthly = await Order.aggregate([
-            {
-                $group: {
-                    _id: { $month: "$createdAt" }, // Group by month and year
-                    totalUsers: { $sum: 1 } // Calculate total sales for each month
-                }
-            },
-            {
-                $project: {
-                    _id: 0, // Exclude _id field
-                    date: "$_id", // Rename _id as month
-                    totalUsers: 1
-                }
-            },
-            {
-                $sort: { date: 1 } // Sort by month in ascending order
-            }
-        ]);
-        const monthlyUsersArray = Array.from({ length: 12 }, (_, index) => {
-            const monthData = salesMonthly.find(item => item.date === index + 1);
-            return monthData ? monthData.totalUsers : 0; // Fixed property name 'count' to 'totalSales'
-        });
-        const productsMonthly = await Order.aggregate([
-            {
-                $group: {
-                    _id: { $month: "$createdAt" }, // Group by month and year
-                    totalProducts: { $sum: 1 } // Calculate total sales for each month
-                }
-            },
-            {
-                $project: {
-                    _id: 0, // Exclude _id field
-                    date: "$_id", // Rename _id as month
-                    totalProducts: 1
-                }
-            },
-            {
-                $sort: { date: 1 } // Sort by month in ascending order
-            }
-        ]);
+        // Map data to monthly arrays
+        const salesMonthlyArray = mapDataToMonthlyArray(salesMonthly);
+        const usersMonthlyArray = mapDataToMonthlyArray(usersMonthly);
+        const productsMonthlyArray = mapDataToMonthlyArray(productsMonthly);
 
-        const monthlyProductsArray = Array.from({ length: 12 }, (_, index) => {
-            const monthData = salesMonthly.find(item => item.date === index + 1);
-            return monthData ? monthData.totalSales : 0; // Fixed property name 'count' to 'totalSales'
+        console.log('Monthly sales:', salesMonthlyArray);
+        console.log('Monthly users:', usersMonthlyArray);
+        console.log('Monthly products:', productsMonthlyArray);
+
+        // Render dashboard with data
+        res.render('admin/dashboard', {
+            dashboardActive: true,
+            salesData: salesMonthlyArray,
+            filter,
+            data,
+            productsCount,
+            usersData: usersMonthlyArray,
+            productsData: productsMonthlyArray,
+            currentMonthTotalRevenue
         });
-        res.render('admin/dashboard', { dashboardActive: true, salesData: salesMonthlyArray, filter, data, productsCount, usersData: monthlyUsersArray, productsData: monthlyProductsArray  });
+
+        // Function to map data to monthly array
+        function mapDataToMonthlyArray(data) {
+            return Array.from({ length: 12 }, (_, index) => {
+                const monthData = data.find(item => item.month === index + 1);
+                return monthData ? monthData.totalSales || monthData.totalUsers || monthData.totalProducts : 0;
+            });
+        }
+
     } else {
         const salesDataYearly = await Order.aggregate([
             {

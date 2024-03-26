@@ -24,22 +24,15 @@ function viewImage(event, index) {
         let image = document.getElementById('imgView' + index);
         image.src = dataURL;
 
-        // Check if there's already a cropper instance
-        let cropper = image.cropper;
-        if (!cropper) {
-            // Initialize Cropper.js on the image if not already initialized
-            cropper = new Cropper(image, {
-                aspectRatio: NaN, // Square aspect ratio
-                viewMode: 1,
-                guides: true,
-                background: true,
-                autoCropArea: 1,
-                zoomable: true,
-            });
-        } else {
-            // Replace the existing image with the new one
-            cropper.replace(dataURL);
-        }
+        // Initialize Cropper.js on the image
+        let cropper = new Cropper(image, {
+            aspectRatio: NaN, // Square aspect ratio
+            viewMode: 1,
+            guides: true,
+            background: true,
+            autoCropArea: 1,
+            zoomable: true,
+        });
 
         // Show the image cropper container
         let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
@@ -52,21 +45,19 @@ function viewImage(event, index) {
             let croppedImage = document.getElementById("croppedImg" + index);
             croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
 
-            // Generate a unique name for the cropped image file based on the current timestamp
-            let timestamp = new Date().getTime();
-            let fileName = `cropped-img-${timestamp}-${index}.png`;
+            // Destroy the cropper instance
+            cropper.destroy();
 
-            await croppedCanvas.toBlob(blob => {
-                let input = document.getElementById('input' + index);
-                let imgFile = new File([blob], fileName, blob)
-                const fileList = new DataTransfer();
-                fileList.items.add(imgFile);
-                input.files = fileList.files
-            });
+            // Hide the cropper container
+            cropperContainer.style.display = 'none';
+
+            // Display the cropped image
+            croppedImage.style.display = 'block';
         });
     };
     reader.readAsDataURL(input.files[0]);
 }
+
 
 $('document').ready(() => {
     const name = $('#name');
@@ -150,7 +141,7 @@ $('document').ready(() => {
         const selectedImages = $('input[type="file"]').filter(function () {
             return this.files && this.files.length > 0;
         });
-        if(selectedImages.length < 3) {
+        if (selectedImages.length < 3) {
             $(`#image-error`).addClass('d-block').text('Please upload 4 images of the product');
             setTimeout(() => {
                 $(`#image-error`).removeClass('d-block').text('');
