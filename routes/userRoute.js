@@ -86,6 +86,8 @@ router.get("/return-order", orderController.handleReturnProduct);
 router.post("/verify-payment", orderController.verifypayment);
 router.get("/order-success", orderController.renderOrderSuccess);
 router.get("/cancel-order", orderController.handleCancelOrder);
+router.post("/pay-pending", orderController.payPending);
+router.post("/pay-pending-verify", orderController.verifypaymentPending);
 
 // Coupon Controller
 

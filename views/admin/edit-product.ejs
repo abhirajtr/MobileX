@@ -65,10 +65,10 @@
                                                 <% categories.forEach(c=> { %>
                                                     <% if (product.category==c.name) { %>
 
-                                                        <option value="<%= c.name %>" selected>
+                                                        <option value="<%= c._id %>" selected>
                                                             <%= c.name %>
                                                                 <% } else {%>
-                                                        <option value="<%= c.name %>">
+                                                        <option value="<%= c._id %>">
                                                             <%= c.name %>
                                                         </option>
                                                         <% } }) %>

@@ -1,5 +1,5 @@
 <%- include('../partials/user-header') %>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script
     <!-- Template CSS -->
     <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
     <section class="content-main">
@@ -139,6 +139,13 @@
                                                         <span class="badge rounded-pill alert-success text-success"><%= order.status %></span>
                                                     </dd>
                                                 </dl>
+                                                <% if (order.status == 'pending') { %>
+                                                    <dl class="dlist">
+                                                        <dd>
+                                                            <a class="btn btn-light" onclick="paypending('<%= order._id %>')">Pay</a>
+                                                        </dd>
+                                                    </dl>
+                                                <% } %>
                                             </article>
                                         </td>
                                     </tr>
@@ -151,7 +158,7 @@
         </div> <!-- card end// -->
     </section> <!-- content-main end// -->
 
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function confirmCancel(orderId) {
             swal({
@@ -161,13 +168,13 @@
                 buttons: true,
                 dangerMode: true,
             })
-            .then((willCancel) => {
-                if (willCancel) {
-                    window.location.href = "/cancel-order?id=" + orderId;
-                }
-            });
+                .then((willCancel) => {
+                    if (willCancel) {
+                        window.location.href = "/cancel-order?id=" + orderId;
+                    }
+                });
         }
-    
+
         function confirmReturn(orderId) {
             Swal.fire({
                 title: "Are you sure?",
@@ -189,6 +196,61 @@
                 }
             });
         }
-        
+
+
+        function paypending(orderId) {
+            alert(orderId)
+            $.ajax({
+                url: '/pay-pending',
+                method: 'POST',
+                data: { orderId: orderId },
+                success: function (response) {
+                    console.log(response);
+                    var options = {
+                        "key": "rzp_test_2hyTCJ2qBkwleR", // Enter the Key ID generated from the Dashboard
+                        // "amount": "5000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "currency": "INR",
+                        "name": "MobileX",
+                        "description": "Test Transaction",
+                        "image": "https://example.com/your_logo",
+                        "order_id": response.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                        // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                        "prefill": {
+                            "name": "Gaurav Kumar",
+                            "email": "gaurav.kumar@example.com",
+                            "contact": "9000090000"
+                        },
+                        "notes": {
+                            "address": "Razorpay Corporate Office"
+                        },
+                        "handler": function (response) {
+                            // alert('Payment successful: ' + response.razorpay_payment_id);
+                            var settings = {
+                                "url": "/verify-payment-pending",
+                                "method": "POST",
+                                "timeout": 0,
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "data": JSON.stringify({ response }),
+                                success: (response) => {
+                                    // console.log(response);
+                                    if (response.redirect) {
+                                        window.location.href = response.redirect;
+                                    }
+                                }
+                            }
+                            $.ajax(settings);
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+                    console.log(response);
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                }
+            })
+        }
     </script>
     <%- include('../partials/user-footer') %>

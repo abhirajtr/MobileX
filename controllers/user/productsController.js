@@ -9,7 +9,7 @@ const renderHome = async (req, res) => {
         if (req.session.passport) {
             req.session.user = req.session.passport.user._id;
         }
-        const [products, topSellingProducts] = await Promise.all([
+        const [products, topSellingProducts, topSellingBrands] = await Promise.all([
             Product.find({ isBlocked: false }).sort({ _id: -1 }).limit(8),
             Order.aggregate([
                 { $match: { status: 'delivered' } }, // Filter orders by status 'delivered'
@@ -39,10 +39,42 @@ const renderHome = async (req, res) => {
                 {
                     $replaceRoot: { newRoot: { $arrayElemAt: ['$productDetails', 0] } }
                 }
+            ]),
+            Order.aggregate([
+                { $match: { status: 'delivered' } }, // Filter orders by status 'delivered'
+                { $unwind: '$products' }, // Deconstruct the products array
+                {
+                    $group: {
+                        _id: '$products.brand', // Group by brand
+                        totalQuantitySold: { $sum: '$products.quantity' } // Sum the quantities sold
+                    }
+                },
+                { $sort: { totalQuantitySold: -1 } }, // Sort by total quantity sold in descending order
+                { $limit: 10 }, // Limit to top 10 brands
+                {
+                    $lookup: {
+                        from: 'products', // Name of the collection to perform the lookup
+                        localField: '_id', // Field from the current collection (Order)
+                        foreignField: 'brand', // Field from the foreign collection (products)
+                        as: 'productDetails' // Alias for the joined documents
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0, // Exclude _id field
+                        totalQuantitySold: 1, // Include totalQuantitySold field
+                        productDetails: { $arrayElemAt: ['$productDetails', 0] } // Include the first product detail from the lookup
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: { $mergeObjects: ['$productDetails', '$$ROOT'] } } // Merge the product details with the root document
+                }
             ])
+
+
         ])
-        console.log(topSellingProducts);
-        res.render('user/home', { home: true, products, user: req.session.user ? req.session.user : false, count: req.session.count, topSellingProducts });
+        console.log(topSellingBrands);
+        res.render('user/home', { home: true, products, user: req.session.user ? req.session.user : false, count: req.session.count, topSellingProducts, topSellingBrands });
         // res.render('user/order-success');
     } catch (error) {
         console.error(error);
@@ -67,7 +99,7 @@ const renderShop = async (req, res) => {
             // Filter out products with blocked categories
             {
                 $match: {
-                    "category.isListed": false,
+                    "category.isListed": true,
                     isBlocked: false
                 }
             },

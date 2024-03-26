@@ -19,12 +19,14 @@
   "homepage": "https://github.com/abhirajtr/MobileX-1#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "chart.js": "^4.4.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.4",
     "ejs": "^3.1.9",
     "exceljs": "^4.4.0",
     "express": "^4.18.2",
     "express-session": "^1.18.0",
+    "jspdf-autotable": "^3.8.2",
     "mongodb": "^6.3.0",
     "mongoose": "^8.1.2",
     "morgan": "^1.10.0",
@@ -34,6 +36,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
     "passport-google-oauth20": "^2.0.0",
+    "pdfkit": "^0.15.0",
     "razorpay": "^2.9.2",
     "shortid": "^2.2.16",
     "uuid": "^9.0.1"

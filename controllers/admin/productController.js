@@ -21,7 +21,7 @@ const renderAddProduct = async (req, res) => {
         // const categories = await Category.find({ isListed: true }, { _id: 0, name: 1 });
         // const brand = await Brand.find({ isBlocked: false });
         const [categories, brand] = await Promise.all([
-            Category.find({ isListed: true }).select('name'),
+            Category.find({ isListed: true }, { name: 1 }),
             Brand.find({ isBlocked: false }).select('name')
         ]);
         console.log('categories', categories);
@@ -38,7 +38,7 @@ const handleAddProduct = async (req, res) => {
         const image = req.files.map(file => file.filename);
         // console.log(image);
         const { name, ram, brand, category, storage, color, description, regularPrice, promotionalPrice, quantity, categoryId } = req.body;
-        const newProduct = new Product({ name, brand, category, ram, storage, color, description, regularPrice, promotionalPrice, quantity, image, categoryId });
+        const newProduct = new Product({ name, brand, categoryId: category, ram, storage, color, description, regularPrice, promotionalPrice, quantity, image, categoryId });
         const savedProduct = await newProduct.save();
         console.log(savedProduct);
         res.redirect('/admin/products');
@@ -76,7 +76,7 @@ const handleEditProduct = async (req, res) => {
         // console.log(image);
         const { id, name, brand, category, ram, storage, color, description, regularPrice, promotionalPrice, quantity } = req.body;
         console.log(req.body);
-        const newProduct = await Product.findByIdAndUpdate(id, { name, category, brand, ram, storage, color, description, regularPrice, promotionalPrice, quantity });
+        const newProduct = await Product.findByIdAndUpdate(id, { name, categoryId: category, brand, ram, storage, color, description, regularPrice, promotionalPrice, quantity });
         console.log(newProduct);
         // console.log(savedProduct);
         res.redirect('/admin/products');

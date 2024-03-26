@@ -45,7 +45,12 @@ const productSchema = new mongoose.Schema({
         default: 0
     },
     categoryId: {
-        type: ObjectId
+        type: ObjectId,
+        ref: 'category'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 }, {
     versionKey: false
