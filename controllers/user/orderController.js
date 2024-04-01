@@ -65,7 +65,8 @@ const handlePlaceOrder = async (req, res) => {
                                 type: "Debit", // Type of transaction (e.g., credit)
                                 amount: req.session.totalPrice, // Amount credited
                                 balance: updatedBalance, // Updated wallet balance after the credit
-                                date: Date.now()
+                                date: Date.now(),
+                                description: 'Product purchase'
                             }
                         }
                     },
@@ -154,6 +155,7 @@ const handlePlaceOrder = async (req, res) => {
                 color: cartItem.color,
                 image: cartItem.image,
                 price: cartItem.price,
+                status: 'pending',
                 subtotal: cartItem.quantity * cartItem.price,
                 orginalPrice: cartItem.orginalPrice
             }));
@@ -210,6 +212,7 @@ const handlePlaceOrder = async (req, res) => {
                 color: cartItem.color,
                 image: cartItem.image,
                 price: cartItem.price,
+                status: 'verified',
                 subtotal: cartItem.quantity * cartItem.price,
                 orginalPrice: cartItem.orginalPrice
             }));

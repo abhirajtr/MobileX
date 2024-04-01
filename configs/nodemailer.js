@@ -1,22 +1,21 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const USER = process.env.USER;
+const EMAIL = process.env.EMAIL;
 const PASSWORD = process.env.PASSWORD;
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: USER,
+        user: EMAIL,
         pass: PASSWORD
     }
 });
 
 function sendMail(receiver, otp) {
-    console.log(USER, PASSWORD);
     return new Promise((resolve, reject) => {
         const mailOptions = {
-            from: USER,
+            from: EMAIL,
             to: receiver,
             subject: 'Verify OTP',
             html: `
