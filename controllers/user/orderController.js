@@ -48,7 +48,6 @@ const handlePlaceOrder = async (req, res) => {
                 image: findProduct.image[0],
                 price: findProduct.promotionalPrice,
                 subtotal: findProduct.promotionalPrice,
-                status: 'verified',
                 orginalPrice: findProduct.regularPrice
             }]
             let totalPrice = findProduct.promotionalPrice - couponDiscount;
@@ -155,7 +154,6 @@ const handlePlaceOrder = async (req, res) => {
                 color: cartItem.color,
                 image: cartItem.image,
                 price: cartItem.price,
-                status: 'pending',
                 subtotal: cartItem.quantity * cartItem.price,
                 orginalPrice: cartItem.orginalPrice
             }));
@@ -212,7 +210,6 @@ const handlePlaceOrder = async (req, res) => {
                 color: cartItem.color,
                 image: cartItem.image,
                 price: cartItem.price,
-                status: 'verified',
                 subtotal: cartItem.quantity * cartItem.price,
                 orginalPrice: cartItem.orginalPrice
             }));
