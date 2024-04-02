@@ -63,7 +63,7 @@ const renderDashboard = async (req, res) => {
                 }
             }
         ]),
-        Order.find({}, { status: 1, total: 1, paymentMethod: 1, createdAt: 1, "address.name": 1, totalPrice:1 }).sort({ createdAt: -1 }).limit(10)
+        Order.find({}, { status: 1, total: 1, paymentMethod: 1, createdAt: 1, "address.name": 1, totalPrice: 1 }).sort({ createdAt: -1 }).limit(10)
     ])
     const currentMonthTotalRevenue = currentMonthRevenue.length > 0 ? currentMonthRevenue[0].totalRevenue : 0;
 
@@ -375,16 +375,43 @@ const handleLogout = (req, res) => {
 
 const renderSalesReport = async (req, res) => {
     try {
-        const orders = await Order.find({ status: "delivered" })
-        const overallSalesCount = await Order.find({ status: "delivered" }).countDocuments();
+        // Extracting fromDate and toDate from query parameters
+        const fromDate = req.query.fromDate;
+        const toDate = req.query.toDate;
+
+        // Constructing the filter object based on the provided dates
+        const filter = { status: "delivered" };
+        if (fromDate && toDate) {
+            // Convert the "toDate" string to the end of the day
+            const endOfDay = new Date(toDate);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            filter.createdAt = { $gte: new Date(fromDate), $lte: endOfDay };
+        }
+
+        // Retrieving orders based on the filter
+        const orders = await Order.find(filter);
+
+        // Calculating overall sales count, order amount, and discount amount
+        const overallSalesCount = await Order.countDocuments(filter);
         const overallOrderAmount = orders.reduce((acc, order) => acc + order.totalPrice, 0);
         const overallDiscountAmount = orders.reduce((acc, order) => acc + order.discount, 0);
-        console.log(orders);
-        res.render('admin/sales-report', { data: orders, salesReportActive: true, overallSalesCount, overallOrderAmount, overallDiscountAmount })
+
+        // Rendering the sales report template with the retrieved data
+        res.render('admin/sales-report', {
+            data: orders,
+            salesReportActive: true,
+            overallSalesCount,
+            overallOrderAmount,
+            overallDiscountAmount,
+            fromDate,
+            toDate
+        });
     } catch (error) {
         console.error(error);
     }
 }
+
 
 const getSalesData = async (req, res) => {
     var option = req.query.option;
@@ -491,7 +518,8 @@ const downloadExcel = async (req, res) => {
         worksheet.columns = [
             { header: 'Order ID', key: 'orderId', width: 50 },
             { header: 'Customer', key: 'customer', width: 30 },
-            { header: 'Date', key: 'date', width: 30 },
+            { header: 'Date', key: 'date', width: 40 },
+            { header: 'Discount', key: 'discount', width: 15 },
             { header: 'Total', key: 'totalAmount', width: 15 },
             { header: 'Payment', key: 'payment', width: 15 },
         ];
@@ -505,6 +533,7 @@ const downloadExcel = async (req, res) => {
                 customer: order.name,
                 date: order.date,
                 payment: order.payment,
+                discount: order.discount,
                 totalAmount: order.totalAmount,
             });
         });

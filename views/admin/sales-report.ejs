@@ -1,9 +1,10 @@
 <%- include("../partials/admin-header") %>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
 
     <!-- Include autoTable plugin -->
     <style>
+        
         .pagination {
             display: flex;
             justify-content: center;
@@ -45,10 +46,9 @@
 
         <div class="card mb-4">
             <header class="card-header">
-                <div class="row gx-3">
-
-
-                    <div class="col-lg-2 col-6 col-md-3">
+                <div class="row gx-3 align-items-center">
+                    <!-- Uncomment and adjust the select dropdown as needed -->
+                    <!-- <div class="col-lg-2 col-6 col-md-3">
                         <select id="salesOption" class="form-select">
                             <option value="" disabled selected>Select an option</option>
                             <option value="salesToday">Sales Today</option>
@@ -56,21 +56,31 @@
                             <option value="salesMonthly">Sales This Month</option>
                             <option value="salesYearly">Sales This Year</option>
                         </select>
-
-                    </div>
+                    </div> -->
                     <div class="col-md-2 col-6">
-                        <input type="date" id="salesDate" class="form-control" value="<%= locals.date ? date : '' %>"
-                            onchange="dateWiseFilter()">
+                        <div class="row gx-2">
+                            <div class="form-group">
+                                <label for="fromDate">From</label>
+                                <input type="date" id="fromDate" class="form-control" value="<%= locals.fromDate %>">
+                            </div>
+                            <div class="form-group">
+                                <label for="toDate">To</label>
+                                <input type="date" id="toDate" class="form-control" onchange="dateWiseFilter()" value="<%= locals.toDate %>">
+                            </div>
+                            
+                            <div class="col-md-12 col-6">
+                                <button class="btn btn-sm btn-secondary" onclick="clearFilter()">Clear Filter</button>
+                            </div>
+                        </div>
                     </div>
-
                     <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                         <a href="" id="download-pdf" class="btn btn-primary mb-2">Generate PDF</a>
                         <a href="" id="downloadExcelReport" class="btn btn-success mb-2">Download Excel</a>
                     </div>
-
                 </div>
             </header>
         </div>
+        
 
 
 
@@ -83,7 +93,7 @@
                             <th>#</th>
                             <th> Data ID</th>
                             <th scope="col">Customer Name</th>
-                            <th scope="col">Date</th>
+                            <th scope="col">Date & Time</th>
                             <th scope="col">payment</th>
                             <th scope="col">Status</th>
                             <th scope="col">Discount</th>
@@ -153,7 +163,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <button id="download-pdf" onclick="">Download as PDF</button>
             </div>
 
 
@@ -195,31 +204,31 @@
 
     <script>
 
-        document.getElementById('salesOption').addEventListener('change', function () {
-            var selectedOption = this.value;
-            if (selectedOption) {
-                fetch('/admin/getSalesData?option=' + selectedOption)
-                    .then(response => response.json())
-                    .then(data => {
-                        var tableBody = document.getElementById('salesTableBody');
-                        tableBody.innerHTML = ''; // Clear the table body
-                        data.forEach((item, index) => {
-                            var row = document.createElement('tr');
-                            row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${item._id}</td>
-                        <td><b>${item.address.name}</b></td>
-                        <td>${new Date(item.createdAt).toLocaleString('en-IN')}</td>
-                        <td>${item.paymentMethod}</td>
-                        <td>${item.status}</td>
-                        <td>${item.discount}</td>
-                        <td class="text-end">${item.totalPrice}</td>
-                    `;
-                            tableBody.appendChild(row);
-                        });
-                    });
-            }
-        });
+        // document.getElementById('salesOption').addEventListener('change', function () {
+        //     var selectedOption = this.value;
+        //     if (selectedOption) {
+        //         fetch('/admin/getSalesData?option=' + selectedOption)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 var tableBody = document.getElementById('salesTableBody');
+        //                 tableBody.innerHTML = ''; // Clear the table body
+        //                 data.forEach((item, index) => {
+        //                     var row = document.createElement('tr');
+        //                     row.innerHTML = `
+        //                 <td>${index + 1}</td>
+        //                 <td>${item._id}</td>
+        //                 <td><b>${item.address.name}</b></td>
+        //                 <td>${new Date(item.createdAt).toLocaleString('en-IN')}</td>
+        //                 <td>${item.paymentMethod}</td>
+        //                 <td>${item.status}</td>
+        //                 <td>${item.discount}</td>
+        //                 <td class="text-end">${item.totalPrice}</td>
+        //             `;
+        //                     tableBody.appendChild(row);
+        //                 });
+        //             });
+        //     }
+        // });
 
 
         // document.getElementById('createSalesReport').addEventListener('click', async (event) => {
@@ -294,15 +303,18 @@
                 const name = row.cells[2].textContent;
                 const date = row.cells[3].textContent;
                 const payment = row.cells[4].textContent
-                let totalAmount = row.cells[6].textContent.trim();
+                let totalAmount = row.cells[7].textContent.trim();
                 totalAmount = parseFloat(totalAmount.replace(/[^0-9]/g, ''), 10);
+                let discount = row.cells[6].textContent.trim();
+                discount = parseFloat(discount.replace(/[^0-9]/g, ''), 10);
                 // Do something with these values, for example, log them                
                 const dataData = {
                     orderId: orderId,
                     name: name,
                     date: date,
                     totalAmount: totalAmount,
-                    payment: payment
+                    payment: payment,
+                    discount: discount
                 }
 
                 salesData.push(dataData);
@@ -334,38 +346,38 @@
             }
         })
 
-        function dateWiseFilter() {
-            const salesDate = document.getElementById('salesDate').value;
-            fetch(`/admin/salesDateWise?date=${salesDate}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log(data);
-                    var tableBody = document.getElementById('salesTableBody');
-                    tableBody.innerHTML = ''; // Clear the table body
-                    data.forEach((item, index) => {
-                        var row = document.createElement('tr');
-                        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${item._id}</td>
-            <td><b>${item.address.name}</b></td>
-            <td>${new Date(item.createdAt).toLocaleString('en-IN')}</td>
-            <td>${item.paymentMethod}</td>
-            <td>${item.status}</td>
-            <td>${item.discount}</td>
-            <td class="text-end">${item.totalPrice}</td>
-            `;
-                        tableBody.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        }
+        // function dateWiseFilter() {
+        //     const salesDate = document.getElementById('salesDate').value;
+        //     fetch(`/admin/salesDateWise?date=${salesDate}`)
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error('Network response was not ok');
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             console.log(data);
+        //             var tableBody = document.getElementById('salesTableBody');
+        //             tableBody.innerHTML = ''; // Clear the table body
+        //             data.forEach((item, index) => {
+        //                 var row = document.createElement('tr');
+        //                 row.innerHTML = `
+        //     <td>${index + 1}</td>
+        //     <td>${item._id}</td>
+        //     <td><b>${item.address.name}</b></td>
+        //     <td>${new Date(item.createdAt).toLocaleString('en-IN')}</td>
+        //     <td>${item.paymentMethod}</td>
+        //     <td>${item.status}</td>
+        //     <td>${item.discount}</td>
+        //     <td class="text-end">${item.totalPrice}</td>
+        //     `;
+        //                 tableBody.appendChild(row);
+        //             });
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching data:', error);
+        //         });
+        // }
 
 
 
@@ -387,8 +399,17 @@
         //     // })
         // }
 
-
-
+        function dateWiseFilter() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            console.log(fromDate, toDate);
+            const url = `/admin/sales-report?fromDate=${fromDate}&toDate=${toDate}`;
+            console.log(url);
+            window.location.href = url
+        }
+         function clearFilter() {
+            window.location.href = '/admin/sales-report'
+         }
     </script>
 
 
