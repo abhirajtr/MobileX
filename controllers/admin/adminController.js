@@ -34,7 +34,7 @@ const renderDashboard = async (req, res) => {
     const currentMonth = currentDate.getMonth() + 1; // Months are zero-based, so add 1 to get the correct month
     const currentYear = currentDate.getFullYear();
 
-    const [data, productsCount, currentMonthRevenue] = await Promise.all([
+    const [data, productsCount, currentMonthRevenue, recentOrders] = await Promise.all([
         Order.aggregate([
             { $match: { status: 'delivered' } }, // Filter only delivered orders
             {
@@ -62,7 +62,8 @@ const renderDashboard = async (req, res) => {
                     totalRevenue: { $sum: "$totalPrice" } // Calculate total revenue for the current month
                 }
             }
-        ])
+        ]),
+        Order.find({}, { status: 1, total: 1, paymentMethod: 1, createdAt: 1, "address.name": 1, totalPrice:1 }).sort({ createdAt: -1 }).limit(10)
     ])
     const currentMonthTotalRevenue = currentMonthRevenue.length > 0 ? currentMonthRevenue[0].totalRevenue : 0;
 
@@ -147,6 +148,7 @@ const renderDashboard = async (req, res) => {
         console.log('Recent sales:', recentSales);
         console.log('Recent users:', recentUsers);
         console.log('Recent products:', recentProducts);
+        console.log('recenkt Orderes', recentOrders);
 
         // Map sales data to array
         const salesCountArray = mapDataToCountArray(recentSales);
@@ -166,7 +168,8 @@ const renderDashboard = async (req, res) => {
             productsCount,
             usersData: usersCountArray,
             productsData: productsCountArray,
-            currentMonthTotalRevenue
+            currentMonthTotalRevenue,
+            recentOrders
         });
 
         // Function to map data to count array
@@ -206,7 +209,7 @@ const renderDashboard = async (req, res) => {
                 }
             ]),
             // Retrieve monthly users data
-            Order.aggregate([
+            User.aggregate([
                 {
                     $group: {
                         _id: { $month: "$createdAt" }, // Group by month and year
@@ -225,7 +228,7 @@ const renderDashboard = async (req, res) => {
                 }
             ]),
             // Retrieve monthly products data
-            Order.aggregate([
+            Product.aggregate([
                 {
                     $group: {
                         _id: { $month: "$createdAt" }, // Group by month and year
