@@ -19,6 +19,7 @@ router.get('/block-user', userController.blockUser);
 router.get('/unblock-user', userController.unblockUser);
 router.get('/edit-user', userController.renderEditUser);
 router.post('/edit-user', userController.handleEdituser);
+router.post('/downloadPDF', adminController.handleDownloadPDF);
 
 // Products route
 router.get('/products', productController.renderProducts);

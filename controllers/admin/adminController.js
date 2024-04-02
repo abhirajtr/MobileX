@@ -4,6 +4,8 @@ const Order = require('../../models/orderModel');
 const Product = require('../../models/productModel');
 const User = require('../../models/userModel');
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 const renderLogin = (req, res) => {
     res.render('admin/login');
@@ -26,6 +28,7 @@ const handleLogin = async (req, res) => {
     }
 }
 const renderDashboard = async (req, res) => {
+    let status = 'Weekly';
     const filter = req.query.filter ? req.query.filter : 'weekly';
     console.log('filter', filter);
     // let salesdata;
@@ -169,7 +172,8 @@ const renderDashboard = async (req, res) => {
             usersData: usersCountArray,
             productsData: productsCountArray,
             currentMonthTotalRevenue,
-            recentOrders
+            recentOrders,
+            status
         });
 
         // Function to map data to count array
@@ -184,6 +188,7 @@ const renderDashboard = async (req, res) => {
 
     }
     if (filter == 'monthly') {
+        status = 'Monthly';
         // Execute all aggregate queries concurrently using Promise.all
         const [salesMonthly, usersMonthly, productsMonthly] = await Promise.all([
             // Retrieve monthly sales data
@@ -267,7 +272,8 @@ const renderDashboard = async (req, res) => {
             usersData: usersMonthlyArray,
             productsData: productsMonthlyArray,
             currentMonthTotalRevenue,
-            recentOrders
+            recentOrders,
+            status
         });
 
         // Function to map data to monthly array
@@ -646,6 +652,102 @@ const getSalesCountArray = (salesData, days) => {
 };
 
 
+// const handleDownloadPDF = (req, res) => {
+//     try {
+//         let tableData = req.body.tableData;
+
+//         // Create a new PDF document
+//         const doc = new PDFDocument();
+
+//         // Set the headers for the response to prompt download
+//         res.setHeader('Content-Type', 'application/pdf');
+//         res.setHeader('Content-Disposition', 'attachment; filename=table.pdf');
+
+//         // Pipe the PDF document to the response
+//         doc.pipe(res);
+
+//         // Add table to the PDF document
+//         doc.table(tableData, {
+//             headers: ['OrderId', 'Customer', 'Country'], // Headers for the table
+//             // Custom styling for the table
+//             prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+//             prepareRow: (row, i) => doc.font('Helvetica').fontSize(12),
+//             // Alignment of table cells
+//             align: ['left', 'center', 'right']
+//         });
+
+//         // Finalize the PDF document
+//         doc.end();
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Error generating PDF');
+//     }
+// };
+
+
+
+const handleDownloadPDF = (req, res) => {
+    try {
+        const doc = new PDFDocument();
+        const filename = 'sales-report.pdf';
+        const orders = req.body.tableData;
+        // console.log(orders);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        doc.pipe(res);
+        doc.fontSize(12);
+        doc.text('Sales Report', { align: 'center', fontSize: 16 });
+        const margin = 5;
+        doc
+            .moveTo(margin, margin)
+            .lineTo(600 - margin, margin)
+            .lineTo(600 - margin, 842 - margin)
+            .lineTo(margin, 600 - margin)
+            .lineTo(margin, margin)
+            .lineTo(600 - margin, margin)
+            .lineWidth(3)
+            .strokeColor('#000000')
+            .stroke();
+
+        doc.moveDown();
+
+
+        const headers = ['Order ID', 'Name', 'Date', 'Total'];
+
+        let headerX = 20;
+        const headerY = doc.y + 10;
+
+        doc.text(headers[0], headerX, headerY);
+        headerX += 200;
+
+        headers.slice(1).forEach(header => {
+            doc.text(header, headerX, headerY);
+            headerX += 130;
+        });
+
+        let dataY = headerY + 25;
+
+        orders.forEach(order => {
+            const cleanedDataId = order.orderId.trim();
+            const cleanedName = order.name.trim();
+
+            doc.text(cleanedDataId, 20, dataY, { width: 200 });
+            doc.text(cleanedName, 230, dataY, { width: 130 });
+            doc.text(cleanedDate, 300, dataY, { width: 130 });
+            doc.text(order.totalAmount, 490, dataY);
+
+            dataY += 30;
+        });
+
+
+
+        doc.end();
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+
 
 module.exports = {
     renderLogin,
@@ -661,5 +763,6 @@ module.exports = {
     renderSalesReport,
     getSalesData,
     downloadExcel,
-    dateWiseFiter
+    dateWiseFiter,
+    handleDownloadPDF
 }
