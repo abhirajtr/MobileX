@@ -266,7 +266,8 @@ const renderDashboard = async (req, res) => {
             productsCount,
             usersData: usersMonthlyArray,
             productsData: productsMonthlyArray,
-            currentMonthTotalRevenue
+            currentMonthTotalRevenue,
+            recentOrders
         });
 
         // Function to map data to monthly array
