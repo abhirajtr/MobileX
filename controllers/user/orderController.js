@@ -377,7 +377,7 @@ const handleCancelOrder = async (req, res) => {
             );
         });
 
-        if (cancelOrder.paymentMethod == 'razorpay' || cancelOrder.paymentMethod == 'wallet') {
+        if ((cancelOrder.paymentMethod === 'razorpay' || cancelOrder.paymentMethod === 'wallet') && cancelOrder.status !== 'pending') {
             const user = await User.findById(req.session.user, { walletBalance: 1 });
             const updatedBalance = user.walletBalance + cancelOrder.totalPrice;
             const updatedUser = await User.findByIdAndUpdate(req.session.user, {

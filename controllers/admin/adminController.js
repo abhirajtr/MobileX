@@ -712,7 +712,7 @@ const handleDownloadPDF = (req, res) => {
         doc.moveDown();
 
 
-        const headers = ['Order ID', 'Name', 'Date', 'Total'];
+        const headers = ['Order ID', 'Name', 'Date and Time', 'Total'];
 
         let headerX = 20;
         const headerY = doc.y + 10;
@@ -733,7 +733,7 @@ const handleDownloadPDF = (req, res) => {
 
             doc.text(cleanedDataId, 20, dataY, { width: 200 });
             doc.text(cleanedName, 230, dataY, { width: 130 });
-            doc.text(cleanedDate, 300, dataY, { width: 130 });
+            doc.text(order.date, 300, dataY, { width: 130 });
             doc.text(order.totalAmount, 490, dataY);
 
             dataY += 30;

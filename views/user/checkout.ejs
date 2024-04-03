@@ -234,7 +234,7 @@
             const walletBalance = parseFloat(document.getElementById('walletBalance').textContent);
             // Get the total amount
             const totalAmount = parseFloat(document.getElementById('totalPrice').textContent); // Assuming you have an element with id "totalPrice" displaying the total amount
-            
+
             // If the selected payment option is "wallet"
             if (paymentOption === "wallet") {
                 // If total amount is greater than wallet balance, show SweetAlert
@@ -402,49 +402,54 @@
                 success: function (response) {
                     console.log(response);
                     if (response.paymentMethod == 'razorpay') {
-                        var options = {
-                            "key": "rzp_test_2hyTCJ2qBkwleR", // Enter the Key ID generated from the Dashboard
-                            // "amount": "5000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                            "currency": "INR",
-                            "name": "MobileX",
-                            "description": "Test Transaction",
-                            "image": "https://example.com/your_logo",
-                            "order_id": response.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                            // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
-                            "prefill": {
-                                "name": "Gaurav Kumar",
-                                "email": "gaurav.kumar@example.com",
-                                "contact": "9000090000"
-                            },
-                            "notes": {
-                                "address": "Razorpay Corporate Office"
-                            },
-                            "handler": function (response) {
-                                // alert('Payment successful: ' + response.razorpay_payment_id);
-                                var settings = {
-                                    "url": "/verify-payment",
-                                    "method": "POST",
-                                    "timeout": 0,
-                                    "headers": {
-                                        "Content-Type": "application/json"
-                                    },
-                                    "data": JSON.stringify({ response }),
-                                    success: (response) => {
-                                        // console.log(response);
-                                        if (response.redirect) {
-                                            window.location.href = response.redirect;
+                        if (response.error) {
+                            console.log(error);
+                            window.location.href = '/payment-failed'
+                        } else {
+                            var options = {
+                                "key": "rzp_test_2hyTCJ2qBkwleR", // Enter the Key ID generated from the Dashboard
+                                // "amount": "5000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                                "currency": "INR",
+                                "name": "MobileX",
+                                "description": "Test Transaction",
+                                "image": "https://example.com/your_logo",
+                                "order_id": response.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                                // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                                "prefill": {
+                                    "name": "Gaurav Kumar",
+                                    "email": "gaurav.kumar@example.com",
+                                    "contact": "9000090000"
+                                },
+                                "notes": {
+                                    "address": "Razorpay Corporate Office"
+                                },
+                                "handler": function (response) {
+                                    // alert('Payment successful: ' + response.razorpay_payment_id);
+                                    var settings = {
+                                        "url": "/verify-payment",
+                                        "method": "POST",
+                                        "timeout": 0,
+                                        "headers": {
+                                            "Content-Type": "application/json"
+                                        },
+                                        "data": JSON.stringify({ response }),
+                                        success: (response) => {
+                                            // console.log(response);
+                                            if (response.redirect) {
+                                                window.location.href = response.redirect;
+                                            }
                                         }
                                     }
+                                    $.ajax(settings);
+                                },
+                                "theme": {
+                                    "color": "#3399cc"
                                 }
-                                $.ajax(settings);
-                            },
-                            "theme": {
-                                "color": "#3399cc"
-                            }
-                        };
-                        console.log(response);
-                        var rzp1 = new Razorpay(options);
-                        rzp1.open();
+                            };
+                            console.log(response);
+                            var rzp1 = new Razorpay(options);
+                            rzp1.open();
+                        }
                     }
                     else {
                         window.location.href = response.redirect;
