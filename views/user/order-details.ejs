@@ -31,6 +31,9 @@
                     </div>
                     <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                         <% if (order.status == 'delivered') { %>
+                            <a class="btn btn-secondary" onclick="invoiceDownload('<%= order._id %>')">Downlod Invoice</a>
+                        <%}%>
+                        <% if (order.status == 'delivered') { %>
                             <a class="btn btn-light" onclick="confirmReturn('<%= order._id %>')">Return</a>
                         <% } else if (order.status == 'cancelled') { %>
                             <a class="btn btn-secondary disabled" href="#">Cancelled</a>
@@ -161,7 +164,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function confirmCancel(orderId) {
-            swal({
+            swal.fire({
                 title: "Are you sure?",
                 text: "Once cancelled, you will not be able to undo this action!",
                 icon: "warning",
@@ -251,6 +254,12 @@
                     rzp1.open();
                 }
             })
+        }
+
+
+        function invoiceDownload(orderId) {
+            event.preventDefault();
+            fetch(`/download-invoice?orderId=${orderId}`)   
         }
     </script>
     <%- include('../partials/user-footer') %>

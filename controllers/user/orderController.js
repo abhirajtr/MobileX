@@ -365,6 +365,7 @@ const handleCancelOrder = async (req, res) => {
         //     $set: { "products.$.status": "cancelled" }
         // });
         const cancelOrder = await Order.findByIdAndUpdate(orderId, { $set: { status: 'cancelled' } });
+        console.log(cancelOrder);
         // await Product.findOneAndUpdate({ _id: productId }, { $inc: { quantity: updatedOrder.products[0].quantity, purchaseCount: -updatedOrder.products[0].quantity } });
         // res.status(200).json({ status: 'success' });
         cancelOrder.products.forEach(async (product) => {
@@ -375,6 +376,23 @@ const handleCancelOrder = async (req, res) => {
                 { new: true } // Return the updated document
             );
         });
+
+        if (cancelOrder.paymentMethod == 'razorpay' || cancelOrder.paymentMethod == 'wallet') {
+            const user = await User.findById(req.session.user, { walletBalance: 1 });
+            const updatedBalance = user.walletBalance + cancelOrder.totalPrice;
+            const updatedUser = await User.findByIdAndUpdate(req.session.user, {
+                $inc: { walletBalance: cancelOrder.totalPrice },
+                $push: {
+                    walletHistory: {
+                        type: "credit",
+                        amount: cancelOrder.totalPrice,
+                        balance: updatedBalance, // Use the calculated updated balance here
+                        description: 'Product cancellation',
+                        date: Date.now()
+                    }
+                }
+            }, { new: true });
+        }
         res.redirect(`/order-details?id=${orderId}`);
     } catch (error) {
         console.error(error);
@@ -429,6 +447,110 @@ const verifypaymentPending = async (req, res) => {
         return false;
     }
 }
+var easyinvoice = require('easyinvoice');
+var fs = require('fs');
+const handleInvoiceDownload = async (req, res) => {
+    try {
+        // Validate the orderId query parameter
+        if (!req.query.orderId) {
+            return res.status(400).send({ error: 'Order ID is required' });
+        }
+
+        // Fetch the order data
+        const orderData = await Order.findOne({ _id: req.query.orderId }, { products: 1, discount: 1, totalPrice: 1, shippingCharge: 1 });
+
+        // Check if the order exists
+        if (!orderData) {
+            return res.status(404).send({ error: 'Order not found' });
+        }
+
+        // Map the products to the required format
+        const products = orderData.products.map(product => ({
+            quantity: product.quantity,
+            description: `${product.productName} - ${product.brand}`, // Customize as needed
+            price: product.price,
+            total: product.subtotal
+        }));
+        const discount = orderData.discount;
+        const totalPrice = orderData.totalPrice;
+        products.push(
+            // { description: 'Discount', price: -discount, total: -discount },
+            { description: 'Shipping', price: 40, total: 40 },
+        );
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: 'long',
+            day: '2-digit'
+        });
+        // Prepare the invoice data
+        const data = {
+            "currency": "INR",
+            "taxNotation": "vat", //or gst
+            "marginTop": 25,
+            "marginRight": 25,
+            "marginLeft": 25,
+            "marginBottom": 25,
+            "logo": "https://public.easyinvoice.cloud/img/logo_en_original.png", //or base64
+            "information": {
+                // Invoice number
+                number: "2021.0001",
+                // Invoice data
+                date: formattedDate,
+            },
+            "fields": {
+                "tax": false,
+                "discounts": {
+                    "discount": {
+                        "amount": discount,
+                        "description": "Discount"
+                    }
+                },
+                "shipping": {
+                    "amount": 40,
+                    "description": "Shipping"
+                },
+                "total": {
+                    "amount": totalPrice,
+                    "label": "Total"
+                }
+            },
+            "sender": {
+                "company": "Sample Company",
+                "address": "Sample Street 123",
+                "zip": "1234 AB",
+                "city": "Sample City",
+                "country": "Sample Country"
+            },
+            "client": {
+                "company": "Client Corp",
+                "address": "Clientstreet 456",
+                "zip": "4567 CD",
+                "city": "Clientcity",
+                "country": "Clientcountry"
+            },
+            "invoiceNumber": "20220402",
+            "invoiceDate": new Date().toISOString(), // Use ISO string format for consistency
+            "products": products,
+            "shipping": 40,
+            "bottomNotice": "Kindly pay your invoice within 15 days."
+        };
+
+        // Generate the invoice
+        const result = await easyinvoice.createInvoice(data);
+        const pdfBuffer = Buffer.from(result.pdf, 'base64');
+
+        // Send the PDF as a response
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=invoice.pdf');
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'An error occurred while generating the invoice' });
+    }
+}
+
+
 
 
 module.exports = {
@@ -438,5 +560,6 @@ module.exports = {
     renderOrderSuccess,
     handleReturnProduct,
     payPending,
-    verifypaymentPending
+    verifypaymentPending,
+    handleInvoiceDownload
 }
