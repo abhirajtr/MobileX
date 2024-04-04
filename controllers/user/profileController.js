@@ -13,6 +13,15 @@ var instance = new Razorpay({
 
 const renderProfile = async (req, res) => {
     try {
+        let page = req.query.page;
+        let orderActive = false;
+        if (!page) {
+            page = 1;
+        } else {
+            orderActive= true
+        }
+        const skip = page -1;
+        console.log(page);
         const userId = new mongoose.Types.ObjectId(req.session.user);
         // const user = await User.findOne({ _id: userId });
         // const addresses = await Address.findOne({ userId }, { _id: 0, address: 1 });
@@ -34,8 +43,15 @@ const renderProfile = async (req, res) => {
                     $sort: {
                         createdAt: -1
                     }
+                },
+                {
+                    $skip:  skip*5
+                },
+                {
+                    $limit: 5
                 }
             ])
+
         ])
         // console.log('user', user);
         // console.log(addresses);
@@ -61,7 +77,7 @@ const renderProfile = async (req, res) => {
         //     }
         // ])
         // console.log('Orders', userOrders);
-        res.render('user/profile', { user, addresses, orders: userOrders, count: req.session.count });
+        res.render('user/profile', { user, addresses, orders: userOrders, count: req.session.count, orderActive });
     } catch (error) {
         console.error(error);
     }
@@ -214,7 +230,7 @@ const verifyWalletPayment = async (req, res) => {
                         type: "credit", // Type of transaction (e.g., credit)
                         amount: addAmount, // Amount credited
                         balance: updatedBalance,
-                        description: "Added funds manually by user", 
+                        description: "Added funds manually by user",
                         date: Date.now()
                     }
                 }
@@ -253,12 +269,12 @@ const redeemReferralCode = async (req, res) => {
         }
         if (foundReferralCode) {
             await User.updateOne(
-                { _id: req.session.user }, 
-                { 
+                { _id: req.session.user },
+                {
                     $set: { redeemed: true },
                     $inc: { walletBalance: 100 },
                     $push: {
-                        walletHistory: { 
+                        walletHistory: {
                             type: "credit",
                             amount: 100,
                             balance: user.walletBalance + 100,
@@ -267,8 +283,8 @@ const redeemReferralCode = async (req, res) => {
                     }
                 }
             );
-            
-            return res.status(200).json({status: true, message: 'Referral code successfully redeemed. ₹100 added to your wallet balance.' });
+
+            return res.status(200).json({ status: true, message: 'Referral code successfully redeemed. ₹100 added to your wallet balance.' });
         }
         res.status(400).json({ error: 'Invalid referral code. Please provide a valid referral code and try again.' });
     } catch (error) {

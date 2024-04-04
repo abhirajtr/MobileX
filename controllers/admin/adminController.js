@@ -36,6 +36,7 @@ const renderDashboard = async (req, res) => {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1; // Months are zero-based, so add 1 to get the correct month
     const currentYear = currentDate.getFullYear();
+    const products = await Product.find();
 
     const [data, productsCount, currentMonthRevenue, recentOrders] = await Promise.all([
         Order.aggregate([
@@ -173,7 +174,8 @@ const renderDashboard = async (req, res) => {
             productsData: productsCountArray,
             currentMonthTotalRevenue,
             recentOrders,
-            status
+            status,
+            products
         });
 
         // Function to map data to count array
