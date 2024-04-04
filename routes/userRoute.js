@@ -44,9 +44,10 @@ router.get('/auth/google',
 passport.authenticate('google', { scope: ['email', 'profile'] })
 );
 
-router.get('/auth/google/callback', passport.authenticate('google', { successRedirect:'/', failureRedirect: '/auth/failure' }), (req, res) => {
+router.get('/auth/google/callback', passport.authenticate('google', { successRedirect:'/google-verified', failureRedirect: '/auth/failure' }), (req, res) => {
     console.log('user details' ,req.user);
 });
+router.get('/google-verified', authController.handelGoogleVerifiedLogin)
 router.get('/auth/failure', (req, res) => {
     res.send('<h1>Google authentication failure</h1>');
 })

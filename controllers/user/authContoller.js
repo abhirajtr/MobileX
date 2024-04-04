@@ -9,6 +9,27 @@ const sendMail = require('../../configs/nodemailer');
 // const { v4: uuidv4 } = require('uuid');
 const generateReferralCode = require('../../configs/generateReferralCode');
 
+const handelGoogleVerifiedLogin = async (req, res) => {
+    try {
+        console.log(req.session);
+        req.session.user = req.session.passport.user._id;
+        delete req.session.passport;
+        console.log(req.session.user);
+        const foundUser = await User.findById(req.session.user);
+        req.session.count = {};
+        if (foundUser.cart) {
+            req.session.count.cart = foundUser.cart.length;
+            // console.log("Number of items in cart:", numberOfItemsInCart);
+        }
+        if (foundUser.wishlist) {
+            req.session.count.wishlist = foundUser.wishlist.length;
+        }
+        res.redirect('/');
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const renderLogin = (req, res) => {
     if (req.session.user) {
         // console.log(req.session.user);
@@ -199,4 +220,5 @@ module.exports = {
     handleForgotPasswordOtp,
     renderForgotPassword,
     handleForgotPassword,
+    handelGoogleVerifiedLogin
 }
