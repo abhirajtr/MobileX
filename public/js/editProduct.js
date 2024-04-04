@@ -140,7 +140,7 @@ $('document').ready(() => {
             return false;
         }
         if (quantity.val().trim() === "" || isNaN(Number(quantity.val().trim())) || Number(quantity.val().trim()) < 1) {
-            displayMessage('qunatity', `Please enter a valid quantity greter than 0`);
+            displayMessage('quantity', `Please enter a valid quantity greter than 0`);
             quantity.focus();
             return false;
         }

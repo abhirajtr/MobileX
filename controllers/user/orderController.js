@@ -457,7 +457,7 @@ const handleInvoiceDownload = async (req, res) => {
         }
 
         // Fetch the order data
-        const orderData = await Order.findOne({ _id: req.query.orderId }, { products: 1, discount: 1, totalPrice: 1, shippingCharge: 1 });
+        const orderData = await Order.findOne({ _id: req.query.orderId }, { products: 1, discount: 1, totalPrice: 1 , address: 1});
 
         // Check if the order exists
         if (!orderData) {
@@ -516,18 +516,17 @@ const handleInvoiceDownload = async (req, res) => {
                 }
             },
             "sender": {
-                "company": "Sample Company",
-                "address": "Sample Street 123",
+                "company": "Mobiex",
+                "address": "Street 123",
                 "zip": "1234 AB",
-                "city": "Sample City",
-                "country": "Sample Country"
+                "city": "Mumbai",
+                "country": "India"
             },
             "client": {
-                "company": "Client Corp",
-                "address": "Clientstreet 456",
-                "zip": "4567 CD",
-                "city": "Clientcity",
-                "country": "Clientcountry"
+                "address": orderData.address.name,
+                "zip": orderData.address.pincode,
+                "city": orderData.address.city,
+                "country": "India"
             },
             "invoiceNumber": "20220402",
             "invoiceDate": new Date().toISOString(), // Use ISO string format for consistency

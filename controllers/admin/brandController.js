@@ -29,8 +29,20 @@ const handleAddBrand = async (req, res) => {
     }
 }
 
+const handleBlockUnblock = async (req, res) => {
+    try {
+        console.log(req.body);
+        const { isBlocked, brandId } = req.body;
+        await Brand.findByIdAndUpdate(brandId, { $set: { isBlocked: isBlocked } });
+        res.status(200).json({ status: true });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     renderBrands,
     renderAddBrand,
     handleAddBrand,
+    handleBlockUnblock
 }

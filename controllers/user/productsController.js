@@ -103,9 +103,27 @@ const renderShop = async (req, res) => {
                     isBlocked: false
                 }
             },
+            // Perform a left outer join with the Brand collection
+            {
+                $lookup: {
+                    from: "brands", // assuming the name of your brands collection is "brands"
+                    localField: "brand",
+                    foreignField: "name",
+                    as: "brand"
+                }
+            },
+            // Unwind the "brand" array to destructure it
+            { $unwind: "$brand" },
+            // Filter out products with blocked brands
+            {
+                $match: {
+                    "brand.isBlocked": false
+                }
+            },
             // Limit the results to 8 products
             { $limit: 8 }
         ]);
+
 
         res.render('user/shop', { shopActive: true, products, productsCount, user: req.session.user ? req.session.user : false, count: req.session.count });
     } catch (error) {

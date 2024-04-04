@@ -44,6 +44,7 @@ router.post('/edit-category', adminController.handleEditCategory);
 router.get('/brands', brandController.renderBrands);
 router.get('/brand-add', brandController.renderAddBrand);
 router.post('/brand-add', brandController.handleAddBrand);
+router.post('/brand-blockUnblock', brandController.handleBlockUnblock);
 
 router.get('/orders', orderController.renderOrders);
 router.get('/order-details', orderController.renderOrderDetails);
