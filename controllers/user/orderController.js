@@ -173,7 +173,7 @@ const handlePlaceOrder = async (req, res) => {
                 userId: userId,
                 products: orderData,
                 paymentMethod: paymentMethod,
-                status: 'pending',
+                status: 'payment failed',
                 totalPrice: totalPrice,
                 address: orderAddress.address[0],
                 discount: findalDiscount
@@ -377,7 +377,7 @@ const handleCancelOrder = async (req, res) => {
             );
         });
 
-        if ((cancelOrder.paymentMethod === 'razorpay' || cancelOrder.paymentMethod === 'wallet') && cancelOrder.status !== 'pending') {
+        if ((cancelOrder.paymentMethod === 'razorpay' || cancelOrder.paymentMethod === 'wallet') && cancelOrder.status !== 'payment failed') {
             const user = await User.findById(req.session.user, { walletBalance: 1 });
             const updatedBalance = user.walletBalance + cancelOrder.totalPrice;
             const updatedUser = await User.findByIdAndUpdate(req.session.user, {

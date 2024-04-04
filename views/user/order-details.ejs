@@ -142,7 +142,7 @@
                                                         <span class="badge rounded-pill alert-success text-success"><%= order.status %></span>
                                                     </dd>
                                                 </dl>
-                                                <% if (order.status == 'pending') { %>
+                                                <% if (order.status == 'payment failed') { %>
                                                     <dl class="dlist">
                                                         <dd>
                                                             <a class="btn btn-light" onclick="paypending('<%= order._id %>')">Pay</a>
