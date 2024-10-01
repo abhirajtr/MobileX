@@ -572,7 +572,6 @@
                                 "address": "Razorpay Corporate Office"
                             },
                             "handler": function (response) {
-                                alert('Payment successful: ' + response.razorpay_payment_id);
                                 var settings = {
                                     "url": "/verify-wallet-payment",
                                     "method": "POST",
